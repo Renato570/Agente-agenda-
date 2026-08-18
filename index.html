@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AgendaSaúde - Mensagens WhatsApp</title>
+
+    <!-- PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0f766e">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AgendaSaúde">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" href="icons/icon-192.png">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-100 min-h-screen font-sans text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-teal-700 text-white shadow-md p-4 sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i data-lucide="calendar-heart" class="w-7 h-7"></i>
+                <h1 class="text-xl font-bold tracking-tight">AgendaSaúde - Mensagens WhatsApp</h1>
+            </div>
+            <button id="openSettingsBtn" class="text-xs bg-teal-800 hover:bg-teal-900 px-3 py-1.5 rounded-lg text-teal-100 border border-teal-600 flex items-center gap-1.5 transition">
+                <i data-lucide="smartphone" class="w-4 h-4"></i>
+                <span id="myPhoneStatus">Cadastrar Meu Nº</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Banner de lembretes pendentes -->
+    <div id="remindersBanner" class="hidden max-w-4xl mx-auto px-4 md:px-6 pt-3">
+        <div class="bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-4 py-3 flex items-center gap-3 text-sm">
+            <i data-lucide="bell-ring" class="w-5 h-5 flex-shrink-0"></i>
+            <span id="remindersBannerText" class="flex-1"></span>
+            <button id="remindersBannerBtn" class="text-xs font-semibold bg-amber-600 text-white px-3 py-1.5 rounded-lg hover:bg-amber-700 transition flex-shrink-0">Ver</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <main id="messageSection" class="max-w-4xl mx-auto p-4 md:p-6 pb-24 grid grid-cols-1 md:grid-cols-12 gap-6">
+
+        <!-- Form Column -->
+        <section class="md:col-span-7 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <h2 class="text-lg font-bold text-slate-700 mb-4 flex items-center gap-2">
+                <i data-lucide="user-plus" class="w-5 h-5 text-teal-600"></i>
+                Agendar Consulta
+            </h2>
+
+            <form id="appointmentForm" class="space-y-4" onsubmit="return false;">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome do Paciente *</label>
+                    <input type="text" id="patientName" required placeholder="Ex: Fulano de Tal"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">WhatsApp do Paciente (com DDD) *</label>
+                    <div class="flex gap-2">
+                        <div class="relative flex-1">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm">+55</span>
+                            <input type="tel" id="patientPhone" required placeholder="(11) 99999-9999"
+                                class="w-full pl-12 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm">
+                        </div>
+                        <button type="button" id="pickContactBtn" title="Escolher dos contatos"
+                            class="flex-shrink-0 px-3 py-2 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg text-teal-700 flex items-center justify-center transition">
+                            <i data-lucide="contact" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    <p id="contactHint" class="hidden text-[11px] text-slate-400 mt-1">Seu navegador não permite escolher contatos direto — digite o número ou cole a partir dos Contatos.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Data *</label>
+                        <input type="date" id="appDate" required
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Horário / A partir de *</label>
+                        <input type="time" id="appTime" required
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm">
+                        <div id="appointmentAvailability" class="hidden mt-1.5 text-xs rounded-lg px-2.5 py-2" role="status" aria-live="polite"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Tipo de Atendimento</label>
+                    <input type="hidden" id="attendanceType" value="scheduled">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <label class="flex items-center gap-2 p-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-teal-50 cursor-pointer transition">
+                            <input type="radio" name="attendanceTypeRadio" value="scheduled" checked
+                                class="w-4 h-4 text-teal-600 focus:ring-teal-500">
+                            <span>
+                                <span class="block text-sm font-medium text-slate-700">Horário Marcado</span>
+                                <span class="block text-[11px] text-slate-400">Paciente deve chegar no horário.</span>
+                            </span>
+                        </label>
+                        <label class="flex items-center gap-2 p-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-teal-50 cursor-pointer transition">
+                            <input type="radio" name="attendanceTypeRadio" value="arrival_order"
+                                class="w-4 h-4 text-teal-600 focus:ring-teal-500">
+                            <span>
+                                <span class="block text-sm font-medium text-slate-700">Ordem de Chegada</span>
+                                <span class="block text-[11px] text-slate-400">Atendimento a partir do horário informado.</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Categoria *</label>
+                        <select id="professionalCategory" required
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm bg-white">
+                            <option value="Médico">Médico</option>
+                            <option value="Enfermeira">Enfermeira</option>
+                            <option value="Dentista">Dentista</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Profissional *</label>
+                        <input type="text" id="doctorName" required placeholder="Ex: Dr. Iago"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo de Consulta *</label>
+                    <input type="text" id="consultType" required placeholder="Ex: Consulta Médica / Pré-natal"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Local / Posto de Saúde</label>
+                    <input type="text" id="location" placeholder="Ex: Unidade Básica de Saúde Central" value="Unidade Básica de Saúde (UBS)"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm">
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="text-xs font-semibold text-slate-600 uppercase">Modelo de Mensagem</label>
+                        <button type="button" id="editTemplateBtn" class="text-xs text-teal-600 hover:underline flex items-center gap-1">
+                            <i data-lucide="edit-3" class="w-3 h-3"></i> Editar Modelo
+                        </button>
+                    </div>
+                    <select id="templateSelect" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm bg-white">
+                        <option value="padrao">Padrão Lembrete Agendamento</option>
+                        <option value="curto">Mensagem Curta e Direta</option>
+                        <option value="documentos">Lembrete com Pedido de Documentos</option>
+                    </select>
+                </div>
+            </form>
+        </section>
+
+        <!-- Preview & Action Column -->
+        <section class="md:col-span-5 flex flex-col gap-4">
+            <div class="bg-emerald-50 border border-emerald-200 p-5 rounded-2xl shadow-sm flex-1 flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <h2 class="text-sm font-bold text-emerald-900 uppercase tracking-wider flex items-center gap-2">
+                            <i data-lucide="message-square" class="w-4 h-4 text-emerald-600"></i>
+                            Pré-visualização
+                        </h2>
+                        <span class="text-xs text-emerald-700 font-medium bg-emerald-100 px-2 py-0.5 rounded">Pronto p/ Enviar</span>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-emerald-100 shadow-inner text-sm whitespace-pre-wrap font-sans text-slate-700 min-h-[220px]" id="messagePreview">
+                        Preencha o formulário para visualizar a mensagem aqui...
+                    </div>
+                </div>
+
+                <div class="mt-4 space-y-2">
+                    <button type="button" id="sendWhatsappBtn"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        Enviar para Paciente
+                    </button>
+
+                    <button type="button" id="sendToSelfBtn"
+                        class="w-full bg-teal-50 hover:bg-teal-100 text-teal-800 font-semibold py-2.5 px-4 border border-teal-200 rounded-xl transition flex items-center justify-center gap-2 text-xs">
+                        <i data-lucide="user-check" class="w-4 h-4 text-teal-600"></i>
+                        Enviar Cópia para Meu Número
+                    </button>
+
+                    <a id="directWaLink" target="_blank" class="hidden text-xs text-center text-teal-700 underline block mt-1">
+                        Clique aqui se a janela não abrir automaticamente
+                    </a>
+
+                    <button type="button" id="copyMsgBtn"
+                        class="w-full bg-white hover:bg-slate-50 text-slate-700 font-semibold py-2.5 px-4 border border-slate-300 rounded-xl transition flex items-center justify-center gap-2 text-xs">
+                        <i data-lucide="copy" class="w-4 h-4 text-slate-500"></i>
+                        Apenas Copiar Texto
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-slate-800 text-slate-200 rounded-xl p-3.5 text-xs flex items-start gap-2.5">
+                <i data-lucide="shield-alert" class="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5"></i>
+                <p>O envio é feito usando o app do WhatsApp (ou Web) conectado no seu aparelho. Nenhum sistema seguro envia mensagens direto sem abrir seu aplicativo por restrição de segurança da Meta.</p>
+            </div>
+        </section>
+
+        <!-- Agendamentos Recentes -->
+        <section class="col-span-1 md:col-span-12 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-base font-bold text-slate-700 flex items-center gap-2">
+                    <i data-lucide="history" class="w-5 h-5 text-teal-600"></i>
+                    Histórico Recente de Lembretes Gerados
+                </h2>
+                <button id="clearHistoryBtn" class="text-xs text-red-500 hover:underline">Limpar Histórico</button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase">
+                            <th class="p-2.5">Paciente</th>
+                            <th class="p-2.5">Data / Hora</th>
+                            <th class="p-2.5">Profissional</th>
+                            <th class="p-2.5">Tipo</th>
+                            <th class="p-2.5 text-right">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody" class="divide-y divide-slate-100">
+                        <tr id="emptyHistoryRow">
+                            <td colspan="5" class="p-4 text-center text-slate-400">Nenhum lembrete gerado ainda.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    <!-- Resumo rápido -->
+    <section id="quickSummary" class="max-w-4xl mx-auto px-4 md:px-6 pb-3">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
+                <p class="text-[10px] uppercase font-bold text-slate-400">Hoje</p>
+                <p id="summaryToday" class="text-xl font-bold text-teal-700">0</p>
+                <p class="text-[10px] text-slate-400">agendamentos</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
+                <p class="text-[10px] uppercase font-bold text-slate-400">Pendentes</p>
+                <p id="summaryPending" class="text-xl font-bold text-amber-600">0</p>
+                <p class="text-[10px] text-slate-400">para avisar</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
+                <p class="text-[10px] uppercase font-bold text-slate-400">Avisados</p>
+                <p id="summarySent" class="text-xl font-bold text-emerald-600">0</p>
+                <p class="text-[10px] text-slate-400">hoje</p>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
+                <p class="text-[10px] uppercase font-bold text-slate-400">Confirmados</p>
+                <p id="summaryConfirmed" class="text-xl font-bold text-blue-600">0</p>
+                <p class="text-[10px] text-slate-400">hoje</p>
+            </div>
+        </div>
+    </section>
+
+    </main>
+
+    <!-- Agenda do Dia -->
+    <section id="agendaSection" class="hidden max-w-6xl mx-auto p-4 md:p-6 pb-24">
+        <div class="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
+
+            <!-- Sidebar: calendário -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 h-fit">
+                <button id="agendaTodayBtn" class="w-full mb-3 text-xs font-semibold text-teal-700 border border-teal-200 rounded-lg py-1.5 hover:bg-teal-50 transition">Hoje</button>
+
+                <div class="flex items-center justify-between mb-3">
+                    <button id="calPrevMonthBtn" class="p-1 rounded hover:bg-slate-100 text-slate-500 transition">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                    <span id="calMonthLabel" class="text-sm font-semibold text-slate-700"></span>
+                    <button id="calNextMonthBtn" class="p-1 rounded hover:bg-slate-100 text-slate-500 transition">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-7 gap-y-1 text-center text-[10px] font-semibold text-slate-400 mb-1">
+                    <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
+                </div>
+                <div id="calDaysGrid" class="grid grid-cols-7 gap-y-1 text-center"></div>
+
+                <div class="mt-5">
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Categoria</label>
+                    <select id="agendaProfSelect"
+                        class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"></select>
+                </div>
+            </div>
+
+            <!-- Lista de horários -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <div class="flex items-center gap-1 mb-0.5">
+                    <button id="prevDayBtn" class="p-1.5 rounded hover:bg-slate-100 text-slate-500 transition">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                    </button>
+                    <button id="nextDayBtn" class="p-1.5 rounded hover:bg-slate-100 text-slate-500 transition">
+                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                    <h2 id="agendaDayLabel" class="text-base md:text-lg font-bold text-slate-800 ml-1"></h2>
+                </div>
+                <p id="agendaMonthLabel" class="text-xs text-slate-400 mb-4 ml-1"></p>
+
+                <div id="agendaSlotsList"></div>
+
+                <button id="agendaAddBtn" class="w-full mt-3 border-2 border-dashed border-slate-200 rounded-xl py-2.5 text-sm font-semibold text-teal-600 hover:border-teal-300 hover:bg-teal-50 transition flex items-center justify-center gap-1.5">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Adicionar paciente
+                </button>
+
+                <p class="text-[11px] text-slate-400 mt-4 flex items-start gap-1.5">
+                    <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5"></i>
+                    Os pacientes aparecem aqui automaticamente ao enviar a mensagem pela aba "Nova Mensagem", em ordem de horário. Você também pode ajustar o nome, telefone e horário direto aqui, ou remover com a lixeira.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lembretes de amanhã -->
+    <section id="remindersSection" class="hidden max-w-4xl mx-auto p-4 md:p-6 pb-24">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <div>
+                <h2 class="text-base md:text-lg font-bold text-slate-800">Lembretes para amanhã</h2>
+                <p id="remindersDateLabel" class="text-xs text-slate-400 mb-4"></p>
+            </div>
+
+            <div id="remindersList" class="divide-y divide-slate-100"></div>
+
+            <p id="remindersEmptyMsg" class="hidden text-sm text-slate-400 text-center py-6">Nenhum paciente com agendamento marcado para amanhã.</p>
+
+            <p class="text-[11px] text-slate-400 mt-4 flex items-start gap-1.5">
+                <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5"></i>
+                Essa lista é montada a partir dos nomes preenchidos na Agenda do Dia. Toque em "Enviar" para abrir o WhatsApp com o lembrete já pronto.
+            </p>
+        </div>
+    </section>
+
+    <!-- Bottom Navigation -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40" style="padding-bottom: env(safe-area-inset-bottom);">
+        <div class="max-w-4xl mx-auto grid grid-cols-3">
+            <button id="tabMessageBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-teal-700 transition">
+                <i data-lucide="send" class="w-5 h-5"></i>
+                <span class="text-[11px] font-semibold">Nova Mensagem</span>
+            </button>
+            <button id="tabAgendaBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
+                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+                <span class="text-[11px] font-semibold">Agenda</span>
+            </button>
+            <button id="tabRemindersBtn" class="relative flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
+                <i data-lucide="bell" class="w-5 h-5"></i>
+                <span class="text-[11px] font-semibold">Lembretes</span>
+                <span id="remindersBadge" class="hidden absolute top-1 right-[28%] bg-red-500 text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Modal Cadastro do Meu Número -->
+    <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <i data-lucide="smartphone" class="w-5 h-5 text-teal-600"></i>
+                Configurar Meu Número
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+                Cadastre seu próprio número do WhatsApp para poder disparar lembretes de teste ou salvar cópias das confirmações no seu próprio chat de anotações.
+            </p>
+            <div>
+                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seu WhatsApp (com DDD)</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm">+55</span>
+                    <input type="tel" id="myPhoneNumber" placeholder="(11) 98888-8888"
+                        class="w-full pl-12 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <div class="mt-4 pt-4 border-t border-slate-200">
+                    <p class="text-xs font-bold text-slate-700 mb-1">💾 Backup local</p>
+                    <p class="text-[11px] text-slate-400 mb-2">Exporta agenda, modelos, histórico e configurações deste aparelho.</p>
+                    <div class="flex gap-2">
+                        <button type="button" id="exportBackupBtn" class="flex-1 px-3 py-2 bg-teal-50 text-teal-700 text-xs font-semibold rounded-lg border border-teal-200">Exportar</button>
+                        <button type="button" id="importBackupBtn" class="flex-1 px-3 py-2 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg">Restaurar</button>
+                    </div>
+                    <input type="file" id="backupFileInput" accept=".json,application/json" class="hidden">
+                </div>
+                <button id="cancelSettingsBtn" class="px-4 py-2 bg-slate-100 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-200">Cancelar</button>
+                <button id="saveSettingsBtn" class="px-4 py-2 bg-teal-600 text-white text-xs font-semibold rounded-lg hover:bg-teal-700">Salvar Meu Número</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edição Modelo -->
+    <div id="templateModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl p-6 shadow-xl space-y-4">
+            <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
+                <i data-lucide="settings" class="w-5 h-5 text-teal-600"></i>
+                Personalizar Modelo de Mensagem
+            </h3>
+            <p class="text-xs text-slate-500">
+                Palavras-chave substituídas automaticamente:
+                <br><span class="font-mono text-teal-700">{NOME}, {DATA}, {HORARIO}, {MEDICO}, {TIPO}, {ATENDIMENTO}, {LOCAL}</span>
+            </p>
+            <textarea id="templateTextarea" rows="8"
+                class="w-full p-3 border border-slate-300 rounded-xl text-sm font-sans focus:ring-2 focus:ring-teal-500 focus:outline-none"></textarea>
+            <div class="flex justify-end gap-2">
+                <button id="cancelTemplateBtn" class="px-4 py-2 bg-slate-100 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-200">Cancelar</button>
+                <button id="saveTemplateBtn" class="px-4 py-2 bg-teal-600 text-white text-xs font-semibold rounded-lg hover:bg-teal-700">Salvar Modelo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install banner -->
+    <div id="installBanner" class="hidden fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 bg-teal-700 text-white rounded-xl shadow-lg p-4 z-50 flex items-center gap-3">
+        <i data-lucide="download" class="w-6 h-6 flex-shrink-0"></i>
+        <div class="flex-1 text-sm">
+            <p class="font-semibold">Instalar AgendaSaúde</p>
+            <p class="text-teal-100 text-xs">Adicione à tela inicial para usar como app.</p>
+        </div>
+        <button id="installBtn" class="bg-white text-teal-800 text-xs font-bold px-3 py-1.5 rounded-lg">Instalar</button>
+        <button id="dismissInstallBtn" class="text-teal-200 text-xs">✕</button>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white text-xs py-2.5 px-4 rounded-lg shadow-lg opacity-0 transition-opacity pointer-events-none z-50">
+        Mensagem copiada!
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        // Templates
+        const defaultTemplates = {
+            padrao: `Olá, *{NOME}*! tudo bem?\n\nPassando para lembrar da sua consulta agendada:\n\n📅 *Data:* {DATA}\n⏰ *Horário:* {HORARIO} ({ATENDIMENTO})\n👨‍⚕️ *Profissional:* {MEDICO}\n📋 *Atendimento:* {TIPO}\n📍 *Local:* {LOCAL}\n\nPor favor, confirme se recebeu esta mensagem. Caso não possa comparecer, nos avise com antecedência!`,
+            curto: `Lembrete de consulta para *{NOME}*:\nDia {DATA} às {HORARIO} com {MEDICO} ({TIPO}).\nAtendimento {ATENDIMENTO} na {LOCAL}.`,
+            documentos: `Olá *{NOME}*!\nLembramos de sua consulta no dia *{DATA}* a partir das *{HORARIO}* com {MEDICO} ({TIPO}).\n\n📌 *Atenção:* Favor trazer documento com foto, cartão do SUS e exames anteriores se possuir.\nLocal: {LOCAL}.`
+        };
+
+        let templates = JSON.parse(localStorage.getItem('app_templates')) || {...defaultTemplates};
+        let history = JSON.parse(localStorage.getItem('app_history')) || [];
+        let myPhone = localStorage.getItem('app_my_phone') || '';
+
+        // DOM elements
+        const patientName = document.getElementById('patientName');
+        const patientPhone = document.getElementById('patientPhone');
+        const appDate = document.getElementById('appDate');
+        const appTime = document.getElementById('appTime');
+        const appointmentAvailability = document.getElementById('appointmentAvailability');
+        const attendanceType = document.getElementById('attendanceType');
+        const doctorName = document.getElementById('doctorName');
+        const consultType = document.getElementById('consultType');
+        const locationInput = document.getElementById('location');
+        const templateSelect = document.getElementById('templateSelect');
+        const messagePreview = document.getElementById('messagePreview');
+        const sendWhatsappBtn = document.getElementById('sendWhatsappBtn');
+        const sendToSelfBtn = document.getElementById('sendToSelfBtn');
+        const directWaLink = document.getElementById('directWaLink');
+        const copyMsgBtn = document.getElementById('copyMsgBtn');
+
+        const editTemplateBtn = document.getElementById('editTemplateBtn');
+        const templateModal = document.getElementById('templateModal');
+        const templateTextarea = document.getElementById('templateTextarea');
+        const saveTemplateBtn = document.getElementById('saveTemplateBtn');
+        const cancelTemplateBtn = document.getElementById('cancelTemplateBtn');
+
+        const openSettingsBtn = document.getElementById('openSettingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const myPhoneNumber = document.getElementById('myPhoneNumber');
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
+        const myPhoneStatus = document.getElementById('myPhoneStatus');
+
+        const historyTableBody = document.getElementById('historyTableBody');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const toast = document.getElementById('toast');
+        const pickContactBtn = document.getElementById('pickContactBtn');
+        const contactHint = document.getElementById('contactHint');
+        const summaryToday = document.getElementById('summaryToday');
+        const summaryPending = document.getElementById('summaryPending');
+        const summarySent = document.getElementById('summarySent');
+        const summaryConfirmed = document.getElementById('summaryConfirmed');
+        const exportBackupBtn = document.getElementById('exportBackupBtn');
+        const importBackupBtn = document.getElementById('importBackupBtn');
+        const backupFileInput = document.getElementById('backupFileInput');
+
+
+        // Agenda do Dia
+        const messageSection = document.getElementById('messageSection');
+        const tabMessageBtn = document.getElementById('tabMessageBtn');
+        const tabAgendaBtn = document.getElementById('tabAgendaBtn');
+        const tabRemindersBtn = document.getElementById('tabRemindersBtn');
+        const remindersSection = document.getElementById('remindersSection');
+        const remindersBadge = document.getElementById('remindersBadge');
+        const remindersBanner = document.getElementById('remindersBanner');
+        const remindersBannerText = document.getElementById('remindersBannerText');
+        const remindersBannerBtn = document.getElementById('remindersBannerBtn');
+        const remindersDateLabel = document.getElementById('remindersDateLabel');
+        const remindersList = document.getElementById('remindersList');
+        const remindersEmptyMsg = document.getElementById('remindersEmptyMsg');
+        const agendaSection = document.getElementById('agendaSection');
+        const agendaMonthLabel = document.getElementById('agendaMonthLabel');
+        const agendaDayLabel = document.getElementById('agendaDayLabel');
+        const agendaSlotsList = document.getElementById('agendaSlotsList');
+        const agendaAddBtn = document.getElementById('agendaAddBtn');
+        const prevDayBtn = document.getElementById('prevDayBtn');
+        const nextDayBtn = document.getElementById('nextDayBtn');
+        const agendaTodayBtn = document.getElementById('agendaTodayBtn');
+        const agendaProfSelect = document.getElementById('agendaProfSelect');
+        const professionalCategory = document.getElementById('professionalCategory');
+        const calMonthLabel = document.getElementById('calMonthLabel');
+        const calDaysGrid = document.getElementById('calDaysGrid');
+        const calPrevMonthBtn = document.getElementById('calPrevMonthBtn');
+        const calNextMonthBtn = document.getElementById('calNextMonthBtn');
+
+        const AGENDA_PROFESSIONALS = ['Médico', 'Enfermeira', 'Dentista'];
+        let agendaCurrentProf = AGENDA_PROFESSIONALS[0];
+
+        const AGENDA_START_HOUR = 9;
+        const AGENDA_END_HOUR = 14;
+        const AGENDA_STEP_MIN = 15;
+        const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+        const weekdayNames = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+
+        function generateSlotTimes() {
+            const times = [];
+            let h = AGENDA_START_HOUR, m = 0;
+            while (h < AGENDA_END_HOUR || (h === AGENDA_END_HOUR && m === 0)) {
+                times.push(`${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`);
+                m += AGENDA_STEP_MIN;
+                if (m >= 60) { m -= 60; h++; }
+            }
+            return times;
+        }
+        const agendaSlotTimes = generateSlotTimes();
+
+        let agendaData = JSON.parse(localStorage.getItem('app_agenda')) || {};
+        let agendaCurrentDate = new Date();
+        let calendarViewDate = new Date(agendaCurrentDate.getFullYear(), agendaCurrentDate.getMonth(), 1);
+
+        function dateKey(d) {
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function saveAgenda() {
+            localStorage.setItem('app_agenda', JSON.stringify(agendaData));
+            if (typeof updateSummary === 'function') updateSummary();
+        }
+
+        function snapToAgendaSlot(timeStr) {
+            if (!timeStr) return null;
+            const [h, m] = timeStr.split(':').map(Number);
+            const totalMin = h * 60 + m;
+            const startMin = AGENDA_START_HOUR * 60;
+            const endMin = AGENDA_END_HOUR * 60;
+            if (totalMin < startMin || totalMin > endMin) return null;
+            const snappedMin = Math.round((totalMin - startMin) / AGENDA_STEP_MIN) * AGENDA_STEP_MIN + startMin;
+            const sh = Math.floor(snappedMin / 60);
+            const sm = snappedMin % 60;
+            return `${String(sh).padStart(2, '0')}:${String(sm).padStart(2, '0')}`;
+        }
+
+        function markAgendaAsNotified(dateStr, timeStr, name, prof, phone) {
+            const slotTime = snapToAgendaSlot(timeStr);
+            const profKey = AGENDA_PROFESSIONALS.includes(prof) ? prof : AGENDA_PROFESSIONALS[0];
+            if (!dateStr || !slotTime) return;
+            if (!agendaData[dateStr]) agendaData[dateStr] = {};
+            if (!agendaData[dateStr][profKey]) agendaData[dateStr][profKey] = {};
+            if (!agendaData[dateStr][profKey][slotTime]) agendaData[dateStr][profKey][slotTime] = { name: '', phone: '', professionalName: '', avisado: false, confirmado: false, tipoHorario: getAttendanceType() === 'arrival_order' ? 'chegada' : 'marcado' };
+            if (!agendaData[dateStr][profKey][slotTime].name) agendaData[dateStr][profKey][slotTime].name = name || '';
+            if (!agendaData[dateStr][profKey][slotTime].phone && phone) agendaData[dateStr][profKey][slotTime].phone = phone;
+            agendaData[dateStr][profKey][slotTime].professionalName = doctorName.value.trim() || agendaData[dateStr][profKey][slotTime].professionalName || profKey;
+            agendaData[dateStr][profKey][slotTime].avisado = true;
+            saveAgenda();
+            if (dateKey(agendaCurrentDate) === dateStr && agendaCurrentProf === profKey) renderAgenda();
+        }
+
+        function getTomorrowDate() {
+            const t = new Date();
+            t.setDate(t.getDate() + 1);
+            return t;
+        }
+
+        function collectTomorrowReminders() {
+            const tomorrow = getTomorrowDate();
+            const key = dateKey(tomorrow);
+            const dayData = agendaData[key] || {};
+            const items = [];
+            AGENDA_PROFESSIONALS.forEach(prof => {
+                const profData = dayData[prof] || {};
+                agendaSlotTimes.forEach(time => {
+                    const slot = profData[time];
+                    if (slot && slot.name && slot.name.trim()) {
+                        items.push({
+                            time, prof, name: slot.name.trim(), phone: (slot.phone || '').trim(), professionalName: (slot.professionalName || '').trim(),
+                            avisado: !!slot.avisado, confirmado: !!slot.confirmado, tipoHorario: slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado'
+                        });
+                    }
+                });
+            });
+            items.sort((a, b) => a.time.localeCompare(b.time));
+            return { tomorrow, key, items };
+        }
+
+        function buildReminderMessage(name, tomorrow, time, prof, tipoHorario) {
+            const dataStr = formatDate(dateKey(tomorrow));
+            const detalheHorario = tipoHorario === 'chegada'
+                ? `às ${time} (atendimento por ordem de chegada)`
+                : `às ${time} (horário marcado)`;
+
+            return `Oi, ${name}! Tudo bem?\n\nPassando para lembrar da sua consulta com ${prof} amanhã, dia ${dataStr}, ${detalheHorario}.\n\nTá tudo certo por aí? Se acontecer algum imprevisto e você não conseguir vir, me avisa aqui o quanto antes para eu liberar a vaga.\n\n*(Lembrete do sistema de agenda)*`;
+        }
+
+        function updateRemindersBanner() {
+            const { items } = collectTomorrowReminders();
+            const pending = items.filter(i => !i.avisado);
+            if (pending.length > 0) {
+                remindersBanner.classList.remove('hidden');
+                remindersBannerText.textContent = pending.length === 1
+                    ? 'Você tem 1 lembrete pendente para amanhã.'
+                    : `Você tem ${pending.length} lembretes pendentes para amanhã.`;
+                remindersBadge.textContent = pending.length;
+                remindersBadge.classList.remove('hidden');
+            } else {
+                remindersBanner.classList.add('hidden');
+                remindersBadge.classList.add('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        function renderReminders() {
+            const { tomorrow, key, items } = collectTomorrowReminders();
+            remindersDateLabel.textContent = `${weekdayNames[tomorrow.getDay()]}, ${tomorrow.getDate()} de ${monthNames[tomorrow.getMonth()]} de ${tomorrow.getFullYear()}`;
+
+            remindersList.innerHTML = '';
+            if (items.length === 0) {
+                remindersEmptyMsg.classList.remove('hidden');
+            } else {
+                remindersEmptyMsg.classList.add('hidden');
+                items.forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = 'flex items-center gap-2 py-3 flex-wrap';
+                    const hasPhone = !!item.phone;
+                    row.innerHTML = `
+                        <span class="w-12 text-xs text-slate-400 flex-shrink-0">${item.time}</span>
+                        <div class="flex-1 min-w-[90px]">
+                            <p class="text-sm font-medium text-slate-800 truncate">${item.name}</p>
+                            <p class="text-[11px] text-slate-400">${item.prof} · ${item.tipoHorario === 'chegada' ? 'Hor. de chegada' : 'Horário marcado'}</p>
+                        </div>
+                        ${item.avisado
+                            ? `<span class="flex items-center gap-1 text-emerald-600 text-xs font-semibold flex-shrink-0"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Enviado</span>
+                               ${hasPhone
+                                    ? `<button data-time="${item.time}" data-prof="${item.prof}" title="Enviar de novo" class="reminder-send-btn flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-teal-300 hover:text-teal-600 transition"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i></button>`
+                                    : `<input type="tel" placeholder="Telefone" data-time="${item.time}" data-prof="${item.prof}"
+                                        class="reminder-phone-input w-24 flex-shrink-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                                       <button data-time="${item.time}" data-prof="${item.prof}" title="Enviar de novo" class="reminder-send-btn flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-teal-300 hover:text-teal-600 transition"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i></button>`
+                               }`
+                            : hasPhone
+                                ? `<button data-time="${item.time}" data-prof="${item.prof}" class="reminder-send-btn flex-shrink-0 text-xs font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1"><i data-lucide="send" class="w-3.5 h-3.5"></i> Enviar</button>`
+                                : `<input type="tel" placeholder="Telefone" data-time="${item.time}" data-prof="${item.prof}"
+                                    class="reminder-phone-input w-28 flex-shrink-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                                  <button data-time="${item.time}" data-prof="${item.prof}" class="reminder-send-btn flex-shrink-0 text-xs font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1"><i data-lucide="send" class="w-3.5 h-3.5"></i> Enviar</button>`
+                        }
+                    `;
+                    remindersList.appendChild(row);
+                });
+            }
+            lucide.createIcons();
+
+            remindersList.querySelectorAll('.reminder-send-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const time = btn.dataset.time;
+                    const prof = btn.dataset.prof;
+                    const { tomorrow, key, items } = collectTomorrowReminders();
+                    const item = items.find(i => i.time === time && i.prof === prof);
+                    if (!item) return;
+
+                    let phone = item.phone;
+                    if (!phone) {
+                        const phoneInput = remindersList.querySelector(`.reminder-phone-input[data-time="${time}"][data-prof="${prof}"]`);
+                        phone = phoneInput ? phoneInput.value.trim() : '';
+                        if (!phone) {
+                            if (phoneInput) phoneInput.focus();
+                            showToast('Digite o telefone antes de enviar');
+                            return;
+                        }
+                    }
+
+                    const profissional = item.professionalName || item.prof;
+                    const msg = buildReminderMessage(item.name, tomorrow, item.time, profissional, item.tipoHorario);
+                    const link = buildWaLink(phone, msg);
+                    window.open(link, '_blank');
+
+                    if (!agendaData[key]) agendaData[key] = {};
+                    if (!agendaData[key][prof]) agendaData[key][prof] = {};
+                    if (!agendaData[key][prof][time]) agendaData[key][prof][time] = { name: item.name, phone: phone, professionalName: item.professionalName || prof, avisado: false, confirmado: false, tipoHorario: item.tipoHorario || 'marcado' };
+                    agendaData[key][prof][time].phone = phone;
+                    agendaData[key][prof][time].avisado = true;
+                    saveAgenda();
+
+                    renderReminders();
+                    updateRemindersBanner();
+                    showToast('Abrindo WhatsApp do paciente...');
+                });
+            });
+        }
+
+        function populateAgendaProfSelect() {
+            agendaProfSelect.innerHTML = AGENDA_PROFESSIONALS
+                .map(prof => `<option value="${prof}">${prof}</option>`)
+                .join('');
+            agendaProfSelect.value = agendaCurrentProf;
+        }
+        agendaProfSelect.addEventListener('change', () => {
+            agendaCurrentProf = agendaProfSelect.value;
+            expandedAgendaTime = null;
+            renderAgenda();
+        });
+
+        function isSameDay(a, b) {
+            return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+        }
+
+        function renderCalendar() {
+            calMonthLabel.textContent = `${monthNames[calendarViewDate.getMonth()]} - ${calendarViewDate.getFullYear()}`;
+            calDaysGrid.innerHTML = '';
+
+            const firstOfMonth = new Date(calendarViewDate.getFullYear(), calendarViewDate.getMonth(), 1);
+            const startOffset = firstOfMonth.getDay();
+            const gridStart = new Date(firstOfMonth);
+            gridStart.setDate(gridStart.getDate() - startOffset);
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            for (let i = 0; i < 42; i++) {
+                const cellDate = new Date(gridStart);
+                cellDate.setDate(gridStart.getDate() + i);
+
+                const btn = document.createElement('button');
+                btn.textContent = cellDate.getDate();
+                const inMonth = cellDate.getMonth() === calendarViewDate.getMonth();
+                const isToday = isSameDay(cellDate, today);
+                const isSelected = isSameDay(cellDate, agendaCurrentDate);
+                const isPast = cellDate.getTime() < today.getTime() && !isToday;
+
+                let cls = 'text-xs py-1.5 rounded-full transition ';
+                if (!inMonth) cls += 'text-slate-200 hover:bg-slate-50 ';
+                else if (isPast) cls += 'text-slate-300 hover:bg-slate-50 ';
+                else cls += 'text-slate-700 hover:bg-teal-50 ';
+                if (isToday && !isSelected) cls += 'font-bold text-teal-600 ';
+                if (isSelected) cls = 'text-xs py-1.5 rounded-full bg-teal-700 text-white font-bold ';
+
+                btn.className = cls;
+                btn.addEventListener('click', () => {
+                    agendaCurrentDate = new Date(cellDate);
+                    expandedAgendaTime = null;
+                    if (cellDate.getMonth() !== calendarViewDate.getMonth()) {
+                        calendarViewDate = new Date(cellDate.getFullYear(), cellDate.getMonth(), 1);
+                    }
+                    renderCalendar();
+                    renderAgenda();
+                });
+                calDaysGrid.appendChild(btn);
+            }
+        }
+
+        calPrevMonthBtn.addEventListener('click', () => {
+            calendarViewDate.setMonth(calendarViewDate.getMonth() - 1);
+            renderCalendar();
+        });
+        calNextMonthBtn.addEventListener('click', () => {
+            calendarViewDate.setMonth(calendarViewDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        const PROF_COLORS = {
+            'Médico': { dot: 'bg-teal-600', text: 'text-teal-700', chip: 'bg-teal-50 text-teal-700' },
+            'Enfermeira': { dot: 'bg-purple-500', text: 'text-purple-700', chip: 'bg-purple-50 text-purple-700' },
+            'Dentista': { dot: 'bg-amber-500', text: 'text-amber-700', chip: 'bg-amber-50 text-amber-700' }
+        };
+        let expandedAgendaTime = null;
+
+        function renderAgenda() {
+            const key = dateKey(agendaCurrentDate);
+            agendaDayLabel.textContent = `${weekdayNames[agendaCurrentDate.getDay()]}, ${agendaCurrentDate.getDate()} de ${monthNames[agendaCurrentDate.getMonth()]} de ${agendaCurrentDate.getFullYear()}`;
+            agendaMonthLabel.textContent = agendaCurrentProf;
+
+            populateAgendaProfSelect();
+
+            const dayData = (agendaData[key] && agendaData[key][agendaCurrentProf]) || {};
+            const times = Object.keys(dayData).sort((a, b) => a.localeCompare(b));
+            const color = PROF_COLORS[agendaCurrentProf] || PROF_COLORS['Médico'];
+
+            agendaSlotsList.innerHTML = '';
+
+            if (times.length === 0) {
+                agendaSlotsList.innerHTML = '<p class="text-sm text-slate-400 text-center py-6">Nenhum paciente marcado ainda para este dia.</p>';
+            }
+
+            times.forEach(time => {
+                const slot = dayData[time];
+                const isOpen = expandedAgendaTime === time;
+                const safeName = (slot.name || '').replace(/"/g, '&quot;');
+                const safePhone = (slot.phone || '').replace(/"/g, '&quot;');
+                const tipoHorario = slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado';
+                const displayName = slot.name && slot.name.trim() ? slot.name : 'Sem nome';
+
+                const card = document.createElement('div');
+                card.className = 'border-t border-slate-100 first:border-t-0';
+
+                const header = document.createElement('button');
+                header.type = 'button';
+                header.className = 'agenda-card-toggle w-full flex items-center gap-3 py-3 text-left';
+                header.dataset.time = time;
+                header.innerHTML = `
+                    <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 ${color.dot}"></span>
+                    <span class="w-12 text-xs text-slate-500 flex-shrink-0">${time}</span>
+                    <span class="flex-1 min-w-0 text-sm font-medium text-slate-800 truncate">${displayName}</span>
+                    ${slot.confirmado
+                        ? `<span class="flex items-center gap-1 text-blue-600 text-[11px] font-semibold flex-shrink-0"><i data-lucide="badge-check" class="w-3.5 h-3.5"></i> Confirmado</span>`
+                        : slot.avisado
+                            ? `<span class="flex items-center gap-1 text-emerald-600 text-[11px] font-semibold flex-shrink-0"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Avisado</span>`
+                            : `<span class="text-[11px] text-slate-300 flex-shrink-0">Pendente</span>`
+                    }
+                    <i data-lucide="chevron-down" class="w-4 h-4 text-slate-300 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}"></i>
+                `;
+                card.appendChild(header);
+
+                if (isOpen) {
+                    const details = document.createElement('div');
+                    details.className = 'pb-3 pl-[26px] space-y-2';
+                    details.innerHTML = `
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <input type="time" value="${time}" step="900" min="09:00" max="14:00" data-time="${time}" data-field="time"
+                                class="agenda-time-input w-[78px] flex-shrink-0 px-1.5 py-1.5 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                            <select data-time="${time}" data-field="tipoHorario"
+                                class="agenda-tipo-select flex-1 min-w-[110px] px-1.5 py-1.5 border border-slate-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                                <option value="marcado" ${tipoHorario === 'marcado' ? 'selected' : ''}>Horário marcado</option>
+                                <option value="chegada" ${tipoHorario === 'chegada' ? 'selected' : ''}>Hor. de chegada</option>
+                            </select>
+                        </div>
+                        <input type="text" value="${safeName}" placeholder="Nome do paciente" data-time="${time}" data-field="name"
+                            class="agenda-name-input w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <input type="tel" value="${safePhone}" placeholder="Telefone" data-time="${time}" data-field="phone"
+                            class="agenda-phone-input w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <div class="flex items-center gap-2 pt-1">
+                            <button data-time="${time}" title="Marcar como avisado"
+                                class="agenda-check-btn flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border text-xs font-semibold transition ${slot.avisado ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-200 text-slate-500 hover:border-emerald-300'}">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i> ${slot.avisado ? 'Avisado' : 'Marcar avisado'}
+                            </button>
+                            <button data-time="${time}" title="Confirmar atendimento"
+                                class="agenda-confirm-btn flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border text-xs font-semibold transition ${slot.confirmado ? 'bg-blue-500 border-blue-500 text-white' : 'bg-white border-slate-200 text-slate-500 hover:border-blue-300'}">
+                                <i data-lucide="badge-check" class="w-3.5 h-3.5"></i> ${slot.confirmado ? 'Confirmado' : 'Confirmar'}
+                            </button>
+                            <button data-time="${time}" title="Remover"
+                                class="agenda-delete-btn w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    `;
+                    card.appendChild(details);
+                }
+
+                agendaSlotsList.appendChild(card);
+            });
+            lucide.createIcons();
+
+            agendaSlotsList.querySelectorAll('.agenda-card-toggle').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const time = btn.dataset.time;
+                    expandedAgendaTime = expandedAgendaTime === time ? null : time;
+                    renderAgenda();
+                });
+            });
+
+            agendaSlotsList.querySelectorAll('.agenda-name-input, .agenda-phone-input').forEach(input => {
+                input.addEventListener('input', () => {
+                    const time = input.dataset.time;
+                    const field = input.dataset.field;
+                    const k = dateKey(agendaCurrentDate);
+                    if (!agendaData[k] || !agendaData[k][agendaCurrentProf] || !agendaData[k][agendaCurrentProf][time]) return;
+                    agendaData[k][agendaCurrentProf][time][field] = input.value;
+                    saveAgenda();
+                });
+                input.addEventListener('blur', () => {
+                    if (input.dataset.field !== 'name' || input.value.trim()) return;
+                    const time = input.dataset.time;
+                    const k = dateKey(agendaCurrentDate);
+                    if (agendaData[k] && agendaData[k][agendaCurrentProf]) {
+                        delete agendaData[k][agendaCurrentProf][time];
+                        saveAgenda();
+                    }
+                    expandedAgendaTime = null;
+                    renderAgenda();
+                    updateRemindersBanner();
+                });
+            });
+
+            agendaSlotsList.querySelectorAll('.agenda-tipo-select').forEach(select => {
+                select.addEventListener('change', () => {
+                    const time = select.dataset.time;
+                    const k = dateKey(agendaCurrentDate);
+                    if (!agendaData[k] || !agendaData[k][agendaCurrentProf] || !agendaData[k][agendaCurrentProf][time]) return;
+                    agendaData[k][agendaCurrentProf][time].tipoHorario = select.value;
+                    saveAgenda();
+                });
+            });
+
+            agendaSlotsList.querySelectorAll('.agenda-time-input').forEach(input => {
+                input.addEventListener('change', () => {
+                    const oldTime = input.dataset.time;
+                    const k = dateKey(agendaCurrentDate);
+                    if (!agendaData[k] || !agendaData[k][agendaCurrentProf] || !agendaData[k][agendaCurrentProf][oldTime]) return;
+                    const snapped = snapToAgendaSlot(input.value) || oldTime;
+                    const entry = agendaData[k][agendaCurrentProf][oldTime];
+                    delete agendaData[k][agendaCurrentProf][oldTime];
+                    agendaData[k][agendaCurrentProf][snapped] = entry;
+                    saveAgenda();
+                    expandedAgendaTime = snapped;
+                    renderAgenda();
+                    updateRemindersBanner();
+                });
+            });
+
+            agendaSlotsList.querySelectorAll('.agenda-check-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const time = btn.dataset.time;
+                    const k = dateKey(agendaCurrentDate);
+                    if (!agendaData[k] || !agendaData[k][agendaCurrentProf] || !agendaData[k][agendaCurrentProf][time]) return;
+                    agendaData[k][agendaCurrentProf][time].avisado = !agendaData[k][agendaCurrentProf][time].avisado;
+                    saveAgenda();
+                    renderAgenda();
+                    updateRemindersBanner();
+                });
+            });
+
+
+            agendaSlotsList.querySelectorAll('.agenda-confirm-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const time = btn.dataset.time;
+                    const k = dateKey(agendaCurrentDate);
+                    if (!agendaData[k] || !agendaData[k][agendaCurrentProf] || !agendaData[k][agendaCurrentProf][time]) return;
+                    agendaData[k][agendaCurrentProf][time].confirmado = !agendaData[k][agendaCurrentProf][time].confirmado;
+                    saveAgenda();
+                    renderAgenda();
+                    updateRemindersBanner();
+                    updateSummary();
+                });
+            });
+
+            agendaSlotsList.querySelectorAll('.agenda-delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const time = btn.dataset.time;
+                    const k = dateKey(agendaCurrentDate);
+                    if (agendaData[k] && agendaData[k][agendaCurrentProf]) {
+                        delete agendaData[k][agendaCurrentProf][time];
+                        saveAgenda();
+                    }
+                    expandedAgendaTime = null;
+                    renderAgenda();
+                    updateRemindersBanner();
+                });
+            });
+        }
+
+        agendaAddBtn.addEventListener('click', () => {
+            const k = dateKey(agendaCurrentDate);
+            if (!agendaData[k]) agendaData[k] = {};
+            if (!agendaData[k][agendaCurrentProf]) agendaData[k][agendaCurrentProf] = {};
+            const used = new Set(Object.keys(agendaData[k][agendaCurrentProf]));
+            const newTime = agendaSlotTimes.find(t => !used.has(t)) || agendaSlotTimes[0];
+            agendaData[k][agendaCurrentProf][newTime] = { name: '', phone: '', professionalName: '', avisado: false, confirmado: false, tipoHorario: 'marcado' };
+            saveAgenda();
+            expandedAgendaTime = newTime;
+            renderAgenda();
+            const newInput = agendaSlotsList.querySelector(`.agenda-name-input[data-time="${newTime}"]`);
+            if (newInput) newInput.focus();
+        });
+
+        function syncCalendarToSelection() {
+            if (calendarViewDate.getMonth() !== agendaCurrentDate.getMonth() || calendarViewDate.getFullYear() !== agendaCurrentDate.getFullYear()) {
+                calendarViewDate = new Date(agendaCurrentDate.getFullYear(), agendaCurrentDate.getMonth(), 1);
+            }
+            renderCalendar();
+        }
+
+        prevDayBtn.addEventListener('click', () => {
+            agendaCurrentDate.setDate(agendaCurrentDate.getDate() - 1);
+            expandedAgendaTime = null;
+            syncCalendarToSelection();
+            renderAgenda();
+        });
+        nextDayBtn.addEventListener('click', () => {
+            agendaCurrentDate.setDate(agendaCurrentDate.getDate() + 1);
+            expandedAgendaTime = null;
+            syncCalendarToSelection();
+            renderAgenda();
+        });
+        agendaTodayBtn.addEventListener('click', () => {
+            agendaCurrentDate = new Date();
+            expandedAgendaTime = null;
+            syncCalendarToSelection();
+            renderAgenda();
+        });
+
+        function switchTab(tab) {
+            const activeClasses = ['text-teal-700'];
+            const inactiveClasses = ['text-slate-400'];
+            const allSections = { message: messageSection, agenda: agendaSection, reminders: remindersSection };
+            const allTabs = { message: tabMessageBtn, agenda: tabAgendaBtn, reminders: tabRemindersBtn };
+
+            Object.keys(allSections).forEach(key => {
+                if (key === tab) {
+                    allSections[key].classList.remove('hidden');
+                    allTabs[key].classList.add(...activeClasses);
+                    allTabs[key].classList.remove(...inactiveClasses);
+                } else {
+                    allSections[key].classList.add('hidden');
+                    allTabs[key].classList.remove(...activeClasses);
+                    allTabs[key].classList.add(...inactiveClasses);
+                }
+            });
+
+            window.scrollTo(0, 0);
+            if (tab === 'agenda') renderAgenda();
+            if (tab === 'reminders') renderReminders();
+        }
+        tabMessageBtn.addEventListener('click', () => switchTab('message'));
+        tabAgendaBtn.addEventListener('click', () => switchTab('agenda'));
+        tabRemindersBtn.addEventListener('click', () => switchTab('reminders'));
+        remindersBannerBtn.addEventListener('click', () => switchTab('reminders'));
+
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2200);
+        }
+
+        function updateMyPhoneBadge() {
+            myPhoneStatus.textContent = myPhone ? 'Meu Nº Salvo' : 'Cadastrar Meu Nº';
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            const [year, month, day] = dateStr.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        function onlyDigits(str) {
+            return (str || '').replace(/\D/g, '');
+        }
+
+        function getAttendanceType() {
+            return attendanceType.value === 'arrival_order' ? 'arrival_order' : 'scheduled';
+        }
+
+        function getAttendanceLabel(type = getAttendanceType()) {
+            return type === 'arrival_order' ? 'por ordem de chegada' : 'horário marcado';
+        }
+
+        function isTomorrow(dateStr) {
+            if (!dateStr) return false;
+            const tomorrow = getTomorrowDate();
+            return dateStr === dateKey(tomorrow);
+        }
+
+        function generateMessage() {
+            const selectedKey = templateSelect.value;
+            let templateText = templates[selectedKey] || templates.padrao;
+
+            const nameVal = patientName.value.trim() || '[Nome do Paciente]';
+            const dateVal = formatDate(appDate.value) || '[Data]';
+            const timeVal = appTime.value || '[Horário]';
+            const doctorVal = doctorName.value.trim() || '[Médico/Profissional]';
+            const consultVal = consultType.value.trim() || '[Consulta]';
+            const attendVal = attendanceType.value === 'arrival_order'
+                ? 'por ordem de chegada'
+                : 'horário marcado';
+            const locVal = locationInput.value.trim() || 'Unidade de Saúde';
+
+            let msg = templateText
+                .replace(/{NOME}/g, nameVal)
+                .replace(/{DATA}/g, dateVal)
+                .replace(/{HORARIO}/g, timeVal)
+                .replace(/{MEDICO}/g, doctorVal)
+                .replace(/{TIPO}/g, consultVal)
+                .replace(/{ATENDIMENTO}/g, attendVal)
+                .replace(/{LOCAL}/g, locVal);
+
+            messagePreview.textContent = msg;
+            return msg;
+        }
+
+        function getAppointmentConflict() {
+            const dateStr = appDate.value;
+            const timeStr = appTime.value;
+            const profKey = professionalCategory.value;
+            if (!dateStr || !timeStr || !AGENDA_PROFESSIONALS.includes(profKey)) return null;
+
+            const slotTime = snapToAgendaSlot(timeStr);
+            if (!slotTime) return null;
+
+            const slot = agendaData?.[dateStr]?.[profKey]?.[slotTime];
+            if (slot && slot.name && slot.name.trim()) {
+                return { slotTime, slot };
+            }
+            return null;
+        }
+
+        function updateAppointmentAvailability() {
+            if (!appointmentAvailability) return;
+            const conflict = getAppointmentConflict();
+
+            appointmentAvailability.className = 'hidden mt-1.5 text-xs rounded-lg px-2.5 py-2';
+            if (!appDate.value || !appTime.value) return;
+
+            if (conflict) {
+                const name = conflict.slot.name.trim();
+                const extra = conflict.slot.tipoHorario === 'chegada' ? ' (ordem de chegada)' : '';
+                appointmentAvailability.className = 'mt-1.5 text-xs rounded-lg px-2.5 py-2 bg-red-50 border border-red-200 text-red-700';
+                appointmentAvailability.innerHTML = `<strong>🔴 Horário ocupado</strong><br>Já existe agendamento para <strong>${name}</strong> às <strong>${conflict.slotTime}</strong>${extra}. Escolha outro horário.`;
+            } else {
+                const slotTime = snapToAgendaSlot(appTime.value);
+                if (slotTime) {
+                    appointmentAvailability.className = 'mt-1.5 text-xs rounded-lg px-2.5 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700';
+                    appointmentAvailability.innerHTML = `🟢 <strong>Horário disponível</strong> para ${professionalCategory.value} às ${slotTime}.`;
+                }
+            }
+        }
+
+        function validateForm(showAlert = true) {
+            const required = [patientName, patientPhone, appDate, appTime, doctorName, consultType];
+            const missing = required.find(el => !el.value.trim());
+            if (missing) {
+                if (showAlert) {
+                    missing.classList.add('ring-2', 'ring-red-400', 'border-red-400');
+                    missing.focus();
+                    showToast('Preencha todos os campos obrigatórios (*)');
+                }
+                return false;
+            }
+
+            const conflict = getAppointmentConflict();
+            if (conflict) {
+                updateAppointmentAvailability();
+                if (showAlert) {
+                    appTime.classList.add('ring-2', 'ring-red-400', 'border-red-400');
+                    appTime.focus();
+                    showToast(`Horário ocupado: ${conflict.slot.name.trim()} já está agendado às ${conflict.slotTime}.`);
+                }
+                return false;
+            }
+
+            return true;
+        }
+
+        function buildWaLink(phoneDigits, message) {
+            const fullPhone = '55' + onlyDigits(phoneDigits);
+            return `https://wa.me/${fullPhone}?text=${encodeURIComponent(message)}`;
+        }
+
+        function saveToHistory(msg) {
+            const entry = {
+                id: Date.now(),
+                patient: patientName.value.trim(),
+                date: formatDate(appDate.value),
+                time: appTime.value,
+                doctor: doctorName.value.trim(),
+                type: consultType.value.trim(),
+                phone: patientPhone.value.trim(),
+                message: msg
+            };
+            history.unshift(entry);
+            history = history.slice(0, 50);
+            localStorage.setItem('app_history', JSON.stringify(history));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            historyTableBody.innerHTML = '';
+            if (history.length === 0) {
+                historyTableBody.innerHTML = `<tr id="emptyHistoryRow"><td colspan="5" class="p-4 text-center text-slate-400">Nenhum lembrete gerado ainda.</td></tr>`;
+                return;
+            }
+            history.forEach(entry => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50';
+                tr.innerHTML = `
+                    <td class="p-2.5 font-medium text-slate-700">${entry.patient}</td>
+                    <td class="p-2.5 text-slate-500">${entry.date} ${entry.time}</td>
+                    <td class="p-2.5 text-slate-500">${entry.doctor}</td>
+                    <td class="p-2.5 text-slate-500">${entry.type}</td>
+                    <td class="p-2.5 text-right">
+                        <button class="text-teal-600 hover:underline resend-btn" data-id="${entry.id}">Reenviar</button>
+                    </td>
+                `;
+                historyTableBody.appendChild(tr);
+            });
+
+            document.querySelectorAll('.resend-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const entry = history.find(h => h.id == btn.dataset.id);
+                    if (entry) {
+                        const link = buildWaLink(entry.phone, entry.message);
+                        window.open(link, '_blank');
+                    }
+                });
+            });
+        }
+
+        function clearFieldErrors() {
+            [patientName, patientPhone, appDate, appTime, doctorName, consultType].forEach(el => {
+                el.classList.remove('ring-2', 'ring-red-400', 'border-red-400');
+            });
+        }
+
+        // Live preview updates
+        [patientName, patientPhone, appDate, appTime, doctorName, consultType, locationInput, templateSelect]
+            .forEach(el => el.addEventListener('input', () => { clearFieldErrors(); generateMessage(); updateAppointmentAvailability(); }));
+
+        document.querySelectorAll('input[name="attendanceTypeRadio"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                attendanceType.value = radio.value;
+                clearFieldErrors();
+                generateMessage();
+                updateAppointmentAvailability();
+            });
+        });
+        templateSelect.addEventListener('change', generateMessage);
+        professionalCategory.addEventListener('change', updateAppointmentAvailability);
+
+        // Send to patient
+        sendWhatsappBtn.addEventListener('click', () => {
+            if (!validateForm()) return;
+            const msg = generateMessage();
+            const link = buildWaLink(patientPhone.value, msg);
+            directWaLink.href = link;
+            directWaLink.classList.remove('hidden');
+            window.open(link, '_blank');
+            saveToHistory(msg);
+            markAgendaAsNotified(appDate.value, appTime.value, patientName.value.trim(), professionalCategory.value, patientPhone.value.trim());
+            const sentSlotTime = snapToAgendaSlot(appTime.value);
+            if (sentSlotTime && agendaData?.[appDate.value]?.[professionalCategory.value]?.[sentSlotTime]) {
+                agendaData[appDate.value][professionalCategory.value][sentSlotTime].tipoHorario = getAttendanceType() === 'arrival_order' ? 'chegada' : 'marcado';
+                saveAgenda();
+            }
+            showToast('Abrindo WhatsApp do paciente...');
+        });
+
+        // Send copy to self
+        sendToSelfBtn.addEventListener('click', () => {
+            if (!myPhone) {
+                showToast('Cadastre seu número primeiro (botão no topo)');
+                settingsModal.classList.remove('hidden');
+                settingsModal.classList.add('flex');
+                return;
+            }
+            const msg = generateMessage();
+            const link = buildWaLink(myPhone, msg);
+            window.open(link, '_blank');
+            showToast('Abrindo seu WhatsApp...');
+        });
+
+        // Copy text only
+        copyMsgBtn.addEventListener('click', async () => {
+            const msg = generateMessage();
+            try {
+                await navigator.clipboard.writeText(msg);
+                showToast('Mensagem copiada!');
+            } catch (e) {
+                const ta = document.createElement('textarea');
+                ta.value = msg;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('Mensagem copiada!');
+            }
+        });
+
+        // Template editing
+        editTemplateBtn.addEventListener('click', () => {
+            templateTextarea.value = templates[templateSelect.value] || '';
+            templateModal.classList.remove('hidden');
+            templateModal.classList.add('flex');
+        });
+        cancelTemplateBtn.addEventListener('click', () => {
+            templateModal.classList.add('hidden');
+            templateModal.classList.remove('flex');
+        });
+        saveTemplateBtn.addEventListener('click', () => {
+            templates[templateSelect.value] = templateTextarea.value;
+            localStorage.setItem('app_templates', JSON.stringify(templates));
+            templateModal.classList.add('hidden');
+            templateModal.classList.remove('flex');
+            generateMessage();
+            showToast('Modelo salvo!');
+        });
+
+        // My phone settings
+        openSettingsBtn.addEventListener('click', () => {
+            myPhoneNumber.value = myPhone;
+            settingsModal.classList.remove('hidden');
+            settingsModal.classList.add('flex');
+        });
+        cancelSettingsBtn.addEventListener('click', () => {
+            settingsModal.classList.add('hidden');
+            settingsModal.classList.remove('flex');
+        });
+        saveSettingsBtn.addEventListener('click', () => {
+            myPhone = myPhoneNumber.value.trim();
+            localStorage.setItem('app_my_phone', myPhone);
+            updateMyPhoneBadge();
+            settingsModal.classList.add('hidden');
+            settingsModal.classList.remove('flex');
+            showToast('Número salvo!');
+        });
+
+        // History
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('Tem certeza que deseja apagar todo o histórico?')) {
+                history = [];
+                localStorage.setItem('app_history', JSON.stringify(history));
+                renderHistory();
+                showToast('Histórico apagado.');
+            }
+        });
+
+        // Escolher contato (Contact Picker API - Chrome/Android)
+        const supportsContactPicker = ('contacts' in navigator && 'ContactsManager' in window);
+
+        pickContactBtn.addEventListener('click', async () => {
+            if (!supportsContactPicker) {
+                contactHint.classList.remove('hidden');
+                showToast('Escolha de contatos não suportada neste navegador');
+                return;
+            }
+            try {
+                const props = ['name', 'tel'];
+                const opts = { multiple: false };
+                const contacts = await navigator.contacts.select(props, opts);
+                if (contacts && contacts.length > 0) {
+                    const contact = contacts[0];
+                    if (contact.name && contact.name.length > 0 && !patientName.value.trim()) {
+                        patientName.value = contact.name[0];
+                    }
+                    if (contact.tel && contact.tel.length > 0) {
+                        patientPhone.value = onlyDigits(contact.tel[0]).replace(/^55/, '');
+                    }
+                    clearFieldErrors();
+                    generateMessage();
+                    showToast('Contato preenchido!');
+                }
+            } catch (err) {
+                // usuário cancelou ou permissão negada - sem toast de erro para não incomodar
+            }
+        });
+
+
+        function updateSummary() {
+            const todayKey = dateKey(new Date());
+            let todayItems = [];
+            const dayData = agendaData[todayKey] || {};
+            AGENDA_PROFESSIONALS.forEach(prof => {
+                const profData = dayData[prof] || {};
+                agendaSlotTimes.forEach(time => {
+                    const slot = profData[time];
+                    if (slot && slot.name && slot.name.trim()) todayItems.push(slot);
+                });
+            });
+            if (summaryToday) summaryToday.textContent = todayItems.length;
+            if (summaryPending) summaryPending.textContent = todayItems.filter(s => !s.avisado).length;
+            if (summarySent) summarySent.textContent = todayItems.filter(s => s.avisado && !s.confirmado).length;
+            if (summaryConfirmed) summaryConfirmed.textContent = todayItems.filter(s => s.confirmado).length;
+        }
+
+        function exportBackup() {
+            const backup = {
+                version: 2,
+                exportedAt: new Date().toISOString(),
+                templates,
+                history,
+                myPhone,
+                agendaData
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `AgendaSaude-backup-${dateKey(new Date())}.json`;
+            a.click();
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('Backup exportado!');
+        }
+
+        function importBackup(file) {
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const data = JSON.parse(reader.result);
+                    if (!data || !data.agendaData || !Array.isArray(data.history) || !data.templates) throw new Error('invalid');
+                    templates = data.templates;
+                    history = data.history;
+                    myPhone = data.myPhone || '';
+                    agendaData = data.agendaData || {};
+                    localStorage.setItem('app_templates', JSON.stringify(templates));
+                    localStorage.setItem('app_history', JSON.stringify(history));
+                    localStorage.setItem('app_my_phone', myPhone);
+                    saveAgenda();
+                    updateMyPhoneBadge();
+                    renderHistory();
+                    generateMessage();
+                    renderCalendar();
+                    renderAgenda();
+                    renderReminders();
+                    updateRemindersBanner();
+                    updateSummary();
+                    showToast('Backup restaurado!');
+                } catch(e) {
+                    showToast('Arquivo de backup inválido');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Init
+        function init() {
+            if (!supportsContactPicker) {
+                pickContactBtn.title = 'Escolha de contatos não suportada — apenas Chrome/Android com o app instalado';
+            }
+            const today = new Date();
+            const todayKey = dateKey(today);
+            appDate.value = todayKey;
+
+            // Normaliza registros antigos para manter compatibilidade com a nova estrutura.
+            Object.values(agendaData).forEach(day => {
+                Object.values(day || {}).forEach(profData => {
+                    Object.values(profData || {}).forEach(slot => {
+                        if (slot) {
+                            if (!slot.tipoHorario) slot.tipoHorario = 'marcado';
+                            if (!slot.professionalName) slot.professionalName = '';
+                        }
+                    });
+                });
+            });
+            localStorage.setItem('app_agenda', JSON.stringify(agendaData));
+            updateAppointmentAvailability();
+            updateMyPhoneBadge();
+            renderHistory();
+            generateMessage();
+            renderCalendar();
+            renderAgenda();
+            updateRemindersBanner();
+            updateSummary();
+            lucide.createIcons();
+        }
+        init();
+
+
+        if (exportBackupBtn) exportBackupBtn.addEventListener('click', exportBackup);
+        if (importBackupBtn) importBackupBtn.addEventListener('click', () => backupFileInput.click());
+        if (backupFileInput) backupFileInput.addEventListener('change', e => {
+            importBackup(e.target.files[0]);
+            e.target.value = '';
+        });
+
+        // ---- PWA: service worker + install prompt ----
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js').catch(() => {});
+            });
+        }
+
+        let deferredPrompt;
+        const installBanner = document.getElementById('installBanner');
+        const installBtn = document.getElementById('installBtn');
+        const dismissInstallBtn = document.getElementById('dismissInstallBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (!localStorage.getItem('install_dismissed')) {
+                installBanner.classList.remove('hidden');
+            }
+        });
+
+        installBtn.addEventListener('click', async () => {
+            installBanner.classList.add('hidden');
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                await deferredPrompt.userChoice;
+                deferredPrompt = null;
+            }
+        });
+
+        dismissInstallBtn.addEventListener('click', () => {
+            installBanner.classList.add('hidden');
+            localStorage.setItem('install_dismissed', '1');
+        });
+    </script>
+</body>
+</html>
