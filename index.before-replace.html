@@ -450,34 +450,6 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
     </div>
 
     <!-- Application Script -->
-
-    <!-- Ações do paciente já agendado -->
-    <div id="agendaPatientActionModal" class="fixed inset-0 z-[80] hidden items-end sm:items-center justify-center bg-slate-900/45 p-3 sm:p-4">
-        <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
-            <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-slate-400">Agendamento</p>
-                    <h3 id="agendaActionPatientName" class="text-base font-bold text-slate-800"></h3>
-                    <p id="agendaActionPatientInfo" class="text-xs text-slate-500 mt-0.5"></p>
-                </div>
-                <button type="button" id="closeAgendaActionModal" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200" aria-label="Fechar">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            <div class="p-4 space-y-2">
-                <button type="button" id="editAgendaPatientBtn" class="w-full flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-left text-blue-700 hover:bg-blue-100 transition">
-                    <span class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center"><i data-lucide="pencil" class="w-4 h-4"></i></span>
-                    <span><span class="block font-semibold">Editar paciente</span><span class="block text-xs text-blue-600/80">Abrir a tela Nova Mensagem com os dados atuais</span></span>
-                </button>
-                <button type="button" id="replaceAgendaPatientBtn" class="w-full flex items-center gap-3 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-left text-amber-700 hover:bg-amber-100 transition">
-                    <span class="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center"><i data-lucide="repeat-2" class="w-4 h-4"></i></span>
-                    <span><span class="block font-semibold">Substituir paciente</span><span class="block text-xs text-amber-700/80">Remove este paciente e abre o mesmo horário para outro</span></span>
-                </button>
-                <button type="button" id="cancelAgendaPatientBtn" class="w-full rounded-xl px-4 py-3 text-center text-sm font-semibold text-slate-500 hover:bg-slate-50">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Templates
         const defaultTemplates = {
@@ -560,14 +532,6 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
         const calDaysGrid = document.getElementById('calDaysGrid');
         const calPrevMonthBtn = document.getElementById('calPrevMonthBtn');
         const calNextMonthBtn = document.getElementById('calNextMonthBtn');
-
-        const agendaPatientActionModal = document.getElementById('agendaPatientActionModal');
-        const agendaActionPatientName = document.getElementById('agendaActionPatientName');
-        const agendaActionPatientInfo = document.getElementById('agendaActionPatientInfo');
-        const closeAgendaActionModal = document.getElementById('closeAgendaActionModal');
-        const editAgendaPatientBtn = document.getElementById('editAgendaPatientBtn');
-        const replaceAgendaPatientBtn = document.getElementById('replaceAgendaPatientBtn');
-        const cancelAgendaPatientBtn = document.getElementById('cancelAgendaPatientBtn');
 
         const AGENDA_PROFESSIONALS = ['Médico', 'Enfermeira', 'Dentista'];
         let agendaCurrentProf = AGENDA_PROFESSIONALS[0];
@@ -850,57 +814,6 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
             'Dentista': { dot: 'bg-amber-500', text: 'text-amber-700', chip: 'bg-amber-50 text-amber-700' }
         };
         let expandedAgendaTime = null;
-        let selectedAgendaPatientAction = null;
-
-        function closeAgendaPatientActionModal() {
-            selectedAgendaPatientAction = null;
-            agendaPatientActionModal.classList.add('hidden');
-            agendaPatientActionModal.classList.remove('flex');
-        }
-
-        function openAgendaPatientActionModal(time) {
-            const key = dateKey(agendaCurrentDate);
-            const dayData = (agendaData[key] && agendaData[key][agendaCurrentProf]) || {};
-            const slot = dayData[time];
-            if (!slot || !slot.name) return openAgendaSlotInMessage(time);
-
-            selectedAgendaPatientAction = { date: key, time, prof: agendaCurrentProf };
-            agendaActionPatientName.textContent = slot.name;
-            agendaActionPatientInfo.textContent = `${time} • ${slot.consultType || defaultConsultTypeForProf(agendaCurrentProf)}`;
-            agendaPatientActionModal.classList.remove('hidden');
-            agendaPatientActionModal.classList.add('flex');
-            lucide.createIcons();
-        }
-
-        closeAgendaActionModal.addEventListener('click', closeAgendaPatientActionModal);
-        cancelAgendaPatientBtn.addEventListener('click', closeAgendaPatientActionModal);
-        agendaPatientActionModal.addEventListener('click', (event) => {
-            if (event.target === agendaPatientActionModal) closeAgendaPatientActionModal();
-        });
-
-        editAgendaPatientBtn.addEventListener('click', () => {
-            if (!selectedAgendaPatientAction) return;
-            const { time } = selectedAgendaPatientAction;
-            closeAgendaPatientActionModal();
-            openAgendaSlotInMessage(time);
-        });
-
-        replaceAgendaPatientBtn.addEventListener('click', () => {
-            if (!selectedAgendaPatientAction) return;
-            const selected = { ...selectedAgendaPatientAction };
-            const slot = agendaData[selected.date]?.[selected.prof]?.[selected.time];
-            if (!slot) return closeAgendaPatientActionModal();
-
-            // Remove imediatamente o paciente atual. O mesmo horário será
-            // reaberto na tela Nova Mensagem para receber o novo paciente.
-            delete agendaData[selected.date][selected.prof][selected.time];
-            if (Object.keys(agendaData[selected.date][selected.prof]).length === 0) delete agendaData[selected.date][selected.prof];
-            if (Object.keys(agendaData[selected.date]).length === 0) delete agendaData[selected.date];
-            saveAgenda();
-            closeAgendaPatientActionModal();
-            openAgendaSlotInMessage(selected.time);
-            showToast(`Horário ${selected.time} liberado para substituição.`);
-        });
 
         function openAgendaSlotInMessage(time) {
             const key = dateKey(agendaCurrentDate);
@@ -998,16 +911,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
             lucide.createIcons();
 
             agendaSlotsList.querySelectorAll('.agenda-card-toggle').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const time = btn.dataset.time;
-                    const slot = dayData[time] || null;
-                    const hasPatient = !!(slot && slot.name && slot.name.trim());
-                    if (hasPatient) {
-                        openAgendaPatientActionModal(time);
-                    } else {
-                        openAgendaSlotInMessage(time);
-                    }
-                });
+                btn.addEventListener('click', () => openAgendaSlotInMessage(btn.dataset.time));
             });
         }
 
