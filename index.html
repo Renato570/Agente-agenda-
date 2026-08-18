@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>AgendaSaúde - Agenda e WhatsApp</title>
+    <title>AgendaSaúde - Mensagens WhatsApp</title>
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -26,7 +26,7 @@
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <i data-lucide="calendar-heart" class="w-7 h-7"></i>
-                <h1 class="text-xl font-bold tracking-tight">AgendaSaúde</h1>
+                <h1 class="text-xl font-bold tracking-tight">AgendaSaúde - Mensagens WhatsApp</h1>
             </div>
             <button id="openSettingsBtn" class="text-xs bg-teal-800 hover:bg-teal-900 px-3 py-1.5 rounded-lg text-teal-100 border border-teal-600 flex items-center gap-1.5 transition">
                 <i data-lucide="smartphone" class="w-4 h-4"></i>
@@ -45,7 +45,7 @@
     </div>
 
     <!-- Main Container -->
-    <main id="messageSection" class="hidden max-w-4xl mx-auto p-4 md:p-6 pb-24 grid grid-cols-1 md:grid-cols-12 gap-6">
+    <main id="messageSection" class="max-w-4xl mx-auto p-4 md:p-6 pb-24 grid grid-cols-1 md:grid-cols-12 gap-6">
 
         <!-- Form Column -->
         <section class="md:col-span-7 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
@@ -87,31 +87,17 @@
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Horário / A partir de *</label>
                         <input type="time" id="appTime" required
                             class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm">
-                        <div id="appointmentAvailability" class="hidden mt-1.5 text-xs rounded-lg px-2.5 py-2" role="status" aria-live="polite"></div>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-2">Tipo de Atendimento</label>
-                    <input type="hidden" id="attendanceType" value="scheduled">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <label class="flex items-center gap-2 p-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-teal-50 cursor-pointer transition">
-                            <input type="radio" name="attendanceTypeRadio" value="scheduled" checked
-                                class="w-4 h-4 text-teal-600 focus:ring-teal-500">
-                            <span>
-                                <span class="block text-sm font-medium text-slate-700">Horário Marcado</span>
-                                <span class="block text-[11px] text-slate-400">Paciente deve chegar no horário.</span>
-                            </span>
-                        </label>
-                        <label class="flex items-center gap-2 p-3 rounded-lg border border-slate-200 bg-slate-50 hover:bg-teal-50 cursor-pointer transition">
-                            <input type="radio" name="attendanceTypeRadio" value="arrival_order"
-                                class="w-4 h-4 text-teal-600 focus:ring-teal-500">
-                            <span>
-                                <span class="block text-sm font-medium text-slate-700">Ordem de Chegada</span>
-                                <span class="block text-[11px] text-slate-400">Atendimento a partir do horário informado.</span>
-                            </span>
-                        </label>
-                    </div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Regra de Atendimento</label>
+                    <select id="attendanceType"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none text-slate-800 text-sm bg-white">
+                        <option value="por ordem de chegada">Ordem de chegada</option>
+                        <option value="horário marcado">Horário marcado exato</option>
+                        <option value="por senha e ordem de chegada">Senha por ordem de chegada</option>
+                    </select>
                 </div>
 
                 <div class="grid grid-cols-2 gap-3">
@@ -236,49 +222,22 @@
                 </table>
             </div>
         </section>
-
-    <!-- Resumo rápido -->
-    <section id="quickSummary" class="max-w-4xl mx-auto px-4 md:px-6 pb-3">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-            <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
-                <p class="text-[10px] uppercase font-bold text-slate-400">Hoje</p>
-                <p id="summaryToday" class="text-xl font-bold text-teal-700">0</p>
-                <p class="text-[10px] text-slate-400">agendamentos</p>
-            </div>
-            <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
-                <p class="text-[10px] uppercase font-bold text-slate-400">Pendentes</p>
-                <p id="summaryPending" class="text-xl font-bold text-amber-600">0</p>
-                <p class="text-[10px] text-slate-400">para avisar</p>
-            </div>
-            <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
-                <p class="text-[10px] uppercase font-bold text-slate-400">Avisados</p>
-                <p id="summarySent" class="text-xl font-bold text-emerald-600">0</p>
-                <p class="text-[10px] text-slate-400">hoje</p>
-            </div>
-            <div class="bg-white rounded-xl border border-slate-200 p-3 shadow-sm">
-                <p class="text-[10px] uppercase font-bold text-slate-400">Confirmados</p>
-                <p id="summaryConfirmed" class="text-xl font-bold text-blue-600">0</p>
-                <p class="text-[10px] text-slate-400">hoje</p>
-            </div>
-        </div>
-    </section>
-
     </main>
 
     <!-- Agenda do Dia -->
-    <section id="agendaSection" class="max-w-6xl mx-auto p-4 md:p-6 pb-24">
-        <div class="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
+    <section id="agendaSection" class="hidden max-w-7xl mx-auto p-3 md:p-5 pb-24">
+        <div class="grid grid-cols-1 lg:grid-cols-[245px_1fr] gap-4">
 
-            <!-- Sidebar: calendário -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 h-fit">
-                <button id="agendaTodayBtn" class="w-full mb-3 text-xs font-semibold text-teal-700 border border-teal-200 rounded-lg py-1.5 hover:bg-teal-50 transition">Hoje</button>
+            <!-- Calendário lateral -->
+            <aside class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 h-fit lg:sticky lg:top-20">
+                <button id="agendaTodayBtn" class="w-full mb-3 text-xs font-semibold text-teal-700 border border-teal-200 rounded-lg py-2 hover:bg-teal-50 transition">Hoje</button>
 
                 <div class="flex items-center justify-between mb-3">
-                    <button id="calPrevMonthBtn" class="p-1 rounded hover:bg-slate-100 text-slate-500 transition">
+                    <button id="calPrevMonthBtn" class="p-1.5 rounded hover:bg-slate-100 text-slate-500 transition">
                         <i data-lucide="chevron-left" class="w-4 h-4"></i>
                     </button>
-                    <span id="calMonthLabel" class="text-sm font-semibold text-slate-700"></span>
-                    <button id="calNextMonthBtn" class="p-1 rounded hover:bg-slate-100 text-slate-500 transition">
+                    <span id="calMonthLabel" class="text-sm font-bold text-slate-700"></span>
+                    <button id="calNextMonthBtn" class="p-1.5 rounded hover:bg-slate-100 text-slate-500 transition">
                         <i data-lucide="chevron-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -288,57 +247,63 @@
                 </div>
                 <div id="calDaysGrid" class="grid grid-cols-7 gap-y-1 text-center"></div>
 
-                <div class="mt-5">
-                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Categoria</label>
-                    <select id="agendaProfSelect"
-                        class="w-full px-2 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"></select>
-                </div>
-            </div>
-
-            <!-- Lista de horários -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                <div class="flex items-center gap-1 mb-0.5">
-                    <button id="prevDayBtn" class="p-1.5 rounded hover:bg-slate-100 text-slate-500 transition">
-                        <i data-lucide="chevron-left" class="w-4 h-4"></i>
-                    </button>
-                    <button id="nextDayBtn" class="p-1.5 rounded hover:bg-slate-100 text-slate-500 transition">
-                        <i data-lucide="chevron-right" class="w-4 h-4"></i>
-                    </button>
-                    <h2 id="agendaDayLabel" class="text-base md:text-lg font-bold text-slate-800 ml-1"></h2>
-                </div>
-                <p id="agendaMonthLabel" class="text-xs text-slate-400 mb-4 ml-1"></p>
-
-                <!-- Anotações do dia -->
-                <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3.5">
-                    <div class="flex items-center justify-between gap-2 mb-2">
-                        <h3 class="text-sm font-bold text-amber-900 flex items-center gap-2">
-                            <i data-lucide="sticky-note" class="w-4 h-4 text-amber-600"></i>
-                            Anotações do dia
-                        </h3>
-                        <span id="agendaNotesCount" class="hidden text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full"></span>
+                <div class="mt-5 pt-4 border-t border-slate-100">
+                    <p class="text-[10px] font-bold uppercase tracking-wide text-slate-400 mb-2">Legenda</p>
+                    <div class="space-y-2 text-xs text-slate-500">
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-teal-500"></span> Horário disponível</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Paciente agendado</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Avisado</div>
                     </div>
-                    <div class="flex gap-2">
-                        <input id="agendaNoteInput" type="text" placeholder="Ex.: lembrar de pegar o remédio"
-                            class="flex-1 min-w-0 px-3 py-2 border border-amber-200 bg-white rounded-lg text-sm focus:ring-2 focus:ring-amber-400 focus:outline-none">
-                        <button id="agendaAddNoteBtn" type="button"
-                            class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5">
-                            <i data-lucide="plus" class="w-4 h-4"></i> Anotar
-                        </button>
-                    </div>
-                    <div id="agendaNotesList" class="mt-2 space-y-1.5"></div>
-                    <p id="agendaNotesEmpty" class="text-[11px] text-amber-700/70 mt-2">Nenhuma anotação para este dia.</p>
                 </div>
+            </aside>
 
-                <div id="agendaSlotsList"></div>
+            <!-- Agenda principal -->
+            <div class="min-w-0">
+                <!-- Cabeçalho no estilo PEC -->
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-4 md:p-5 border-b border-slate-200 bg-slate-50/70">
+                        <div class="flex flex-col md:flex-row md:items-end gap-3">
+                            <div class="flex-1 min-w-0">
+                                <label class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Profissional / equipe</label>
+                                <select id="agendaProfSelect" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-semibold bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none"></select>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button id="prevDayBtn" title="Dia anterior" class="p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-500 transition">
+                                    <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                                </button>
+                                <button id="nextDayBtn" title="Próximo dia" class="p-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-500 transition">
+                                    <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
 
-                <button id="agendaAddBtn" class="w-full mt-3 border-2 border-dashed border-slate-200 rounded-xl py-2.5 text-sm font-semibold text-teal-600 hover:border-teal-300 hover:bg-teal-50 transition flex items-center justify-center gap-1.5">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Adicionar paciente
-                </button>
+                    <div class="px-4 md:px-5 pt-4">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                            <div>
+                                <h2 id="agendaDayLabel" class="text-lg md:text-xl font-bold text-slate-800"></h2>
+                                <p id="agendaMonthLabel" class="text-xs text-slate-400"></p>
+                            </div>
+                            <button id="agendaAddBtn" class="inline-flex items-center justify-center gap-1.5 bg-teal-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold hover:bg-teal-700 transition">
+                                <i data-lucide="plus" class="w-4 h-4"></i> Inserir paciente
+                            </button>
+                        </div>
+                    </div>
 
-                <p class="text-[11px] text-slate-400 mt-4 flex items-start gap-1.5">
-                    <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5"></i>
-                    Os pacientes aparecem aqui automaticamente ao enviar a mensagem pela aba "Nova Mensagem", em ordem de horário. Você também pode ajustar o nome, telefone e horário direto aqui, ou remover com a lixeira.
-                </p>
+                    <!-- Horários -->
+                    <div class="p-4 md:p-5 pt-3">
+                        <div class="flex items-center gap-3 px-2 pb-2 border-b border-slate-200 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                            <span class="w-14 flex-shrink-0">Horário</span>
+                            <span class="flex-1">Paciente / atendimento</span>
+                            <span class="hidden sm:block w-28 text-right">Status</span>
+                        </div>
+                        <div id="agendaSlotsList" class="divide-y divide-slate-100"></div>
+                        <p class="text-[11px] text-slate-400 mt-4 flex items-start gap-1.5">
+                            <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5"></i>
+                            Toque em um horário para inserir ou editar o paciente. O aviso pelo WhatsApp continua usando a aba "Nova Mensagem".
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -362,21 +327,46 @@
         </div>
     </section>
 
+    <!-- Anotações -->
+    <section id="notesSection" class="hidden max-w-4xl mx-auto p-4 md:p-6 pb-24">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+            <div class="flex items-center justify-between gap-3 mb-4">
+                <div>
+                    <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2"><i data-lucide="notebook-pen" class="w-5 h-5 text-teal-600"></i> Anotações</h2>
+                    <p class="text-xs text-slate-400">Área separada da agenda para lembretes pessoais de trabalho.</p>
+                </div>
+                <button id="clearNotesBtn" class="text-xs font-semibold text-red-500 hover:underline">Limpar tudo</button>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-4">
+                <div class="grid grid-cols-1 md:grid-cols-[1fr_160px] gap-2">
+                    <input id="noteText" type="text" placeholder="Ex.: lembrar de confirmar os pacientes de quinta-feira" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    <button id="addNoteBtn" class="bg-teal-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold hover:bg-teal-700 transition">+ Adicionar anotação</button>
+                </div>
+            </div>
+            <div id="notesList" class="space-y-2"></div>
+            <p id="notesEmpty" class="text-sm text-slate-400 text-center py-8">Nenhuma anotação salva.</p>
+        </div>
+    </section>
+
     <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40" style="padding-bottom: env(safe-area-inset-bottom);">
-        <div class="max-w-4xl mx-auto grid grid-cols-3">
-            <button id="tabAgendaBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-teal-700 transition">
-                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-                <span class="text-[11px] font-semibold">Agenda</span>
-            </button>
-            <button id="tabMessageBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
+        <div class="max-w-4xl mx-auto grid grid-cols-4">
+            <button id="tabMessageBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-teal-700 transition">
                 <i data-lucide="send" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Nova Mensagem</span>
+            </button>
+            <button id="tabAgendaBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
+                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+                <span class="text-[11px] font-semibold">Agenda</span>
             </button>
             <button id="tabRemindersBtn" class="relative flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
                 <i data-lucide="bell" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Lembretes</span>
                 <span id="remindersBadge" class="hidden absolute top-1 right-[28%] bg-red-500 text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
+            </button>
+            <button id="tabNotesBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
+                <i data-lucide="notebook-pen" class="w-5 h-5"></i>
+                <span class="text-[11px] font-semibold">Anotações</span>
             </button>
         </div>
     </nav>
@@ -400,15 +390,6 @@
                 </div>
             </div>
             <div class="flex justify-end gap-2 pt-2">
-                <div class="mt-4 pt-4 border-t border-slate-200">
-                    <p class="text-xs font-bold text-slate-700 mb-1">💾 Backup local</p>
-                    <p class="text-[11px] text-slate-400 mb-2">Exporta agenda, modelos, histórico e configurações deste aparelho.</p>
-                    <div class="flex gap-2">
-                        <button type="button" id="exportBackupBtn" class="flex-1 px-3 py-2 bg-teal-50 text-teal-700 text-xs font-semibold rounded-lg border border-teal-200">Exportar</button>
-                        <button type="button" id="importBackupBtn" class="flex-1 px-3 py-2 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg">Restaurar</button>
-                    </div>
-                    <input type="file" id="backupFileInput" accept=".json,application/json" class="hidden">
-                </div>
                 <button id="cancelSettingsBtn" class="px-4 py-2 bg-slate-100 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-200">Cancelar</button>
                 <button id="saveSettingsBtn" class="px-4 py-2 bg-teal-600 text-white text-xs font-semibold rounded-lg hover:bg-teal-700">Salvar Meu Número</button>
             </div>
@@ -455,7 +436,7 @@
     <script>
         // Templates
         const defaultTemplates = {
-            padrao: `Olá, *{NOME}*! tudo bem?\n\nPassando para lembrar da sua consulta agendada:\n\n📅 *Data:* {DATA}\n⏰ *Horário:* {HORARIO} ({ATENDIMENTO})\n👨‍⚕️ *Profissional:* {MEDICO}\n📋 *Atendimento:* {TIPO}\n📍 *Local:* {LOCAL}\n\nPor favor, confirme se recebeu esta mensagem. Caso não possa comparecer, nos avise com antecedência!`,
+            padrao: `Olá, *{NOME}*! tudo bem?\n\nPassando para lembrar da sua consulta agendada:\n\n📅 *Data:* {DATA}\n⏰ *Horário:* A partir das {HORARIO} ({ATENDIMENTO})\n👨‍⚕️ *Profissional:* {MEDICO}\n📋 *Atendimento:* {TIPO}\n📍 *Local:* {LOCAL}\n\nPor favor, confirme se recebeu esta mensagem. Caso não possa comparecer, nos avise com antecedência!`,
             curto: `Lembrete de consulta para *{NOME}*:\nDia {DATA} às {HORARIO} com {MEDICO} ({TIPO}).\nAtendimento {ATENDIMENTO} na {LOCAL}.`,
             documentos: `Olá *{NOME}*!\nLembramos de sua consulta no dia *{DATA}* a partir das *{HORARIO}* com {MEDICO} ({TIPO}).\n\n📌 *Atenção:* Favor trazer documento com foto, cartão do SUS e exames anteriores se possuir.\nLocal: {LOCAL}.`
         };
@@ -469,7 +450,6 @@
         const patientPhone = document.getElementById('patientPhone');
         const appDate = document.getElementById('appDate');
         const appTime = document.getElementById('appTime');
-        const appointmentAvailability = document.getElementById('appointmentAvailability');
         const attendanceType = document.getElementById('attendanceType');
         const doctorName = document.getElementById('doctorName');
         const consultType = document.getElementById('consultType');
@@ -499,20 +479,19 @@
         const toast = document.getElementById('toast');
         const pickContactBtn = document.getElementById('pickContactBtn');
         const contactHint = document.getElementById('contactHint');
-        const summaryToday = document.getElementById('summaryToday');
-        const summaryPending = document.getElementById('summaryPending');
-        const summarySent = document.getElementById('summarySent');
-        const summaryConfirmed = document.getElementById('summaryConfirmed');
-        const exportBackupBtn = document.getElementById('exportBackupBtn');
-        const importBackupBtn = document.getElementById('importBackupBtn');
-        const backupFileInput = document.getElementById('backupFileInput');
-
 
         // Agenda do Dia
         const messageSection = document.getElementById('messageSection');
         const tabMessageBtn = document.getElementById('tabMessageBtn');
         const tabAgendaBtn = document.getElementById('tabAgendaBtn');
         const tabRemindersBtn = document.getElementById('tabRemindersBtn');
+        const tabNotesBtn = document.getElementById('tabNotesBtn');
+        const notesSection = document.getElementById('notesSection');
+        const noteText = document.getElementById('noteText');
+        const addNoteBtn = document.getElementById('addNoteBtn');
+        const clearNotesBtn = document.getElementById('clearNotesBtn');
+        const notesList = document.getElementById('notesList');
+        const notesEmpty = document.getElementById('notesEmpty');
         const remindersSection = document.getElementById('remindersSection');
         const remindersBadge = document.getElementById('remindersBadge');
         const remindersBanner = document.getElementById('remindersBanner');
@@ -529,11 +508,6 @@
         const prevDayBtn = document.getElementById('prevDayBtn');
         const nextDayBtn = document.getElementById('nextDayBtn');
         const agendaTodayBtn = document.getElementById('agendaTodayBtn');
-        const agendaNoteInput = document.getElementById('agendaNoteInput');
-        const agendaAddNoteBtn = document.getElementById('agendaAddNoteBtn');
-        const agendaNotesList = document.getElementById('agendaNotesList');
-        const agendaNotesEmpty = document.getElementById('agendaNotesEmpty');
-        const agendaNotesCount = document.getElementById('agendaNotesCount');
         const agendaProfSelect = document.getElementById('agendaProfSelect');
         const professionalCategory = document.getElementById('professionalCategory');
         const calMonthLabel = document.getElementById('calMonthLabel');
@@ -563,7 +537,7 @@
         const agendaSlotTimes = generateSlotTimes();
 
         let agendaData = JSON.parse(localStorage.getItem('app_agenda')) || {};
-        let agendaNotes = JSON.parse(localStorage.getItem('app_agenda_notes')) || {};
+        let notesData = JSON.parse(localStorage.getItem('app_notes')) || [];
         let agendaCurrentDate = new Date();
         let calendarViewDate = new Date(agendaCurrentDate.getFullYear(), agendaCurrentDate.getMonth(), 1);
 
@@ -576,7 +550,6 @@
 
         function saveAgenda() {
             localStorage.setItem('app_agenda', JSON.stringify(agendaData));
-            if (typeof updateSummary === 'function') updateSummary();
         }
 
         function snapToAgendaSlot(timeStr) {
@@ -598,10 +571,9 @@
             if (!dateStr || !slotTime) return;
             if (!agendaData[dateStr]) agendaData[dateStr] = {};
             if (!agendaData[dateStr][profKey]) agendaData[dateStr][profKey] = {};
-            if (!agendaData[dateStr][profKey][slotTime]) agendaData[dateStr][profKey][slotTime] = { name: '', phone: '', professionalName: '', avisado: false, confirmado: false, tipoHorario: getAttendanceType() === 'arrival_order' ? 'chegada' : 'marcado' };
+            if (!agendaData[dateStr][profKey][slotTime]) agendaData[dateStr][profKey][slotTime] = { name: '', phone: '', avisado: false, tipoHorario: 'marcado' };
             if (!agendaData[dateStr][profKey][slotTime].name) agendaData[dateStr][profKey][slotTime].name = name || '';
             if (!agendaData[dateStr][profKey][slotTime].phone && phone) agendaData[dateStr][profKey][slotTime].phone = phone;
-            agendaData[dateStr][profKey][slotTime].professionalName = doctorName.value.trim() || agendaData[dateStr][profKey][slotTime].professionalName || profKey;
             agendaData[dateStr][profKey][slotTime].avisado = true;
             saveAgenda();
             if (dateKey(agendaCurrentDate) === dateStr && agendaCurrentProf === profKey) renderAgenda();
@@ -624,8 +596,8 @@
                     const slot = profData[time];
                     if (slot && slot.name && slot.name.trim()) {
                         items.push({
-                            time, prof, name: slot.name.trim(), phone: (slot.phone || '').trim(), professionalName: (slot.professionalName || '').trim(),
-                            avisado: !!slot.avisado, confirmado: !!slot.confirmado, tipoHorario: slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado'
+                            time, prof, name: slot.name.trim(), phone: (slot.phone || '').trim(),
+                            avisado: !!slot.avisado, tipoHorario: slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado'
                         });
                     }
                 });
@@ -636,11 +608,11 @@
 
         function buildReminderMessage(name, tomorrow, time, prof, tipoHorario) {
             const dataStr = formatDate(dateKey(tomorrow));
-            const detalheHorario = tipoHorario === 'chegada'
-                ? `às ${time} (atendimento por ordem de chegada)`
-                : `às ${time} (horário marcado)`;
-
-            return `Oi, *${name}*! Tudo bem?\n\nPassando para lembrar da sua consulta com *${prof}* amanhã, dia *${dataStr}*, ${detalheHorario}.\n\n*Podemos confirmar a sua presença?* Se acontecer algum imprevisto e você não puder vir, me avisa aqui o quanto antes para eu liberar a vaga.\n\n*(Lembrete do sistema de agenda)*`;
+            const footer = `\n\n_Esta é uma mensagem automática, então não precisa responder. Só pedimos, por gentileza, que nos avise caso não possa comparecer — assim, conseguimos oferecer a sua vaga para outra pessoa que também precisa ser atendida._`;
+            if (tipoHorario === 'chegada') {
+                return `Olá ${name}, tudo bem? Passando para avisar sobre sua consulta amanhã, dia ${dataStr}. O atendimento é por ordem de chegada a partir das ${time} — chegue com antecedência para garantir sua vaga!${footer}`;
+            }
+            return `Olá ${name}, tudo bem? Passando para avisar sobre sua consulta amanhã, dia ${dataStr}. Não esqueça de chegar no horário certinho!${footer}`;
         }
 
         function updateRemindersBanner() {
@@ -718,14 +690,13 @@
                         }
                     }
 
-                    const profissional = item.professionalName || item.prof;
-                    const msg = buildReminderMessage(item.name, tomorrow, item.time, profissional, item.tipoHorario);
+                    const msg = buildReminderMessage(item.name, tomorrow, item.time, item.prof, item.tipoHorario);
                     const link = buildWaLink(phone, msg);
                     window.open(link, '_blank');
 
                     if (!agendaData[key]) agendaData[key] = {};
                     if (!agendaData[key][prof]) agendaData[key][prof] = {};
-                    if (!agendaData[key][prof][time]) agendaData[key][prof][time] = { name: item.name, phone: phone, professionalName: item.professionalName || prof, avisado: false, confirmado: false, tipoHorario: item.tipoHorario || 'marcado' };
+                    if (!agendaData[key][prof][time]) agendaData[key][prof][time] = { name: item.name, phone: phone, avisado: false };
                     agendaData[key][prof][time].phone = phone;
                     agendaData[key][prof][time].avisado = true;
                     saveAgenda();
@@ -752,71 +723,6 @@
         function isSameDay(a, b) {
             return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
         }
-
-        function getDayNotes(key) {
-            return Array.isArray(agendaNotes[key]) ? agendaNotes[key] : [];
-        }
-
-        function saveNotes() {
-            localStorage.setItem('app_agenda_notes', JSON.stringify(agendaNotes));
-        }
-
-        function renderAgendaNotes() {
-            const key = dateKey(agendaCurrentDate);
-            const notes = getDayNotes(key);
-            agendaNotesList.innerHTML = '';
-            agendaNotesEmpty.classList.toggle('hidden', notes.length > 0);
-            if (notes.length) {
-                agendaNotesCount.textContent = `${notes.length} ${notes.length === 1 ? 'anotação' : 'anotações'}`;
-                agendaNotesCount.classList.remove('hidden');
-            } else {
-                agendaNotesCount.classList.add('hidden');
-            }
-            notes.forEach((note, index) => {
-                const row = document.createElement('div');
-                row.className = 'flex items-center gap-2 bg-white border border-amber-100 rounded-lg px-2.5 py-2';
-
-                const text = document.createElement('span');
-                text.className = 'flex-1 min-w-0 text-xs text-amber-950 break-words';
-                text.textContent = note;
-
-                const del = document.createElement('button');
-                del.type = 'button';
-                del.title = 'Excluir anotação';
-                del.className = 'w-7 h-7 flex-shrink-0 rounded-md text-amber-500 hover:text-red-600 hover:bg-red-50 flex items-center justify-center';
-                del.innerHTML = '<i data-lucide="trash-2" class="w-3.5 h-3.5"></i>';
-                del.addEventListener('click', () => {
-                    agendaNotes[key].splice(index, 1);
-                    if (!agendaNotes[key].length) delete agendaNotes[key];
-                    saveNotes();
-                    renderAgendaNotes();
-                    renderCalendar();
-                });
-
-                row.appendChild(text);
-                row.appendChild(del);
-                agendaNotesList.appendChild(row);
-            });
-            lucide.createIcons();
-        }
-
-        function addAgendaNote() {
-            const note = agendaNoteInput.value.trim();
-            if (!note) return;
-            const key = dateKey(agendaCurrentDate);
-            if (!agendaNotes[key]) agendaNotes[key] = [];
-            agendaNotes[key].push(note);
-            saveNotes();
-            agendaNoteInput.value = '';
-            renderAgendaNotes();
-            renderCalendar();
-            showToast('Anotação salva!');
-        }
-
-        agendaAddNoteBtn.addEventListener('click', addAgendaNote);
-        agendaNoteInput.addEventListener('keydown', e => {
-            if (e.key === 'Enter') { e.preventDefault(); addAgendaNote(); }
-        });
 
         function renderCalendar() {
             calMonthLabel.textContent = `${monthNames[calendarViewDate.getMonth()]} - ${calendarViewDate.getFullYear()}`;
@@ -849,15 +755,6 @@
                 if (isSelected) cls = 'text-xs py-1.5 rounded-full bg-teal-700 text-white font-bold ';
 
                 btn.className = cls;
-
-                const noteCount = getDayNotes(dateKey(cellDate)).length;
-                if (noteCount > 0) {
-                    const noteDot = document.createElement('span');
-                    noteDot.className = 'block mx-auto mt-0.5 w-1.5 h-1.5 rounded-full bg-amber-500';
-                    noteDot.title = `${noteCount} ${noteCount === 1 ? 'anotação' : 'anotações'}`;
-                    btn.appendChild(noteDot);
-                }
-
                 btn.addEventListener('click', () => {
                     agendaCurrentDate = new Date(cellDate);
                     expandedAgendaTime = null;
@@ -890,78 +787,82 @@
         function renderAgenda() {
             const key = dateKey(agendaCurrentDate);
             agendaDayLabel.textContent = `${weekdayNames[agendaCurrentDate.getDay()]}, ${agendaCurrentDate.getDate()} de ${monthNames[agendaCurrentDate.getMonth()]} de ${agendaCurrentDate.getFullYear()}`;
-            agendaMonthLabel.textContent = agendaCurrentProf;
+            agendaMonthLabel.textContent = `Agenda de ${agendaCurrentProf}`;
 
             populateAgendaProfSelect();
-            renderAgendaNotes();
 
             const dayData = (agendaData[key] && agendaData[key][agendaCurrentProf]) || {};
-            const times = Object.keys(dayData).sort((a, b) => a.localeCompare(b));
             const color = PROF_COLORS[agendaCurrentProf] || PROF_COLORS['Médico'];
-
             agendaSlotsList.innerHTML = '';
 
-            if (times.length === 0) {
-                agendaSlotsList.innerHTML = '<p class="text-sm text-slate-400 text-center py-6">Nenhum paciente marcado ainda para este dia.</p>';
-            }
-
-            times.forEach(time => {
-                const slot = dayData[time];
+            // Mostra todos os horários disponíveis, como no PEC, e não apenas os já ocupados.
+            agendaSlotTimes.forEach(time => {
+                const slot = dayData[time] || null;
                 const isOpen = expandedAgendaTime === time;
-                const safeName = (slot.name || '').replace(/"/g, '&quot;');
-                const safePhone = (slot.phone || '').replace(/"/g, '&quot;');
-                const tipoHorario = slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado';
-                const displayName = slot.name && slot.name.trim() ? slot.name : 'Sem nome';
+                const safeName = slot ? (slot.name || '').replace(/"/g, '&quot;') : '';
+                const safePhone = slot ? (slot.phone || '').replace(/"/g, '&quot;') : '';
+                const tipoHorario = slot && slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado';
+                const hasPatient = !!(slot && slot.name && slot.name.trim());
 
                 const card = document.createElement('div');
-                card.className = 'border-t border-slate-100 first:border-t-0';
+                card.className = `${hasPatient ? 'bg-white' : 'bg-slate-50/40'} border-b border-slate-100`;
 
                 const header = document.createElement('button');
                 header.type = 'button';
-                header.className = 'agenda-card-toggle w-full flex items-center gap-3 py-3 text-left';
+                header.className = 'agenda-card-toggle w-full flex items-center gap-3 py-3 px-2 text-left hover:bg-teal-50/50 transition rounded-lg';
                 header.dataset.time = time;
                 header.innerHTML = `
-                    <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 ${color.dot}"></span>
-                    <span class="w-12 text-xs text-slate-500 flex-shrink-0">${time}</span>
-                    <span class="flex-1 min-w-0 text-sm font-medium text-slate-800 truncate">${displayName}</span>
-                    ${slot.confirmado
-                        ? `<span class="flex items-center gap-1 text-blue-600 text-[11px] font-semibold flex-shrink-0"><i data-lucide="badge-check" class="w-3.5 h-3.5"></i> Confirmado</span>`
-                        : slot.avisado
-                            ? `<span class="flex items-center gap-1 text-emerald-600 text-[11px] font-semibold flex-shrink-0"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i> Avisado</span>`
-                            : `<span class="text-[11px] text-slate-300 flex-shrink-0">Pendente</span>`
-                    }
+                    <span class="w-1.5 h-10 rounded-full flex-shrink-0 ${hasPatient ? color.dot : 'bg-slate-200'}"></span>
+                    <span class="w-14 text-xs md:text-sm font-semibold ${hasPatient ? 'text-slate-700' : 'text-slate-400'} flex-shrink-0">${time}</span>
+                    <span class="flex-1 min-w-0">
+                        <span class="block text-sm font-medium ${hasPatient ? 'text-slate-800' : 'text-slate-400'} truncate">${hasPatient ? escapeHtml(slot.name) : 'Horário disponível'}</span>
+                        ${hasPatient && slot.tipoHorario === 'chegada' ? '<span class="text-[10px] text-slate-400">Atendimento por ordem de chegada</span>' : ''}
+                    </span>
+                    <span class="hidden sm:block w-28 text-right flex-shrink-0">
+                        ${hasPatient ? (slot.avisado
+                            ? `<span class="inline-flex items-center gap-1 text-emerald-600 text-[11px] font-semibold"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>Avisado</span>`
+                            : `<span class="text-[11px] text-amber-600 font-semibold">Pendente</span>`) : '<span class="text-[11px] text-slate-300">Livre</span>'}
+                    </span>
                     <i data-lucide="chevron-down" class="w-4 h-4 text-slate-300 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}"></i>
                 `;
                 card.appendChild(header);
 
                 if (isOpen) {
                     const details = document.createElement('div');
-                    details.className = 'pb-3 pl-[26px] space-y-2';
+                    details.className = 'pb-4 pl-[26px] pr-2 space-y-2';
                     details.innerHTML = `
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <input type="time" value="${time}" step="900" min="09:00" max="14:00" data-time="${time}" data-field="time"
-                                class="agenda-time-input w-[78px] flex-shrink-0 px-1.5 py-1.5 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                            <select data-time="${time}" data-field="tipoHorario"
-                                class="agenda-tipo-select flex-1 min-w-[110px] px-1.5 py-1.5 border border-slate-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                                <option value="marcado" ${tipoHorario === 'marcado' ? 'selected' : ''}>Horário marcado</option>
-                                <option value="chegada" ${tipoHorario === 'chegada' ? 'selected' : ''}>Hor. de chegada</option>
-                            </select>
+                        <div class="grid grid-cols-1 sm:grid-cols-[100px_1fr] gap-2">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Horário</label>
+                                <input type="time" value="${time}" step="900" min="09:00" max="14:00" data-time="${time}" data-field="time"
+                                    class="agenda-time-input w-full px-2 py-2 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Tipo de horário</label>
+                                <select data-time="${time}" data-field="tipoHorario"
+                                    class="agenda-tipo-select w-full px-2 py-2 border border-slate-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                                    <option value="marcado" ${tipoHorario === 'marcado' ? 'selected' : ''}>Horário marcado</option>
+                                    <option value="chegada" ${tipoHorario === 'chegada' ? 'selected' : ''}>Horário de chegada</option>
+                                </select>
+                            </div>
                         </div>
-                        <input type="text" value="${safeName}" placeholder="Nome do paciente" data-time="${time}" data-field="name"
-                            class="agenda-name-input w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
-                        <input type="tel" value="${safePhone}" placeholder="Telefone" data-time="${time}" data-field="phone"
-                            class="agenda-phone-input w-full px-3 py-1.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Paciente</label>
+                            <input type="text" value="${safeName}" placeholder="Digite o nome do paciente" data-time="${time}" data-field="name"
+                                class="agenda-name-input w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">WhatsApp</label>
+                            <input type="tel" value="${safePhone}" placeholder="(27) 99999-9999" data-time="${time}" data-field="phone"
+                                class="agenda-phone-input w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        </div>
                         <div class="flex items-center gap-2 pt-1">
                             <button data-time="${time}" title="Marcar como avisado"
-                                class="agenda-check-btn flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border text-xs font-semibold transition ${slot.avisado ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-200 text-slate-500 hover:border-emerald-300'}">
-                                <i data-lucide="check" class="w-3.5 h-3.5"></i> ${slot.avisado ? 'Avisado' : 'Marcar avisado'}
+                                class="agenda-check-btn flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg border text-xs font-semibold transition ${slot && slot.avisado ? 'bg-emerald-500 border-emerald-500 text-white' : 'bg-white border-slate-200 text-slate-500 hover:border-emerald-300'}">
+                                <i data-lucide="check" class="w-3.5 h-3.5"></i> ${slot && slot.avisado ? 'Avisado' : 'Marcar avisado'}
                             </button>
-                            <button data-time="${time}" title="Confirmar atendimento"
-                                class="agenda-confirm-btn flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg border text-xs font-semibold transition ${slot.confirmado ? 'bg-blue-500 border-blue-500 text-white' : 'bg-white border-slate-200 text-slate-500 hover:border-blue-300'}">
-                                <i data-lucide="badge-check" class="w-3.5 h-3.5"></i> ${slot.confirmado ? 'Confirmado' : 'Confirmar'}
-                            </button>
-                            <button data-time="${time}" title="Remover"
-                                class="agenda-delete-btn w-9 h-9 flex-shrink-0 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition">
+                            <button data-time="${time}" title="Remover horário"
+                                class="agenda-delete-btn w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-lg border border-slate-200 text-slate-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
                             </button>
                         </div>
@@ -976,8 +877,19 @@
             agendaSlotsList.querySelectorAll('.agenda-card-toggle').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const time = btn.dataset.time;
+                    const k = dateKey(agendaCurrentDate);
+                    if (!agendaData[k]) agendaData[k] = {};
+                    if (!agendaData[k][agendaCurrentProf]) agendaData[k][agendaCurrentProf] = {};
+                    if (!agendaData[k][agendaCurrentProf][time]) {
+                        agendaData[k][agendaCurrentProf][time] = { name: '', phone: '', avisado: false, tipoHorario: 'marcado' };
+                        saveAgenda();
+                    }
                     expandedAgendaTime = expandedAgendaTime === time ? null : time;
                     renderAgenda();
+                    if (expandedAgendaTime === time) {
+                        const input = agendaSlotsList.querySelector(`.agenda-name-input[data-time="${time}"]`);
+                        if (input) input.focus();
+                    }
                 });
             });
 
@@ -1020,6 +932,11 @@
                     const k = dateKey(agendaCurrentDate);
                     if (!agendaData[k] || !agendaData[k][agendaCurrentProf] || !agendaData[k][agendaCurrentProf][oldTime]) return;
                     const snapped = snapToAgendaSlot(input.value) || oldTime;
+                    if (snapped !== oldTime && agendaData[k][agendaCurrentProf][snapped]) {
+                        showToast('Esse horário já está ocupado. Escolha outro horário.');
+                        renderAgenda();
+                        return;
+                    }
                     const entry = agendaData[k][agendaCurrentProf][oldTime];
                     delete agendaData[k][agendaCurrentProf][oldTime];
                     agendaData[k][agendaCurrentProf][snapped] = entry;
@@ -1035,24 +952,15 @@
                     const time = btn.dataset.time;
                     const k = dateKey(agendaCurrentDate);
                     if (!agendaData[k] || !agendaData[k][agendaCurrentProf] || !agendaData[k][agendaCurrentProf][time]) return;
-                    agendaData[k][agendaCurrentProf][time].avisado = !agendaData[k][agendaCurrentProf][time].avisado;
+                    const entry = agendaData[k][agendaCurrentProf][time];
+                    if (!entry.name || !entry.name.trim()) {
+                        showToast('Informe o paciente antes de marcar como avisado.');
+                        return;
+                    }
+                    entry.avisado = !entry.avisado;
                     saveAgenda();
                     renderAgenda();
                     updateRemindersBanner();
-                });
-            });
-
-
-            agendaSlotsList.querySelectorAll('.agenda-confirm-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const time = btn.dataset.time;
-                    const k = dateKey(agendaCurrentDate);
-                    if (!agendaData[k] || !agendaData[k][agendaCurrentProf] || !agendaData[k][agendaCurrentProf][time]) return;
-                    agendaData[k][agendaCurrentProf][time].confirmado = !agendaData[k][agendaCurrentProf][time].confirmado;
-                    saveAgenda();
-                    renderAgenda();
-                    updateRemindersBanner();
-                    updateSummary();
                 });
             });
 
@@ -1077,7 +985,7 @@
             if (!agendaData[k][agendaCurrentProf]) agendaData[k][agendaCurrentProf] = {};
             const used = new Set(Object.keys(agendaData[k][agendaCurrentProf]));
             const newTime = agendaSlotTimes.find(t => !used.has(t)) || agendaSlotTimes[0];
-            agendaData[k][agendaCurrentProf][newTime] = { name: '', phone: '', professionalName: '', avisado: false, confirmado: false, tipoHorario: 'marcado' };
+            agendaData[k][agendaCurrentProf][newTime] = { name: '', phone: '', avisado: false, tipoHorario: 'marcado' };
             saveAgenda();
             expandedAgendaTime = newTime;
             renderAgenda();
@@ -1111,11 +1019,57 @@
             renderAgenda();
         });
 
+        function saveNotes() {
+            localStorage.setItem('app_notes', JSON.stringify(notesData));
+        }
+
+        function renderNotes() {
+            notesList.innerHTML = '';
+            notesEmpty.classList.toggle('hidden', notesData.length > 0);
+            notesData.forEach(note => {
+                const item = document.createElement('div');
+                item.className = 'flex items-start gap-3 p-3 rounded-xl border border-slate-200 bg-white hover:bg-slate-50';
+                item.innerHTML = `
+                    <button data-id="${note.id}" class="note-done-btn mt-0.5 w-6 h-6 rounded-full border ${note.done ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 text-transparent'} flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    </button>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm ${note.done ? 'line-through text-slate-400' : 'text-slate-700'} break-words">${escapeHtml(note.text)}</p>
+                        <p class="text-[10px] text-slate-400 mt-1">${note.date}</p>
+                    </div>
+                    <button data-id="${note.id}" class="note-delete-btn text-slate-300 hover:text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                notesList.appendChild(item);
+            });
+            notesList.querySelectorAll('.note-done-btn').forEach(btn => btn.addEventListener('click', () => {
+                const n = notesData.find(x => x.id == btn.dataset.id); if (n) n.done = !n.done; saveNotes(); renderNotes();
+            }));
+            notesList.querySelectorAll('.note-delete-btn').forEach(btn => btn.addEventListener('click', () => {
+                notesData = notesData.filter(x => x.id != btn.dataset.id); saveNotes(); renderNotes();
+            }));
+            lucide.createIcons();
+        }
+
+        function escapeHtml(value) {
+            return String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+        }
+
+        addNoteBtn.addEventListener('click', () => {
+            const text = noteText.value.trim();
+            if (!text) { noteText.focus(); showToast('Digite uma anotação primeiro.'); return; }
+            notesData.unshift({ id: Date.now(), text, done: false, date: new Date().toLocaleString('pt-BR') });
+            noteText.value = ''; saveNotes(); renderNotes(); showToast('Anotação salva!');
+        });
+        noteText.addEventListener('keydown', e => { if (e.key === 'Enter') addNoteBtn.click(); });
+        clearNotesBtn.addEventListener('click', () => {
+            if (!notesData.length) return;
+            if (confirm('Apagar todas as anotações?')) { notesData = []; saveNotes(); renderNotes(); }
+        });
+
         function switchTab(tab) {
             const activeClasses = ['text-teal-700'];
             const inactiveClasses = ['text-slate-400'];
-            const allSections = { message: messageSection, agenda: agendaSection, reminders: remindersSection };
-            const allTabs = { message: tabMessageBtn, agenda: tabAgendaBtn, reminders: tabRemindersBtn };
+            const allSections = { message: messageSection, agenda: agendaSection, reminders: remindersSection, notes: notesSection };
+            const allTabs = { message: tabMessageBtn, agenda: tabAgendaBtn, reminders: tabRemindersBtn, notes: tabNotesBtn };
 
             Object.keys(allSections).forEach(key => {
                 if (key === tab) {
@@ -1132,10 +1086,12 @@
             window.scrollTo(0, 0);
             if (tab === 'agenda') renderAgenda();
             if (tab === 'reminders') renderReminders();
+            if (tab === 'notes') renderNotes();
         }
         tabMessageBtn.addEventListener('click', () => switchTab('message'));
         tabAgendaBtn.addEventListener('click', () => switchTab('agenda'));
         tabRemindersBtn.addEventListener('click', () => switchTab('reminders'));
+        tabNotesBtn.addEventListener('click', () => switchTab('notes'));
         remindersBannerBtn.addEventListener('click', () => switchTab('reminders'));
 
 
@@ -1159,20 +1115,6 @@
             return (str || '').replace(/\D/g, '');
         }
 
-        function getAttendanceType() {
-            return attendanceType.value === 'arrival_order' ? 'arrival_order' : 'scheduled';
-        }
-
-        function getAttendanceLabel(type = getAttendanceType()) {
-            return type === 'arrival_order' ? 'por ordem de chegada' : 'horário marcado';
-        }
-
-        function isTomorrow(dateStr) {
-            if (!dateStr) return false;
-            const tomorrow = getTomorrowDate();
-            return dateStr === dateKey(tomorrow);
-        }
-
         function generateMessage() {
             const selectedKey = templateSelect.value;
             let templateText = templates[selectedKey] || templates.padrao;
@@ -1182,9 +1124,7 @@
             const timeVal = appTime.value || '[Horário]';
             const doctorVal = doctorName.value.trim() || '[Médico/Profissional]';
             const consultVal = consultType.value.trim() || '[Consulta]';
-            const attendVal = attendanceType.value === 'arrival_order'
-                ? 'por ordem de chegada'
-                : 'horário marcado';
+            const attendVal = attendanceType.value;
             const locVal = locationInput.value.trim() || 'Unidade de Saúde';
 
             let msg = templateText
@@ -1200,43 +1140,6 @@
             return msg;
         }
 
-        function getAppointmentConflict() {
-            const dateStr = appDate.value;
-            const timeStr = appTime.value;
-            const profKey = professionalCategory.value;
-            if (!dateStr || !timeStr || !AGENDA_PROFESSIONALS.includes(profKey)) return null;
-
-            const slotTime = snapToAgendaSlot(timeStr);
-            if (!slotTime) return null;
-
-            const slot = agendaData?.[dateStr]?.[profKey]?.[slotTime];
-            if (slot && slot.name && slot.name.trim()) {
-                return { slotTime, slot };
-            }
-            return null;
-        }
-
-        function updateAppointmentAvailability() {
-            if (!appointmentAvailability) return;
-            const conflict = getAppointmentConflict();
-
-            appointmentAvailability.className = 'hidden mt-1.5 text-xs rounded-lg px-2.5 py-2';
-            if (!appDate.value || !appTime.value) return;
-
-            if (conflict) {
-                const name = conflict.slot.name.trim();
-                const extra = conflict.slot.tipoHorario === 'chegada' ? ' (ordem de chegada)' : '';
-                appointmentAvailability.className = 'mt-1.5 text-xs rounded-lg px-2.5 py-2 bg-red-50 border border-red-200 text-red-700';
-                appointmentAvailability.innerHTML = `<strong>🔴 Horário ocupado</strong><br>Já existe agendamento para <strong>${name}</strong> às <strong>${conflict.slotTime}</strong>${extra}. Escolha outro horário.`;
-            } else {
-                const slotTime = snapToAgendaSlot(appTime.value);
-                if (slotTime) {
-                    appointmentAvailability.className = 'mt-1.5 text-xs rounded-lg px-2.5 py-2 bg-emerald-50 border border-emerald-200 text-emerald-700';
-                    appointmentAvailability.innerHTML = `🟢 <strong>Horário disponível</strong> para ${professionalCategory.value} às ${slotTime}.`;
-                }
-            }
-        }
-
         function validateForm(showAlert = true) {
             const required = [patientName, patientPhone, appDate, appTime, doctorName, consultType];
             const missing = required.find(el => !el.value.trim());
@@ -1248,18 +1151,6 @@
                 }
                 return false;
             }
-
-            const conflict = getAppointmentConflict();
-            if (conflict) {
-                updateAppointmentAvailability();
-                if (showAlert) {
-                    appTime.classList.add('ring-2', 'ring-red-400', 'border-red-400');
-                    appTime.focus();
-                    showToast(`Horário ocupado: ${conflict.slot.name.trim()} já está agendado às ${conflict.slotTime}.`);
-                }
-                return false;
-            }
-
             return true;
         }
 
@@ -1324,19 +1215,10 @@
         }
 
         // Live preview updates
-        [patientName, patientPhone, appDate, appTime, doctorName, consultType, locationInput, templateSelect]
-            .forEach(el => el.addEventListener('input', () => { clearFieldErrors(); generateMessage(); updateAppointmentAvailability(); }));
-
-        document.querySelectorAll('input[name="attendanceTypeRadio"]').forEach(radio => {
-            radio.addEventListener('change', () => {
-                attendanceType.value = radio.value;
-                clearFieldErrors();
-                generateMessage();
-                updateAppointmentAvailability();
-            });
-        });
+        [patientName, patientPhone, appDate, appTime, attendanceType, doctorName, consultType, locationInput, templateSelect]
+            .forEach(el => el.addEventListener('input', () => { clearFieldErrors(); generateMessage(); }));
+        attendanceType.addEventListener('change', generateMessage);
         templateSelect.addEventListener('change', generateMessage);
-        professionalCategory.addEventListener('change', updateAppointmentAvailability);
 
         // Send to patient
         sendWhatsappBtn.addEventListener('click', () => {
@@ -1348,11 +1230,6 @@
             window.open(link, '_blank');
             saveToHistory(msg);
             markAgendaAsNotified(appDate.value, appTime.value, patientName.value.trim(), professionalCategory.value, patientPhone.value.trim());
-            const sentSlotTime = snapToAgendaSlot(appTime.value);
-            if (sentSlotTime && agendaData?.[appDate.value]?.[professionalCategory.value]?.[sentSlotTime]) {
-                agendaData[appDate.value][professionalCategory.value][sentSlotTime].tipoHorario = getAttendanceType() === 'arrival_order' ? 'chegada' : 'marcado';
-                saveAgenda();
-            }
             showToast('Abrindo WhatsApp do paciente...');
         });
 
@@ -1465,118 +1342,23 @@
             }
         });
 
-
-        function updateSummary() {
-            const todayKey = dateKey(new Date());
-            let todayItems = [];
-            const dayData = agendaData[todayKey] || {};
-            AGENDA_PROFESSIONALS.forEach(prof => {
-                const profData = dayData[prof] || {};
-                agendaSlotTimes.forEach(time => {
-                    const slot = profData[time];
-                    if (slot && slot.name && slot.name.trim()) todayItems.push(slot);
-                });
-            });
-            if (summaryToday) summaryToday.textContent = todayItems.length;
-            if (summaryPending) summaryPending.textContent = todayItems.filter(s => !s.avisado).length;
-            if (summarySent) summarySent.textContent = todayItems.filter(s => s.avisado && !s.confirmado).length;
-            if (summaryConfirmed) summaryConfirmed.textContent = todayItems.filter(s => s.confirmado).length;
-        }
-
-        function exportBackup() {
-            const backup = {
-                version: 3,
-                exportedAt: new Date().toISOString(),
-                templates,
-                history,
-                myPhone,
-                agendaData,
-                agendaNotes
-            };
-            const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `AgendaSaude-backup-${dateKey(new Date())}.json`;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-            showToast('Backup exportado!');
-        }
-
-        function importBackup(file) {
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-                try {
-                    const data = JSON.parse(reader.result);
-                    if (!data || !data.agendaData || !Array.isArray(data.history) || !data.templates) throw new Error('invalid');
-                    templates = data.templates;
-                    history = data.history;
-                    myPhone = data.myPhone || '';
-                    agendaData = data.agendaData || {};
-                    agendaNotes = data.agendaNotes || {};
-                    localStorage.setItem('app_agenda_notes', JSON.stringify(agendaNotes));
-                    localStorage.setItem('app_templates', JSON.stringify(templates));
-                    localStorage.setItem('app_history', JSON.stringify(history));
-                    localStorage.setItem('app_my_phone', myPhone);
-                    saveAgenda();
-                    updateMyPhoneBadge();
-                    renderHistory();
-                    generateMessage();
-                    renderCalendar();
-                    renderAgenda();
-                    renderReminders();
-                    updateRemindersBanner();
-                    updateSummary();
-                    showToast('Backup restaurado!');
-                } catch(e) {
-                    showToast('Arquivo de backup inválido');
-                }
-            };
-            reader.readAsText(file);
-        }
-
         // Init
         function init() {
             if (!supportsContactPicker) {
                 pickContactBtn.title = 'Escolha de contatos não suportada — apenas Chrome/Android com o app instalado';
             }
             const today = new Date();
-            const todayKey = dateKey(today);
-            appDate.value = todayKey;
-
-            // Normaliza registros antigos para manter compatibilidade com a nova estrutura.
-            Object.values(agendaData).forEach(day => {
-                Object.values(day || {}).forEach(profData => {
-                    Object.values(profData || {}).forEach(slot => {
-                        if (slot) {
-                            if (!slot.tipoHorario) slot.tipoHorario = 'marcado';
-                            if (!slot.professionalName) slot.professionalName = '';
-                        }
-                    });
-                });
-            });
-            localStorage.setItem('app_agenda', JSON.stringify(agendaData));
-            saveNotes();
-            updateAppointmentAvailability();
+            appDate.value = today.toISOString().split('T')[0];
             updateMyPhoneBadge();
             renderHistory();
             generateMessage();
+            renderNotes();
             renderCalendar();
             renderAgenda();
             updateRemindersBanner();
-            updateSummary();
             lucide.createIcons();
         }
         init();
-
-
-        if (exportBackupBtn) exportBackupBtn.addEventListener('click', exportBackup);
-        if (importBackupBtn) importBackupBtn.addEventListener('click', () => backupFileInput.click());
-        if (backupFileInput) backupFileInput.addEventListener('change', e => {
-            importBackup(e.target.files[0]);
-            e.target.value = '';
-        });
 
         // ---- PWA: service worker + install prompt ----
         if ('serviceWorker' in navigator) {
