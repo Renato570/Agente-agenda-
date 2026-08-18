@@ -26,6 +26,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
 .pec-time-value{color:var(--pec-blue-dark)!important;font-weight:800!important}
 .pec-time-note{color:#5d7180!important}
 </style>
+<style id="agendasaude-design">
 .required-field{border:2px solid #5b8fba!important;background:#f8fbfe!important}.required-field:focus{border-color:#005ca9!important;box-shadow:0 0 0 2px rgba(0,92,169,.12)!important}.optional-field{border:1px solid #d9e0e6!important;background:#fafbfc!important}.optional-field:focus{border-color:#b7c4cf!important;box-shadow:0 0 0 2px rgba(100,116,139,.08)!important}
 .whatsapp-bubble{position:relative;background:#dcf8c6;border:1px solid #c7edaa;border-radius:8px 8px 8px 2px;box-shadow:0 1px 1px rgba(0,0,0,.08)}.whatsapp-bubble:after{content:"";position:absolute;left:-7px;bottom:0;border-width:0 8px 8px 0;border-style:solid;border-color:transparent #c7edaa transparent transparent}.whatsapp-bubble:before{content:"";position:absolute;left:-5px;bottom:1px;border-width:0 7px 7px 0;border-style:solid;border-color:transparent #dcf8c6 transparent transparent;z-index:1}.whatsapp-meta{color:#667781}
 .calendar-available{background:#eaf3fa!important;color:#005ca9!important}.calendar-scheduled{background:#fff!important;color:#004b87!important;box-shadow:inset 0 0 0 2px #005ca9!important}.calendar-notified{background:#e8f7ef!important;color:#087443!important;box-shadow:inset 0 0 0 2px #15945b!important}.calendar-selected{outline:2px solid #005ca9;outline-offset:1px}.calendar-note{box-shadow:inset 0 0 0 2px #e6b94a!important}
@@ -860,7 +861,6 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
         agendaProfSelect.addEventListener('change', () => {
             agendaCurrentProf = agendaProfSelect.value;
             expandedAgendaTime = null;
-            renderCalendar();
             renderAgenda();
         });
 
@@ -874,18 +874,20 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
 
         function getCalendarAppointmentStatus(dateStr) {
             const dayData = agendaData[dateStr] || {};
-            const profData = dayData[agendaCurrentProf] || {};
             let hasScheduled = false;
             let hasNotified = false;
             let hasAvailable = false;
-            agendaSlotTimes.forEach(time => {
-                const slot = profData[time];
-                if (slot && slot.name && slot.name.trim()) {
-                    hasScheduled = true;
-                    if (slot.avisado) hasNotified = true;
-                } else {
-                    hasAvailable = true;
-                }
+            AGENDA_PROFESSIONALS.forEach(prof => {
+                const profData = dayData[prof] || {};
+                agendaSlotTimes.forEach(time => {
+                    const slot = profData[time];
+                    if (slot && slot.name && slot.name.trim()) {
+                        hasScheduled = true;
+                        if (slot.avisado) hasNotified = true;
+                    } else {
+                        hasAvailable = true;
+                    }
+                });
             });
             return { hasScheduled, hasNotified, hasAvailable };
         }
