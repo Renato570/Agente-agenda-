@@ -337,11 +337,19 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                     <i data-lucide="edit-3" class="w-3 h-3"></i> Editar mensagens
                 </button>
             </div>
-            <select id="reminderTemplateSelect" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none mb-3">
+            <select id="reminderTemplateSelect" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none mb-2">
                 <option value="padrao">Lembrete completo</option>
                 <option value="curto">Lembrete curto</option>
                 <option value="confirmacao">Pedido de confirmação</option>
             </select>
+
+            <div class="mb-4 rounded-xl border border-blue-100 bg-blue-50/60 overflow-hidden">
+                <div class="px-3 py-2 border-b border-blue-100 flex items-center gap-2">
+                    <i data-lucide="eye" class="w-4 h-4 text-blue-600"></i>
+                    <span class="text-xs font-semibold text-blue-800">Mensagem que será enviada</span>
+                </div>
+                <div id="reminderMessagePreview" class="px-3 py-3 text-sm whitespace-pre-wrap text-slate-700 min-h-[110px] max-h-64 overflow-auto"></div>
+            </div>
 
             <div id="remindersList" class="divide-y divide-slate-100"></div>
 
@@ -529,7 +537,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
         const defaultReminderTemplates = {
             padrao: `Olá, *{NOME}*! 👋\n\nPassando para lembrar que você tem um atendimento amanhã, *{DATA}*.\n\n⏰ *Horário:* {HORARIO}\n👨‍⚕️ *Profissional:* {PROFISSIONAL}\n📋 *Atendimento:* {ATENDIMENTO}\n📍 *Local:* {LOCAL}\n\nPedimos que compareça no horário informado. Caso não possa comparecer, nos avise com antecedência.`,
             curto: `Olá, *{NOME}*! Lembrete do seu atendimento amanhã, {DATA}, às {HORARIO}, com {PROFISSIONAL}. Local: {LOCAL}.`,
-            confirmacao: `Olá, *{NOME}*! Seu atendimento está marcado para amanhã, *{DATA}*, às *{HORARIO}*, com {PROFISSIONAL}.\n\nPode confirmar o recebimento desta mensagem? Se não puder comparecer, avise a unidade.\n📍 {LOCAL}`
+            confirmacao: `Olá, *{NOME}*! Seu atendimento está marcado para amanhã, *{DATA}*, às *{HORARIO}*, com {PROFISSIONAL}.\n\nPodemos confirmar sua presença? Se não puder comparecer, me avise para disponibilizarmos a vaga para outro paciente.\n\n📍 {LOCAL}`
         };
         let reminderTemplates = JSON.parse(localStorage.getItem('app_reminder_templates')) || {...defaultReminderTemplates};
         let templates = JSON.parse(localStorage.getItem('app_templates')) || {...defaultTemplates};
@@ -593,6 +601,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
         const remindersList = document.getElementById('remindersList');
         const remindersEmptyMsg = document.getElementById('remindersEmptyMsg');
         const reminderTemplateSelect = document.getElementById('reminderTemplateSelect');
+        const reminderMessagePreview = document.getElementById('reminderMessagePreview');
         const reminderTemplateLabel = document.getElementById('reminderTemplateLabel');
         const editReminderTemplateBtn = document.getElementById('editReminderTemplateBtn');
         const reminderTemplateModal = document.getElementById('reminderTemplateModal');
@@ -730,6 +739,18 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                 .replace(/{LOCAL}/g, item.local || 'Unidade de Saúde');
         }
 
+        function updateReminderMessagePreview() {
+            if (!reminderMessagePreview) return;
+            const { tomorrow, items } = collectTomorrowReminders();
+            if (items.length) {
+                const firstPending = items.find(i => !i.avisado) || items[0];
+                reminderMessagePreview.textContent = buildReminderMessage(firstPending, tomorrow);
+            } else {
+                reminderMessagePreview.textContent = 'Nenhum agendamento para amanhã. A prévia aparecerá aqui quando houver um paciente agendado.';
+            }
+            lucide.createIcons();
+        }
+
         function updateRemindersBanner() {
             const { items } = collectTomorrowReminders();
             const pending = items.filter(i => !i.avisado);
@@ -750,6 +771,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
         function renderReminders() {
             const { tomorrow, key, items } = collectTomorrowReminders();
             remindersDateLabel.textContent = `${weekdayNames[tomorrow.getDay()]}, ${tomorrow.getDate()} de ${monthNames[tomorrow.getMonth()]} de ${tomorrow.getFullYear()}`;
+            updateReminderMessagePreview();
 
             remindersList.innerHTML = '';
             if (items.length === 0) {
@@ -1388,6 +1410,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
             const key = reminderTemplateSelect?.value || 'padrao';
             const names = { padrao: 'Lembrete completo', curto: 'Lembrete curto', confirmacao: 'Pedido de confirmação' };
             if (reminderTemplateLabel) reminderTemplateLabel.textContent = names[key] || 'Modelo personalizado';
+            updateReminderMessagePreview();
         }
 
         function openReminderTemplateEditor() {
@@ -1436,7 +1459,8 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
             directWaLink.classList.remove('hidden');
             window.open(link, '_blank');
             saveToHistory(msg);
-            markAgendaAsNotified(appDate.value, appTime.value, patientName.value.trim(), professionalCategory.value, patientPhone.value.trim());
+            // Enviar a primeira mensagem não significa que o lembrete de amanhã foi enviado.
+            // O status do lembrete só muda quando o botão Enviar da tela de Lembretes for usado.
             renderAgenda();
             showToast('Paciente agendado e abrindo WhatsApp...');
         });
