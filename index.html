@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>AgendaSaúde - Mensagens WhatsApp</title>
+    <title>AgendaSaúde - Agenda e WhatsApp</title>
 
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
@@ -26,7 +26,7 @@
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <i data-lucide="calendar-heart" class="w-7 h-7"></i>
-                <h1 class="text-xl font-bold tracking-tight">AgendaSaúde - Mensagens WhatsApp</h1>
+                <h1 class="text-xl font-bold tracking-tight">AgendaSaúde</h1>
             </div>
             <button id="openSettingsBtn" class="text-xs bg-teal-800 hover:bg-teal-900 px-3 py-1.5 rounded-lg text-teal-100 border border-teal-600 flex items-center gap-1.5 transition">
                 <i data-lucide="smartphone" class="w-4 h-4"></i>
@@ -45,7 +45,7 @@
     </div>
 
     <!-- Main Container -->
-    <main id="messageSection" class="max-w-4xl mx-auto p-4 md:p-6 pb-24 grid grid-cols-1 md:grid-cols-12 gap-6">
+    <main id="messageSection" class="hidden max-w-4xl mx-auto p-4 md:p-6 pb-24 grid grid-cols-1 md:grid-cols-12 gap-6">
 
         <!-- Form Column -->
         <section class="md:col-span-7 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
@@ -266,7 +266,7 @@
     </main>
 
     <!-- Agenda do Dia -->
-    <section id="agendaSection" class="hidden max-w-6xl mx-auto p-4 md:p-6 pb-24">
+    <section id="agendaSection" class="max-w-6xl mx-auto p-4 md:p-6 pb-24">
         <div class="grid grid-cols-1 md:grid-cols-[260px_1fr] gap-4">
 
             <!-- Sidebar: calendário -->
@@ -308,6 +308,27 @@
                 </div>
                 <p id="agendaMonthLabel" class="text-xs text-slate-400 mb-4 ml-1"></p>
 
+                <!-- Anotações do dia -->
+                <div class="mb-4 rounded-xl border border-amber-200 bg-amber-50 p-3.5">
+                    <div class="flex items-center justify-between gap-2 mb-2">
+                        <h3 class="text-sm font-bold text-amber-900 flex items-center gap-2">
+                            <i data-lucide="sticky-note" class="w-4 h-4 text-amber-600"></i>
+                            Anotações do dia
+                        </h3>
+                        <span id="agendaNotesCount" class="hidden text-[10px] font-bold bg-amber-200 text-amber-900 px-2 py-0.5 rounded-full"></span>
+                    </div>
+                    <div class="flex gap-2">
+                        <input id="agendaNoteInput" type="text" placeholder="Ex.: lembrar de pegar o remédio"
+                            class="flex-1 min-w-0 px-3 py-2 border border-amber-200 bg-white rounded-lg text-sm focus:ring-2 focus:ring-amber-400 focus:outline-none">
+                        <button id="agendaAddNoteBtn" type="button"
+                            class="px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Anotar
+                        </button>
+                    </div>
+                    <div id="agendaNotesList" class="mt-2 space-y-1.5"></div>
+                    <p id="agendaNotesEmpty" class="text-[11px] text-amber-700/70 mt-2">Nenhuma anotação para este dia.</p>
+                </div>
+
                 <div id="agendaSlotsList"></div>
 
                 <button id="agendaAddBtn" class="w-full mt-3 border-2 border-dashed border-slate-200 rounded-xl py-2.5 text-sm font-semibold text-teal-600 hover:border-teal-300 hover:bg-teal-50 transition flex items-center justify-center gap-1.5">
@@ -344,13 +365,13 @@
     <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40" style="padding-bottom: env(safe-area-inset-bottom);">
         <div class="max-w-4xl mx-auto grid grid-cols-3">
-            <button id="tabMessageBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-teal-700 transition">
-                <i data-lucide="send" class="w-5 h-5"></i>
-                <span class="text-[11px] font-semibold">Nova Mensagem</span>
-            </button>
-            <button id="tabAgendaBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
+            <button id="tabAgendaBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-teal-700 transition">
                 <i data-lucide="calendar-clock" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Agenda</span>
+            </button>
+            <button id="tabMessageBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
+                <i data-lucide="send" class="w-5 h-5"></i>
+                <span class="text-[11px] font-semibold">Nova Mensagem</span>
             </button>
             <button id="tabRemindersBtn" class="relative flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
                 <i data-lucide="bell" class="w-5 h-5"></i>
@@ -508,6 +529,11 @@
         const prevDayBtn = document.getElementById('prevDayBtn');
         const nextDayBtn = document.getElementById('nextDayBtn');
         const agendaTodayBtn = document.getElementById('agendaTodayBtn');
+        const agendaNoteInput = document.getElementById('agendaNoteInput');
+        const agendaAddNoteBtn = document.getElementById('agendaAddNoteBtn');
+        const agendaNotesList = document.getElementById('agendaNotesList');
+        const agendaNotesEmpty = document.getElementById('agendaNotesEmpty');
+        const agendaNotesCount = document.getElementById('agendaNotesCount');
         const agendaProfSelect = document.getElementById('agendaProfSelect');
         const professionalCategory = document.getElementById('professionalCategory');
         const calMonthLabel = document.getElementById('calMonthLabel');
@@ -537,6 +563,7 @@
         const agendaSlotTimes = generateSlotTimes();
 
         let agendaData = JSON.parse(localStorage.getItem('app_agenda')) || {};
+        let agendaNotes = JSON.parse(localStorage.getItem('app_agenda_notes')) || {};
         let agendaCurrentDate = new Date();
         let calendarViewDate = new Date(agendaCurrentDate.getFullYear(), agendaCurrentDate.getMonth(), 1);
 
@@ -613,7 +640,7 @@
                 ? `às ${time} (atendimento por ordem de chegada)`
                 : `às ${time} (horário marcado)`;
 
-            return `Oi, ${name}! Tudo bem?\n\nPassando para lembrar da sua consulta com ${prof} amanhã, dia ${dataStr}, ${detalheHorario}.\n\nTá tudo certo por aí? Se acontecer algum imprevisto e você não conseguir vir, me avisa aqui o quanto antes para eu liberar a vaga.\n\n*(Lembrete do sistema de agenda)*`;
+            return `Oi, *${name}*! Tudo bem?\n\nPassando para lembrar da sua consulta com *${prof}* amanhã, dia *${dataStr}*, ${detalheHorario}.\n\n*Podemos confirmar a sua presença?* Se acontecer algum imprevisto e você não puder vir, me avisa aqui o quanto antes para eu liberar a vaga.\n\n*(Lembrete do sistema de agenda)*`;
         }
 
         function updateRemindersBanner() {
@@ -726,6 +753,71 @@
             return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
         }
 
+        function getDayNotes(key) {
+            return Array.isArray(agendaNotes[key]) ? agendaNotes[key] : [];
+        }
+
+        function saveNotes() {
+            localStorage.setItem('app_agenda_notes', JSON.stringify(agendaNotes));
+        }
+
+        function renderAgendaNotes() {
+            const key = dateKey(agendaCurrentDate);
+            const notes = getDayNotes(key);
+            agendaNotesList.innerHTML = '';
+            agendaNotesEmpty.classList.toggle('hidden', notes.length > 0);
+            if (notes.length) {
+                agendaNotesCount.textContent = `${notes.length} ${notes.length === 1 ? 'anotação' : 'anotações'}`;
+                agendaNotesCount.classList.remove('hidden');
+            } else {
+                agendaNotesCount.classList.add('hidden');
+            }
+            notes.forEach((note, index) => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2 bg-white border border-amber-100 rounded-lg px-2.5 py-2';
+
+                const text = document.createElement('span');
+                text.className = 'flex-1 min-w-0 text-xs text-amber-950 break-words';
+                text.textContent = note;
+
+                const del = document.createElement('button');
+                del.type = 'button';
+                del.title = 'Excluir anotação';
+                del.className = 'w-7 h-7 flex-shrink-0 rounded-md text-amber-500 hover:text-red-600 hover:bg-red-50 flex items-center justify-center';
+                del.innerHTML = '<i data-lucide="trash-2" class="w-3.5 h-3.5"></i>';
+                del.addEventListener('click', () => {
+                    agendaNotes[key].splice(index, 1);
+                    if (!agendaNotes[key].length) delete agendaNotes[key];
+                    saveNotes();
+                    renderAgendaNotes();
+                    renderCalendar();
+                });
+
+                row.appendChild(text);
+                row.appendChild(del);
+                agendaNotesList.appendChild(row);
+            });
+            lucide.createIcons();
+        }
+
+        function addAgendaNote() {
+            const note = agendaNoteInput.value.trim();
+            if (!note) return;
+            const key = dateKey(agendaCurrentDate);
+            if (!agendaNotes[key]) agendaNotes[key] = [];
+            agendaNotes[key].push(note);
+            saveNotes();
+            agendaNoteInput.value = '';
+            renderAgendaNotes();
+            renderCalendar();
+            showToast('Anotação salva!');
+        }
+
+        agendaAddNoteBtn.addEventListener('click', addAgendaNote);
+        agendaNoteInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); addAgendaNote(); }
+        });
+
         function renderCalendar() {
             calMonthLabel.textContent = `${monthNames[calendarViewDate.getMonth()]} - ${calendarViewDate.getFullYear()}`;
             calDaysGrid.innerHTML = '';
@@ -757,6 +849,15 @@
                 if (isSelected) cls = 'text-xs py-1.5 rounded-full bg-teal-700 text-white font-bold ';
 
                 btn.className = cls;
+
+                const noteCount = getDayNotes(dateKey(cellDate)).length;
+                if (noteCount > 0) {
+                    const noteDot = document.createElement('span');
+                    noteDot.className = 'block mx-auto mt-0.5 w-1.5 h-1.5 rounded-full bg-amber-500';
+                    noteDot.title = `${noteCount} ${noteCount === 1 ? 'anotação' : 'anotações'}`;
+                    btn.appendChild(noteDot);
+                }
+
                 btn.addEventListener('click', () => {
                     agendaCurrentDate = new Date(cellDate);
                     expandedAgendaTime = null;
@@ -792,6 +893,7 @@
             agendaMonthLabel.textContent = agendaCurrentProf;
 
             populateAgendaProfSelect();
+            renderAgendaNotes();
 
             const dayData = (agendaData[key] && agendaData[key][agendaCurrentProf]) || {};
             const times = Object.keys(dayData).sort((a, b) => a.localeCompare(b));
@@ -1383,12 +1485,13 @@
 
         function exportBackup() {
             const backup = {
-                version: 2,
+                version: 3,
                 exportedAt: new Date().toISOString(),
                 templates,
                 history,
                 myPhone,
-                agendaData
+                agendaData,
+                agendaNotes
             };
             const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
             const url = URL.createObjectURL(blob);
@@ -1411,6 +1514,8 @@
                     history = data.history;
                     myPhone = data.myPhone || '';
                     agendaData = data.agendaData || {};
+                    agendaNotes = data.agendaNotes || {};
+                    localStorage.setItem('app_agenda_notes', JSON.stringify(agendaNotes));
                     localStorage.setItem('app_templates', JSON.stringify(templates));
                     localStorage.setItem('app_history', JSON.stringify(history));
                     localStorage.setItem('app_my_phone', myPhone);
@@ -1452,6 +1557,7 @@
                 });
             });
             localStorage.setItem('app_agenda', JSON.stringify(agendaData));
+            saveNotes();
             updateAppointmentAvailability();
             updateMyPhoneBadge();
             renderHistory();
