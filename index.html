@@ -6,14 +6,14 @@
     <title>AgendaSaúde - Mensagens WhatsApp</title>
 
     <!-- PWA -->
-    <link rel="manifest" href="manifest.json?v=3">
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#005ca9">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AgendaSaúde">
-    <link rel="apple-touch-icon" href="icons/icon-192.png?v=3">
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=3">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -26,66 +26,18 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
 .pec-selected-time{background:#eaf3fa!important;border-left:4px solid var(--pec-blue)!important}
 .pec-time-value{color:var(--pec-blue-dark)!important;font-weight:800!important}
 .pec-time-note{color:#5d7180!important}
-
-/* ===== AgendaSaúde Design refinements ===== */
-header{padding:.65rem 1rem!important;min-height:58px}
-header .max-w-4xl{min-height:42px}
-header h1{font-size:1rem!important;line-height:1.15!important}
-header .flex.items-center.gap-2 > i{width:1.45rem!important;height:1.45rem!important}
-#openSettingsBtn{padding:.35rem .55rem!important;font-size:.65rem!important;border-radius:.6rem!important;gap:.35rem!important;opacity:.96}
-#openSettingsBtn i{width:.9rem!important;height:.9rem!important}
-@media(max-width:480px){#openSettingsBtn span{max-width:62px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} header{padding:.55rem .8rem!important} header h1{font-size:.92rem!important}}
-
-/* Required fields are intentionally stronger than optional fields. */
-#appointmentForm input[required],
-#appointmentForm select[required]{border:1.5px solid #7f9bb2!important;background:#fff!important}
-#appointmentForm input[required]:focus,
-#appointmentForm select[required]:focus{border-color:#005ca9!important;box-shadow:0 0 0 2px rgba(0,92,169,.13)!important}
-#appointmentForm #attendanceType,
-#appointmentForm #location{border-color:#d9e0e5!important;background:#fbfcfd!important}
-#appointmentForm #attendanceType:focus,
-#appointmentForm #location:focus{border-color:#9fb3c2!important;box-shadow:0 0 0 2px rgba(96,125,139,.1)!important}
-
-/* WhatsApp actions use WhatsApp green; internal actions stay PEC blue. */
-#sendWhatsappBtn,.reminder-send-btn{background:#25D366!important;border-color:#25D366!important}
-#sendWhatsappBtn:hover,.reminder-send-btn:hover{background:#1ebe5d!important;border-color:#1ebe5d!important}
-#sendWhatsappBtn:active,.reminder-send-btn:active{background:#169c4b!important}
-
-/* Title/subtitle hierarchy. */
-#remindersSection h2,#notesSection h2,#messageSection h2{letter-spacing:-.01em}
-#remindersDateLabel,#agendaMonthLabel{display:block;margin-top:.28rem!important;color:#718096!important;font-weight:500!important;line-height:1.45!important}
-#remindersSection > div > div:first-child{margin-bottom:1.1rem!important}
-
-/* WhatsApp-style preview bubble. */
-#reminderMessagePreview{position:relative;background:#d9fdd3!important;border:1px solid #c3edbd!important;border-radius:4px 14px 14px 14px!important;margin:10px 12px 12px!important;padding:12px 14px!important;color:#26332f!important;box-shadow:0 1px 1px rgba(0,0,0,.06)!important;line-height:1.5!important}
-#reminderMessagePreview::after{content:"";position:absolute;left:-7px;top:0;border-width:0 8px 8px 0;border-style:solid;border-color:transparent #c3edbd transparent transparent;transform:rotate(0deg)}
-#reminderMessagePreview::before{content:"";position:absolute;left:-5px;top:1px;border-width:0 7px 7px 0;border-style:solid;border-color:transparent #d9fdd3 transparent transparent;z-index:1}
-
-/* Monthly calendar states. */
-.cal-day-free{background:#eaf3fa!important;color:#35637f!important;border-radius:999px!important}
-.cal-day-pending{box-shadow:inset 0 0 0 2px #005ca9!important;color:#004b87!important;font-weight:800!important;border-radius:999px!important}
-.cal-day-advised{box-shadow:inset 0 0 0 2px #16a05d!important;color:#137747!important;font-weight:800!important;border-radius:999px!important}
-.cal-day-mixed{box-shadow:inset 0 0 0 2px #005ca9!important;color:#004b87!important;font-weight:800!important;border-radius:999px!important}
-.cal-day-selected{background:#005ca9!important;color:#fff!important;box-shadow:0 0 0 2px #005ca9!important}
-.cal-status-dot-pending{background:#005ca9!important}
-.cal-status-dot-advised{background:#16a05d!important}
-.cal-status-dot-note{background:#d08a00!important}
-
-/* Health-inspired bottom navigation icons without sacrificing recognition. */
-nav#bottomNav .nav-health-icon{stroke-width:2.15}
-
 </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
     <!-- Header -->
-    <header class="bg-blue-700 text-white shadow-md sticky top-0 z-10">
+    <header class="bg-blue-700 text-white shadow-md p-4 sticky top-0 z-10">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <i data-lucide="calendar-heart" class="w-6 h-6"></i>
-                <h1 class="text-lg font-bold tracking-tight">AgendaSaúde - Mensagens WhatsApp</h1>
+                <i data-lucide="calendar-heart" class="w-7 h-7"></i>
+                <h1 class="text-xl font-bold tracking-tight">AgendaSaúde - Mensagens WhatsApp</h1>
             </div>
-            <button id="openSettingsBtn" class="text-[10px] bg-blue-800 hover:bg-blue-900 px-2 py-1 rounded-lg text-blue-100 border border-blue-500 flex items-center gap-1 transition">
+            <button id="openSettingsBtn" class="text-xs bg-blue-800 hover:bg-blue-900 px-3 py-1.5 rounded-lg text-blue-100 border border-blue-600 flex items-center gap-1.5 transition">
                 <i data-lucide="smartphone" class="w-4 h-4"></i>
                 <span id="myPhoneStatus">Cadastrar Meu Nº</span>
             </button>
@@ -115,7 +67,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome do Paciente *</label>
                     <input type="text" id="patientName" required placeholder="Ex: Fulano de Tal"
-                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                        class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                 </div>
 
                 <div>
@@ -124,7 +76,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                         <div class="relative flex-1">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm">+55</span>
                             <input type="tel" id="patientPhone" required placeholder="(11) 99999-9999"
-                                class="w-full pl-12 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                                class="w-full pl-12 pr-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                         </div>
                         <button type="button" id="pickContactBtn" title="Escolher dos contatos"
                             class="flex-shrink-0 px-3 py-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-blue-700 flex items-center justify-center transition">
@@ -138,20 +90,20 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Data *</label>
                         <input type="date" id="appDate" required
-                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Horário / A partir de *</label>
                         <input type="time" id="appTime" required
-                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                         <p id="agendaTimeHint" class="hidden text-[11px] text-blue-700 mt-1 font-medium">Horário selecionado pela agenda.</p>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Regra de Atendimento <span class="normal-case font-medium text-slate-400">(opcional)</span></label>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Regra de Atendimento <span class="font-normal normal-case text-slate-400">(opcional)</span></label>
                     <select id="attendanceType"
-                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm bg-white">
+                        class="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg focus:ring-2 focus:ring-slate-300 focus:outline-none text-slate-800 text-sm">
                         <option value="por ordem de chegada">Ordem de chegada</option>
                         <option value="horário marcado">Horário marcado exato</option>
                         <option value="por senha e ordem de chegada">Senha por ordem de chegada</option>
@@ -162,7 +114,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Categoria *</label>
                         <select id="professionalCategory" required
-                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm bg-white">
+                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                             <option value="Médico">Médico</option>
                             <option value="Enfermeira">Enfermeira</option>
                             <option value="Dentista">Dentista</option>
@@ -171,20 +123,20 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Profissional *</label>
                         <input type="text" id="doctorName" required placeholder="Ex: Dr. Iago"
-                            class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo de Consulta *</label>
                     <input type="text" id="consultType" required placeholder="Ex: Consulta Médica / Pré-natal"
-                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                        class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Local / Posto de Saúde <span class="normal-case font-medium text-slate-400">(opcional)</span></label>
+                    <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Local / Posto de Saúde <span class="font-normal normal-case text-slate-400">(opcional)</span></label>
                     <input type="text" id="location" placeholder="Ex: Unidade Básica de Saúde Central" value="Unidade Básica de Saúde (UBS)"
-                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                        class="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg focus:ring-2 focus:ring-slate-300 focus:outline-none text-slate-800 text-sm">
                 </div>
 
                 <div>
@@ -196,10 +148,9 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                     </div>
                     <select id="templateSelect" class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm bg-white">
                         <option value="padrao">Confirmação de Agendamento</option>
-                        <option value="curto">Confirmação de Agendamento — Curta</option>
-                        <option value="documentos">Confirmação + Documentos</option>
+                        <option value="curto">Confirmação de Agendamento · curta</option>
+                        <option value="documentos">Confirmação de Agendamento · documentos</option>
                     </select>
-                    <p id="templateDescription" class="text-[10px] text-slate-400 mt-1.5">Enviado no momento em que o agendamento é criado ou alterado.</p>
                 </div>
             </form>
         </section>
@@ -223,7 +174,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
 
                 <div class="mt-4 space-y-2">
                     <button type="button" id="sendWhatsappBtn"
-                        class="w-full bg-[#25D366] hover:bg-[#1ebe5d] active:bg-[#169c4b] text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold py-3 px-4 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
                         <i data-lucide="send" class="w-4 h-4"></i>
                         Enviar para Paciente
                     </button>
@@ -309,9 +260,9 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                 <div class="mt-5 pt-4 border-t border-slate-100">
                     <p class="text-[10px] font-bold uppercase tracking-wide text-slate-400 mb-2">Legenda</p>
                     <div class="space-y-2 text-xs text-slate-500">
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#eaf3fa] border border-[#cfdde8]"></span> Sem paciente marcado</div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full border-2 border-[#005ca9]"></span> Paciente agendado</div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full border-2 border-[#16a05d]"></span> Avisado</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Horário disponível</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Paciente agendado</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Avisado</div>
                     </div>
                 </div>
             </aside>
@@ -381,7 +332,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
             <div class="flex items-center justify-between gap-2 mb-3">
                 <div>
                     <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Modelo da notificação</p>
-                    <p id="reminderTemplateLabel" class="text-xs text-slate-400">Enviado 1 dia antes da consulta.</p>
+                    <p id="reminderTemplateLabel" class="text-xs text-slate-400">Escolha como o lembrete de amanhã será enviado.</p>
                 </div>
                 <button id="editReminderTemplateBtn" type="button" class="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
                     <i data-lucide="edit-3" class="w-3 h-3"></i> Editar mensagens
@@ -389,15 +340,14 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
             </div>
             <select id="reminderTemplateSelect" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none mb-2">
                 <option value="padrao">Lembrete de Véspera</option>
-                <option value="curto">Lembrete de Véspera — Curto</option>
-                <option value="confirmacao">Lembrete de Véspera — Confirmação</option>
+                <option value="curto">Lembrete de Véspera · curto</option>
+                <option value="confirmacao">Lembrete de Véspera · confirmação</option>
             </select>
-            <p id="reminderTemplateDescription" class="text-[10px] text-slate-400 -mt-0.5 mb-3">Enviado 1 dia antes da consulta.</p>
 
             <div class="mb-4 rounded-xl border border-blue-100 bg-blue-50/60 overflow-hidden">
                 <div class="px-3 py-2 border-b border-blue-100 flex items-center gap-2">
                     <i data-lucide="eye" class="w-4 h-4 text-blue-600"></i>
-                    <span class="text-xs font-semibold text-blue-800">Mensagem que será enviada</span><span class="ml-auto text-[10px] text-slate-400">Prévia no WhatsApp</span>
+                    <span class="text-xs font-semibold text-blue-800">Mensagem que será enviada</span>
                 </div>
                 <div id="reminderMessagePreview" class="px-3 py-3 text-sm whitespace-pre-wrap text-slate-700 min-h-[110px] max-h-64 overflow-auto"></div>
             </div>
@@ -440,23 +390,23 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
     </section>
 
     <!-- Bottom Navigation -->
-    <nav id="bottomNav" class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40" style="padding-bottom: env(safe-area-inset-bottom);">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40" style="padding-bottom: env(safe-area-inset-bottom);">
         <div class="max-w-4xl mx-auto grid grid-cols-4">
             <button id="tabAgendaBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-blue-700 transition">
-                <i data-lucide="calendar-heart" class="w-5 h-5 nav-health-icon"></i>
+                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Agenda</span>
             </button>
             <button id="tabMessageBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
-                <i data-lucide="message-circle-heart" class="w-5 h-5 nav-health-icon"></i>
+                <i data-lucide="send" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Nova Mensagem</span>
             </button>
             <button id="tabRemindersBtn" class="relative flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
-                <i data-lucide="bell-plus" class="w-5 h-5 nav-health-icon"></i>
+                <i data-lucide="bell" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Lembretes</span>
                 <span id="remindersBadge" class="hidden absolute top-1 right-[28%] bg-red-500 text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
             </button>
             <button id="tabNotesBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
-                <i data-lucide="notebook-pen" class="w-5 h-5 nav-health-icon"></i>
+                <i data-lucide="notebook-pen" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Anotações</span>
             </button>
         </div>
@@ -494,9 +444,8 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                 <i data-lucide="settings" class="w-5 h-5 text-blue-600"></i>
                 Personalizar Modelo de Mensagem
             </h3>
-            <p id="templateModalDescription" class="text-xs text-slate-500">
-                Enviado no momento do agendamento.
-                <br>Palavras-chave substituídas automaticamente:
+            <p class="text-xs text-slate-500">
+                Palavras-chave substituídas automaticamente:
                 <br><span class="font-mono text-blue-700">{NOME}, {DATA}, {HORARIO}, {MEDICO}, {TIPO}, {ATENDIMENTO}, {LOCAL}</span>
             </p>
             <textarea id="templateTextarea" rows="8"
@@ -538,10 +487,9 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                 <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Mensagem</label>
                 <select id="reminderTemplateModalSelect" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white mb-3">
                     <option value="padrao">Lembrete de Véspera</option>
-                    <option value="curto">Lembrete de Véspera — Curto</option>
-                    <option value="confirmacao">Lembrete de Véspera — Confirmação</option>
+                    <option value="curto">Lembrete de Véspera · curto</option>
+                    <option value="confirmacao">Lembrete de Véspera · confirmação</option>
                 </select>
-                <p id="reminderTemplateModalDescription" class="text-[10px] text-slate-500 mb-2">Enviado 1 dia antes da consulta.</p>
                 <textarea id="reminderTemplateTextarea" rows="9" class="w-full p-3 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                 <p class="text-[10px] text-slate-400 mt-2">Variáveis: <span class="font-mono text-blue-700">{NOME}, {DATA}, {HORARIO}, {PROFISSIONAL}, {ATENDIMENTO}, {LOCAL}</span></p>
             </div>
@@ -582,30 +530,18 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
     <script>
         // Templates
         const defaultTemplates = {
-            padrao: `Olá, *{NOME}*! 👋\n\nSeu atendimento foi agendado com sucesso:\n\n📅 *Data:* {DATA}\n⏰ *Horário:* {HORARIO}\n👨‍⚕️ *Profissional:* {MEDICO}\n📋 *Atendimento:* {TIPO}\n📍 *Local:* {LOCAL}\n\nSe precisar cancelar ou remarcar, por favor avise a unidade com antecedência.`,
-            curto: `Olá, *{NOME}*! 👋\n\nSeu atendimento foi agendado para *{DATA}*, às *{HORARIO}*, com {MEDICO}.\n📍 {LOCAL}\n\nSe precisar cancelar ou remarcar, avise a unidade.`,
-            documentos: `Olá, *{NOME}*! 👋\n\nSeu atendimento foi agendado:\n\n📅 *Data:* {DATA}\n⏰ *Horário:* {HORARIO}\n👨‍⚕️ *Profissional:* {MEDICO}\n📋 *Atendimento:* {TIPO}\n📍 *Local:* {LOCAL}\n\n📌 *Atenção:* se possível, leve documento com foto, cartão do SUS e exames anteriores relacionados ao atendimento.`
+            padrao: `Olá, *{NOME}*! tudo bem?\n\nPassando para lembrar da sua consulta agendada:\n\n📅 *Data:* {DATA}\n⏰ *Horário:* A partir das {HORARIO} ({ATENDIMENTO})\n👨‍⚕️ *Profissional:* {MEDICO}\n📋 *Atendimento:* {TIPO}\n📍 *Local:* {LOCAL}\n\nPor favor, confirme se recebeu esta mensagem. Caso não possa comparecer, nos avise com antecedência!`,
+            curto: `Lembrete de consulta para *{NOME}*:\nDia {DATA} às {HORARIO} com {MEDICO} ({TIPO}).\nAtendimento {ATENDIMENTO} na {LOCAL}.`,
+            documentos: `Olá *{NOME}*!\nLembramos de sua consulta no dia *{DATA}* a partir das *{HORARIO}* com {MEDICO} ({TIPO}).\n\n📌 *Atenção:* Favor trazer documento com foto, cartão do SUS e exames anteriores se possuir.\nLocal: {LOCAL}.`
         };
 
         const defaultReminderTemplates = {
             padrao: `Olá, *{NOME}*! 👋\n\nPassando para lembrar que você tem um atendimento amanhã, *{DATA}*.\n\n⏰ *Horário:* {HORARIO}\n👨‍⚕️ *Profissional:* {PROFISSIONAL}\n📋 *Atendimento:* {ATENDIMENTO}\n📍 *Local:* {LOCAL}\n\nPedimos que compareça no horário informado. Caso não possa comparecer, nos avise com antecedência.`,
-            curto: `Olá, *{NOME}*! 👋\n\nLembrete do seu atendimento amanhã, *{DATA}*, às *{HORARIO}*, com {PROFISSIONAL}.\n📍 {LOCAL}\n\nSe não puder comparecer, avise a unidade.`,
-            confirmacao: `Olá, *{NOME}*! 👋\n\nSeu atendimento está marcado para amanhã, *{DATA}*, às *{HORARIO}*, com {PROFISSIONAL}.\n\nPodemos confirmar sua presença? Se não puder comparecer, me avise para disponibilizarmos a vaga para outro paciente.\n\n📍 *Local:* {LOCAL}`
+            curto: `Olá, *{NOME}*! Lembrete do seu atendimento amanhã, {DATA}, às {HORARIO}, com {PROFISSIONAL}. Local: {LOCAL}.`,
+            confirmacao: `Olá, *{NOME}*! Seu atendimento está marcado para amanhã, *{DATA}*, às *{HORARIO}*, com {PROFISSIONAL}.\n\nPodemos confirmar sua presença? Se não puder comparecer, me avise para disponibilizarmos a vaga para outro paciente.\n\n📍 {LOCAL}`
         };
         let reminderTemplates = JSON.parse(localStorage.getItem('app_reminder_templates')) || {...defaultReminderTemplates};
         let templates = JSON.parse(localStorage.getItem('app_templates')) || {...defaultTemplates};
-        // Migração segura dos modelos antigos: só substitui os textos que eram os
-        // padrões anteriores; modelos personalizados pelo usuário são preservados.
-        const oldDefaultTemplates = {
-            padrao: 'Olá, *{NOME}*! tudo bem?\n\nPassando para lembrar da sua consulta agendada:',
-            curto: 'Lembrete de consulta para *{NOME}*:',
-            documentos: 'Olá *{NOME}*!\nLembramos de sua consulta'
-        };
-        let templatesMigrated = false;
-        if (templates.padrao && templates.padrao.includes(oldDefaultTemplates.padrao)) { templates.padrao = defaultTemplates.padrao; templatesMigrated = true; }
-        if (templates.curto && templates.curto.includes(oldDefaultTemplates.curto)) { templates.curto = defaultTemplates.curto; templatesMigrated = true; }
-        if (templates.documentos && templates.documentos.includes(oldDefaultTemplates.documentos)) { templates.documentos = defaultTemplates.documentos; templatesMigrated = true; }
-        if (templatesMigrated) localStorage.setItem('app_templates', JSON.stringify(templates));
         let history = JSON.parse(localStorage.getItem('app_history')) || [];
         let myPhone = localStorage.getItem('app_my_phone') || '';
 
@@ -619,10 +555,6 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
         const consultType = document.getElementById('consultType');
         const locationInput = document.getElementById('location');
         const templateSelect = document.getElementById('templateSelect');
-        const templateDescription = document.getElementById('templateDescription');
-        const templateModalDescription = document.getElementById('templateModalDescription');
-        const reminderTemplateDescription = document.getElementById('reminderTemplateDescription');
-        const reminderTemplateModalDescription = document.getElementById('reminderTemplateModalDescription');
         const messagePreview = document.getElementById('messagePreview');
         const sendWhatsappBtn = document.getElementById('sendWhatsappBtn');
         const sendToSelfBtn = document.getElementById('sendToSelfBtn');
@@ -723,20 +655,6 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
         const agendaSlotTimes = generateSlotTimes();
 
         let agendaData = JSON.parse(localStorage.getItem('app_agenda')) || {};
-        // O lembrete de véspera tem estado próprio. Registros antigos que só possuem
-        // `avisado` vieram do primeiro envio e não devem aparecer como lembrete enviado.
-        let agendaNeedsMigration = false;
-        Object.values(agendaData || {}).forEach(day => {
-            Object.values(day || {}).forEach(profData => {
-                Object.values(profData || {}).forEach(slot => {
-                    if (slot && slot.name && typeof slot.lembreteEnviado === 'undefined') {
-                        slot.lembreteEnviado = false;
-                        agendaNeedsMigration = true;
-                    }
-                });
-            });
-        });
-        if (agendaNeedsMigration) localStorage.setItem('app_agenda', JSON.stringify(agendaData));
         let notesData = JSON.parse(localStorage.getItem('app_notes')) || [];
         let agendaCurrentDate = new Date();
         let calendarViewDate = new Date(agendaCurrentDate.getFullYear(), agendaCurrentDate.getMonth(), 1);
@@ -797,7 +715,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                     if (slot && slot.name && slot.name.trim()) {
                         items.push({
                             time, prof, name: slot.name.trim(), phone: (slot.phone || '').trim(),
-                            lembreteEnviado: !!slot.lembreteEnviado, avisado: !!slot.avisado, tipoHorario: slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado',
+                            avisado: !!slot.avisado, tipoHorario: slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado',
                             profissional: (slot.doctor || prof || '').trim(),
                             atendimento: (slot.consultType || (slot.tipoHorario === 'chegada' ? 'Atendimento por ordem de chegada' : 'Atendimento com horário marcado')).trim(),
                             local: (slot.location || 'Unidade de Saúde').trim()
@@ -826,7 +744,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
             if (!reminderMessagePreview) return;
             const { tomorrow, items } = collectTomorrowReminders();
             if (items.length) {
-                const firstPending = items.find(i => !i.lembreteEnviado) || items[0];
+                const firstPending = items.find(i => !i.avisado) || items[0];
                 reminderMessagePreview.textContent = buildReminderMessage(firstPending, tomorrow);
             } else {
                 reminderMessagePreview.textContent = 'Nenhum agendamento para amanhã. A prévia aparecerá aqui quando houver um paciente agendado.';
@@ -836,7 +754,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
 
         function updateRemindersBanner() {
             const { items } = collectTomorrowReminders();
-            const pending = items.filter(i => !i.lembreteEnviado);
+            const pending = items.filter(i => !i.avisado);
             if (pending.length > 0) {
                 remindersBanner.classList.remove('hidden');
                 remindersBannerText.textContent = pending.length === 1
@@ -871,7 +789,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                             <p class="text-sm font-medium text-slate-800 truncate">${item.name}</p>
                             <p class="text-[11px] text-slate-400">${item.prof} · ${item.tipoHorario === 'chegada' ? 'Hor. de chegada' : 'Horário marcado'}</p>
                         </div>
-                        ${item.lembreteEnviado
+                        ${item.avisado
                             ? `<span class="flex items-center gap-1 text-emerald-600 text-xs font-semibold flex-shrink-0"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Enviado</span>
                                ${hasPhone
                                     ? `<button data-time="${item.time}" data-prof="${item.prof}" title="Enviar de novo" class="reminder-send-btn flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 transition"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i></button>`
@@ -916,10 +834,9 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
 
                     if (!agendaData[key]) agendaData[key] = {};
                     if (!agendaData[key][prof]) agendaData[key][prof] = {};
-                    if (!agendaData[key][prof][time]) agendaData[key][prof][time] = { name: item.name, phone: phone, avisado: false, lembreteEnviado: false };
+                    if (!agendaData[key][prof][time]) agendaData[key][prof][time] = { name: item.name, phone: phone, avisado: false };
                     agendaData[key][prof][time].phone = phone;
-                    agendaData[key][prof][time].lembreteEnviado = true;
-                    agendaData[key][prof][time].lembreteEnviadoAt = new Date().toISOString();
+                    agendaData[key][prof][time].avisado = true;
                     saveAgenda();
 
                     renderReminders();
@@ -949,19 +866,21 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
             return notesData.filter(note => note.reminderDate === dateStr);
         }
 
-        function getAppointmentSummaryForDate(dateStr) {
+        function getCalendarAppointmentStatus(dateStr) {
             const dayData = agendaData[dateStr] || {};
-            let total = 0, pending = 0, advised = 0;
-            Object.values(dayData).forEach(profData => {
-                Object.values(profData || {}).forEach(slot => {
+            let hasScheduled = false;
+            let hasNotified = false;
+            AGENDA_PROFESSIONALS.forEach(prof => {
+                const profData = dayData[prof] || {};
+                agendaSlotTimes.forEach(time => {
+                    const slot = profData[time];
                     if (slot && slot.name && slot.name.trim()) {
-                        total++;
-                        if (slot.avisado) advised++;
-                        else pending++;
+                        hasScheduled = true;
+                        if (slot.avisado) hasNotified = true;
                     }
                 });
             });
-            return { total, pending, advised };
+            return { hasScheduled, hasNotified };
         }
 
         function renderCalendar() {
@@ -984,23 +903,14 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                 const cellKey = dateKey(cellDate);
                 const dateNotes = getNotesForDate(cellKey);
                 const hasNotes = dateNotes.length > 0;
-                const appointmentSummary = getAppointmentSummaryForDate(cellKey);
-                const hasAppointments = appointmentSummary.total > 0;
-                const hasPendingAppointments = appointmentSummary.pending > 0;
-                const hasAdvisedAppointments = appointmentSummary.advised > 0;
-                const dots = [
-                    hasPendingAppointments ? '<span class="w-1.5 h-1.5 rounded-full cal-status-dot-pending"></span>' : '',
-                    hasAdvisedAppointments ? '<span class="w-1.5 h-1.5 rounded-full cal-status-dot-advised"></span>' : '',
-                    hasNotes ? '<span class="w-1.5 h-1.5 rounded-full cal-status-dot-note"></span>' : ''
-                ].join('');
-                btn.innerHTML = `<span class="inline-flex flex-col items-center justify-center w-full leading-none gap-1">
-                    <span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${hasNotes ? `<span class="absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-100 text-amber-700 border border-amber-200"><i data-lucide="notebook-pen" class="w-2.5 h-2.5"></i></span>` : ''}</span>
-                    <span class="flex items-center justify-center gap-0.5 h-1.5">${dots}</span>
-                </span>`;
-                if (hasAppointments) {
-                    const statusText = `${appointmentSummary.total} agendamento(s)${appointmentSummary.pending ? ` • ${appointmentSummary.pending} pendente(s)` : ''}${appointmentSummary.advised ? ` • ${appointmentSummary.advised} avisado(s)` : ''}`;
-                    btn.title = statusText + (hasNotes ? ' • Há anotação neste dia' : '');
-                }
+                const apptStatus = getCalendarAppointmentStatus(cellKey);
+                const statusDots = apptStatus.hasScheduled
+                    ? `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-0.5">
+                         <span class="w-1.5 h-1.5 rounded-full bg-blue-700"></span>
+                         ${apptStatus.hasNotified ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>' : ''}
+                       </span>`
+                    : '';
+                btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}${hasNotes ? `<span class="absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-100 text-amber-700 border border-amber-200"><i data-lucide="notebook-pen" class="w-2.5 h-2.5"></i></span>` : ''}</span>`;
                 if (hasNotes) {
                     const pendingNotes = dateNotes.filter(n => !n.done).length;
                     btn.title = `${dateNotes.length} anotação(ões)${pendingNotes ? ` • ${pendingNotes} pendente(s)` : ' • concluídas'}`;
@@ -1011,22 +921,11 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                 const isPast = cellDate.getTime() < today.getTime() && !isToday;
 
                 let cls = 'text-xs py-1.5 rounded-full transition ';
-                if (!inMonth) {
-                    cls += 'text-slate-200 hover:bg-slate-50 ';
-                } else if (isSelected) {
-                    cls += 'cal-day-selected ';
-                } else if (isPast) {
-                    cls += 'text-slate-300 hover:bg-slate-50 ';
-                } else if (hasPendingAppointments && hasAdvisedAppointments) {
-                    cls += 'cal-day-mixed ';
-                } else if (hasPendingAppointments) {
-                    cls += 'cal-day-pending ';
-                } else if (hasAdvisedAppointments) {
-                    cls += 'cal-day-advised ';
-                } else {
-                    cls += 'cal-day-free ';
-                }
-                if (isToday && !isSelected) cls += 'font-bold ';
+                if (!inMonth) cls += 'text-slate-200 hover:bg-slate-50 ';
+                else if (isPast) cls += 'text-slate-300 hover:bg-slate-50 ';
+                else cls += 'text-slate-700 hover:bg-blue-50 ';
+                if (isToday && !isSelected) cls += 'font-bold text-blue-600 ';
+                if (isSelected) cls = 'text-xs py-1.5 rounded-full bg-blue-700 text-white font-bold ';
                 if (hasNotes && !isSelected) cls += ' ring-1 ring-amber-200 ';
 
                 btn.className = cls;
@@ -1188,10 +1087,10 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                 header.className = 'agenda-card-toggle w-full flex items-center gap-3 py-3 px-2 text-left hover:bg-blue-50/50 active:bg-blue-100/50 transition rounded-lg';
                 header.dataset.time = time;
                 header.innerHTML = `
-                    <span class="w-1.5 h-10 rounded-full flex-shrink-0 ${hasPatient ? (slot.avisado ? 'bg-emerald-500' : 'bg-blue-600') : 'bg-slate-200'}"></span>
-                    <span class="w-14 text-xs md:text-sm font-semibold ${hasPatient ? 'text-slate-700' : 'text-slate-400'} flex-shrink-0">${time}</span>
+                    <span class="w-1.5 h-10 rounded-full flex-shrink-0 ${hasPatient ? (slot.avisado ? 'bg-emerald-500' : 'bg-blue-700') : 'bg-slate-300'}"></span>
+                    <span class="w-14 text-xs md:text-sm font-semibold ${hasPatient ? (slot.avisado ? 'text-emerald-800' : 'text-blue-900') : 'text-slate-400'} flex-shrink-0">${time}</span>
                     <span class="flex-1 min-w-0">
-                        <span class="block text-sm font-medium ${hasPatient ? 'text-slate-800' : 'text-slate-400'} truncate">${hasPatient ? escapeHtml(slot.name) : 'Horário disponível'}</span>
+                        <span class="block text-sm font-medium ${hasPatient ? (slot.avisado ? 'text-emerald-900' : 'text-blue-950') : 'text-slate-400'} truncate">${hasPatient ? escapeHtml(slot.name) : 'Horário disponível'}</span>
                         ${hasPatient && slot.tipoHorario === 'chegada' ? '<span class="text-[10px] text-slate-400">Atendimento por ordem de chegada</span>' : ''}
                     </span>
                     <span class="hidden sm:block w-28 text-right flex-shrink-0">
@@ -1381,6 +1280,16 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
             return (str || '').replace(/\D/g, '');
         }
 
+        function updateTemplateDescription() {
+            const descriptions = {
+                padrao: 'Enviado no momento do agendamento.',
+                curto: 'Enviado no momento do agendamento, em versão resumida.',
+                documentos: 'Enviado no momento do agendamento, com orientação sobre documentos.'
+            };
+            const el = document.getElementById('templateDescription');
+            if (el) el.textContent = descriptions[templateSelect.value] || '';
+        }
+
         function generateMessage() {
             const selectedKey = templateSelect.value;
             let templateText = templates[selectedKey] || templates.padrao;
@@ -1487,8 +1396,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
         [patientName, patientPhone, appDate, appTime, attendanceType, doctorName, consultType, locationInput, templateSelect]
             .forEach(el => el.addEventListener('input', () => { clearFieldErrors(); generateMessage(); }));
         attendanceType.addEventListener('change', generateMessage);
-        templateSelect.addEventListener('change', () => { refreshTemplateDescription(); generateMessage(); });
-        refreshTemplateDescription();
+        templateSelect.addEventListener('change', () => { generateMessage(); updateTemplateDescription(); });
 
         function syncMessageToAgenda() {
             if (!pendingAgendaSlot) return;
@@ -1522,8 +1430,6 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
                 phone: patientPhone.value.trim(),
                 // Agendar não significa avisar. Só a ação de envio marca como avisado.
                 avisado: existing ? !!existing.avisado : false,
-                lembreteEnviado: existing ? !!existing.lembreteEnviado : false,
-                lembreteEnviadoAt: existing ? (existing.lembreteEnviadoAt || null) : null,
                 tipoHorario: attendanceType.value === 'horário marcado' ? 'marcado' : 'chegada',
                 doctor: doctorName.value.trim(),
                 consultType: consultType.value.trim(),
@@ -1535,28 +1441,10 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
             return true;
         }
 
-        const templateDescriptions = {
-            padrao: 'Confirmação de Agendamento • Enviado no momento do agendamento.',
-            curto: 'Confirmação de Agendamento — Curta • Enviado no momento do agendamento.',
-            documentos: 'Confirmação + Documentos • Enviado no momento do agendamento.'
-        };
-        const reminderDescriptions = {
-            padrao: 'Lembrete de Véspera • Enviado 1 dia antes da consulta.',
-            curto: 'Lembrete de Véspera — Curto • Enviado 1 dia antes da consulta.',
-            confirmacao: 'Lembrete de Véspera — Confirmação • Enviado 1 dia antes da consulta.'
-        };
-
-        function refreshTemplateDescription() {
-            const key = templateSelect?.value || 'padrao';
-            if (templateDescription) templateDescription.textContent = templateDescriptions[key] || 'Enviado no momento do agendamento.';
-            if (templateModalDescription) templateModalDescription.innerHTML = (templateDescriptions[key] || 'Enviado no momento do agendamento.') + '<br>Palavras-chave substituídas automaticamente:';
-        }
-
         function refreshReminderTemplateControls() {
             const key = reminderTemplateSelect?.value || 'padrao';
-            const names = { padrao: 'Lembrete de Véspera', curto: 'Lembrete de Véspera — Curto', confirmacao: 'Lembrete de Véspera — Confirmação' };
+            const names = { padrao: 'Lembrete de Véspera', curto: 'Lembrete de Véspera · curto', confirmacao: 'Lembrete de Véspera · confirmação' };
             if (reminderTemplateLabel) reminderTemplateLabel.textContent = names[key] || 'Modelo personalizado';
-            if (reminderTemplateDescription) reminderTemplateDescription.textContent = reminderDescriptions[key] || 'Enviado 1 dia antes da consulta.';
             updateReminderMessagePreview();
         }
 
@@ -1564,7 +1452,6 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
             const key = reminderTemplateSelect.value || 'padrao';
             reminderTemplateModalSelect.value = key;
             reminderTemplateTextarea.value = reminderTemplates[key] || '';
-            if (reminderTemplateModalDescription) reminderTemplateModalDescription.textContent = reminderDescriptions[key] || 'Enviado 1 dia antes da consulta.';
             reminderTemplateModal.classList.remove('hidden');
             reminderTemplateModal.classList.add('flex');
             lucide.createIcons();
@@ -1578,9 +1465,7 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
         reminderTemplateSelect?.addEventListener('change', refreshReminderTemplateControls);
         editReminderTemplateBtn?.addEventListener('click', openReminderTemplateEditor);
         reminderTemplateModalSelect?.addEventListener('change', () => {
-            const key = reminderTemplateModalSelect.value;
-            reminderTemplateTextarea.value = reminderTemplates[key] || '';
-            if (reminderTemplateModalDescription) reminderTemplateModalDescription.textContent = reminderDescriptions[key] || 'Enviado 1 dia antes da consulta.';
+            reminderTemplateTextarea.value = reminderTemplates[reminderTemplateModalSelect.value] || '';
         });
         cancelReminderTemplateBtn?.addEventListener('click', closeReminderTemplateEditor);
         reminderTemplateModal?.addEventListener('click', (event) => {
@@ -1649,7 +1534,6 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
         // Template editing
         editTemplateBtn.addEventListener('click', () => {
             templateTextarea.value = templates[templateSelect.value] || '';
-            refreshTemplateDescription();
             templateModal.classList.remove('hidden');
             templateModal.classList.add('flex');
         });
@@ -1660,7 +1544,6 @@ nav#bottomNav .nav-health-icon{stroke-width:2.15}
         saveTemplateBtn.addEventListener('click', () => {
             templates[templateSelect.value] = templateTextarea.value;
             localStorage.setItem('app_templates', JSON.stringify(templates));
-            refreshTemplateDescription();
             templateModal.classList.add('hidden');
             templateModal.classList.remove('flex');
             generateMessage();

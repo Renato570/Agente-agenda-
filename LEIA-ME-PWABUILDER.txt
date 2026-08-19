@@ -1,0 +1,30 @@
+AgendaSaúde — pacote para PWABuilder
+
+ÍCONE
+Os ícones em /icons foram gerados a partir da imagem fornecida e o manifest.json
+já aponta para eles.
+
+BARRA/URL NO TOPO DO APK
+O site já está configurado como PWA standalone, mas a remoção da barra de URL
+no APK do PWABuilder depende da verificação Digital Asset Links (TWA).
+Ela não pode ser preenchida corretamente sem o package name e o SHA-256 do
+certificado usado para assinar o APK.
+
+Depois de gerar o APK no PWABuilder, obtenha esses dois dados e publique:
+  /.well-known/assetlinks.json
+
+Formato:
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "SEU_PACKAGE_NAME",
+      "sha256_cert_fingerprints": ["SEU_SHA256"]
+    }
+  }
+]
+
+Importante: o SHA-256 precisa ser o da chave que assina o APK instalado.
+Sem essa associação, o Android abre o site como Custom Tab e a barra de URL
+fica visível.
