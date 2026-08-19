@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.vercel.agente_agenda_44hg0q29p_cebin44_8435s_projects.twa",
+      "sha256_cert_fingerprints": [
+        "C5:DB:D8:44:F6:A7:B6:0D:30:73:0A:2B:95:66:41:7C:5D:3E:A2:60:25:FE:F3:00:0A:B6:4F:85:68:A4:E9:54"
+      ]
+    }
+  }
+]
