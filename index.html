@@ -26,26 +26,19 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
 .pec-time-value{color:var(--pec-blue-dark)!important;font-weight:800!important}
 .pec-time-note{color:#5d7180!important}
 </style>
-<style id="agendasaude-design">
-.required-field{border:2px solid #5b8fba!important;background:#f8fbfe!important}.required-field:focus{border-color:#005ca9!important;box-shadow:0 0 0 2px rgba(0,92,169,.12)!important}.optional-field{border:1px solid #d9e0e6!important;background:#fafbfc!important}.optional-field:focus{border-color:#b7c4cf!important;box-shadow:0 0 0 2px rgba(100,116,139,.08)!important}
-.whatsapp-bubble{position:relative;background:#dcf8c6;border:1px solid #c7edaa;border-radius:8px 8px 8px 2px;box-shadow:0 1px 1px rgba(0,0,0,.08)}.whatsapp-bubble:after{content:"";position:absolute;left:-7px;bottom:0;border-width:0 8px 8px 0;border-style:solid;border-color:transparent #c7edaa transparent transparent}.whatsapp-bubble:before{content:"";position:absolute;left:-5px;bottom:1px;border-width:0 7px 7px 0;border-style:solid;border-color:transparent #dcf8c6 transparent transparent;z-index:1}.whatsapp-meta{color:#667781}
-.calendar-available{background:#eaf3fa!important;color:#005ca9!important}.calendar-scheduled{background:#fff!important;color:#004b87!important;box-shadow:inset 0 0 0 2px #005ca9!important}.calendar-notified{background:#e8f7ef!important;color:#087443!important;box-shadow:inset 0 0 0 2px #15945b!important}.calendar-selected{outline:2px solid #005ca9;outline-offset:1px}.calendar-note{box-shadow:inset 0 0 0 2px #e6b94a!important}
-.screen-title{font-size:1.15rem;font-weight:700;color:#1e293b}.screen-subtitle{font-size:.8rem;color:#7b8794;margin-top:.35rem}
-@media(max-width:640px){.screen-title{font-size:1.05rem}.screen-subtitle{margin-top:.4rem}}
-</style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
     <!-- Header -->
-    <header class="bg-blue-700 text-white shadow-md px-3 py-2 sticky top-0 z-10">
+    <header class="bg-blue-700 text-white shadow-md p-4 sticky top-0 z-10">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2 min-w-0">
-                <i data-lucide="calendar-heart" class="w-6 h-6 flex-shrink-0"></i>
-                <h1 class="text-base md:text-lg font-bold tracking-tight truncate">AgendaSaúde - Mensagens WhatsApp</h1>
+            <div class="flex items-center gap-2">
+                <i data-lucide="calendar-heart" class="w-7 h-7"></i>
+                <h1 class="text-xl font-bold tracking-tight">AgendaSaúde - Mensagens WhatsApp</h1>
             </div>
-            <button id="openSettingsBtn" title="Meu número do WhatsApp" aria-label="Meu número do WhatsApp" class="flex-shrink-0 w-9 h-9 bg-blue-800/70 hover:bg-blue-900 px-2 rounded-lg text-blue-100 border border-blue-500/70 flex items-center justify-center transition">
+            <button id="openSettingsBtn" class="text-xs bg-blue-800 hover:bg-blue-900 px-3 py-1.5 rounded-lg text-blue-100 border border-blue-600 flex items-center gap-1.5 transition">
                 <i data-lucide="smartphone" class="w-4 h-4"></i>
-                <span id="myPhoneStatus" class="sr-only">Cadastrar Meu Nº</span>
+                <span id="myPhoneStatus">Cadastrar Meu Nº</span>
             </button>
         </div>
     </header>
@@ -73,7 +66,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome do Paciente *</label>
                     <input type="text" id="patientName" required placeholder="Ex: Fulano de Tal"
-                        class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm required-field">
+                        class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                 </div>
 
                 <div>
@@ -82,7 +75,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                         <div class="relative flex-1">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm">+55</span>
                             <input type="tel" id="patientPhone" required placeholder="(11) 99999-9999"
-                                class="w-full pl-12 pr-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm required-field">
+                                class="w-full pl-12 pr-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                         </div>
                         <button type="button" id="pickContactBtn" title="Escolher dos contatos"
                             class="flex-shrink-0 px-3 py-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-blue-700 flex items-center justify-center transition">
@@ -96,12 +89,12 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Data *</label>
                         <input type="date" id="appDate" required
-                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm required-field">
+                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Horário / A partir de *</label>
                         <input type="time" id="appTime" required
-                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm required-field">
+                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                         <p id="agendaTimeHint" class="hidden text-[11px] text-blue-700 mt-1 font-medium">Horário selecionado pela agenda.</p>
                     </div>
                 </div>
@@ -109,7 +102,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Regra de Atendimento <span class="font-normal normal-case text-slate-400">(opcional)</span></label>
                     <select id="attendanceType"
-                        class="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg focus:ring-2 focus:ring-slate-300 focus:outline-none text-slate-800 text-sm optional-field">
+                        class="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg focus:ring-2 focus:ring-slate-300 focus:outline-none text-slate-800 text-sm">
                         <option value="por ordem de chegada">Ordem de chegada</option>
                         <option value="horário marcado">Horário marcado exato</option>
                         <option value="por senha e ordem de chegada">Senha por ordem de chegada</option>
@@ -120,7 +113,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Categoria *</label>
                         <select id="professionalCategory" required
-                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm required-field">
+                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                             <option value="Médico">Médico</option>
                             <option value="Enfermeira">Enfermeira</option>
                             <option value="Dentista">Dentista</option>
@@ -129,20 +122,20 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                     <div>
                         <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Profissional *</label>
                         <input type="text" id="doctorName" required placeholder="Ex: Dr. Iago"
-                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm required-field">
+                            class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo de Consulta *</label>
                     <input type="text" id="consultType" required placeholder="Ex: Consulta Médica / Pré-natal"
-                        class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm required-field">
+                        class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                 </div>
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Local / Posto de Saúde <span class="font-normal normal-case text-slate-400">(opcional)</span></label>
                     <input type="text" id="location" placeholder="Ex: Unidade Básica de Saúde Central" value="Unidade Básica de Saúde (UBS)"
-                        class="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg focus:ring-2 focus:ring-slate-300 focus:outline-none text-slate-800 text-sm optional-field">
+                        class="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg focus:ring-2 focus:ring-slate-300 focus:outline-none text-slate-800 text-sm">
                 </div>
 
                 <div>
@@ -173,7 +166,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                         <span class="text-xs text-emerald-700 font-medium bg-emerald-100 px-2 py-0.5 rounded">Pronto p/ Enviar</span>
                     </div>
 
-                    <div class="whatsapp-bubble p-4 text-sm whitespace-pre-wrap font-sans text-slate-700 min-h-[220px]" id="messagePreview">
+                    <div class="bg-white p-4 rounded-xl border border-emerald-100 shadow-inner text-sm whitespace-pre-wrap font-sans text-slate-700 min-h-[220px]" id="messagePreview">
                         Preencha o formulário para visualizar a mensagem aqui...
                     </div>
                 </div>
@@ -266,9 +259,9 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                 <div class="mt-5 pt-4 border-t border-slate-100">
                     <p class="text-[10px] font-bold uppercase tracking-wide text-slate-400 mb-2">Legenda</p>
                     <div class="space-y-2 text-xs text-slate-500">
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-blue-50 border border-blue-200"></span> Horário disponível</div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-white ring-2 ring-blue-600 ring-inset"></span> Paciente agendado</div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-emerald-50 ring-2 ring-emerald-500 ring-inset"></span> Avisado</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Horário disponível</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Paciente agendado</div>
+                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Avisado</div>
                     </div>
                 </div>
             </aside>
@@ -297,15 +290,20 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                     <div class="px-4 md:px-5 pt-4">
                         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
                             <div>
-                                <h2 id="agendaDayLabel" class="screen-title"></h2>
-                                <p id="agendaMonthLabel" class="screen-subtitle"></p>
+                                <h2 id="agendaDayLabel" class="text-lg md:text-xl font-bold text-slate-800"></h2>
+                                <p id="agendaMonthLabel" class="text-xs text-slate-400"></p>
                             </div>
                             <div class="hidden md:flex items-center gap-1.5 text-[11px] text-slate-400">
                                 <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Toque no horário para agendar
                             </div>
-                            <button id="agendaAddBtn" class="inline-flex items-center justify-center gap-1.5 bg-blue-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold hover:bg-blue-700 transition">
-                                <i data-lucide="plus" class="w-4 h-4"></i> Inserir paciente
-                            </button>
+                            <div class="flex items-center gap-2 flex-wrap justify-end">
+                                <button id="sendAgendaListBtn" class="inline-flex items-center justify-center gap-1.5 bg-emerald-600 text-white rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-emerald-700 transition">
+                                    <i data-lucide="send" class="w-4 h-4"></i> Enviar lista
+                                </button>
+                                <button id="agendaAddBtn" class="inline-flex items-center justify-center gap-1.5 bg-blue-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold hover:bg-blue-700 transition">
+                                    <i data-lucide="plus" class="w-4 h-4"></i> Inserir paciente
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -331,8 +329,8 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
     <section id="remindersSection" class="hidden max-w-4xl mx-auto p-4 md:p-6 pb-24">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
             <div>
-                <h2 class="screen-title">Lembretes para amanhã</h2>
-                <p id="remindersDateLabel" class="screen-subtitle mb-5"></p>
+                <h2 class="text-base md:text-lg font-bold text-slate-800">Lembretes para amanhã</h2>
+                <p id="remindersDateLabel" class="text-xs text-slate-400 mb-4"></p>
             </div>
 
             <div class="flex items-center justify-between gap-2 mb-3">
@@ -374,8 +372,8 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
             <div class="flex items-center justify-between gap-3 mb-4">
                 <div>
-                    <h2 class="screen-title flex items-center gap-2"><i data-lucide="notebook-pen" class="w-5 h-5 text-blue-600"></i> Anotações</h2>
-                    <p class="screen-subtitle">Área separada da agenda para lembretes pessoais de trabalho.</p>
+                    <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2"><i data-lucide="notebook-pen" class="w-5 h-5 text-blue-600"></i> Anotações</h2>
+                    <p class="text-xs text-slate-400">Área separada da agenda para lembretes pessoais de trabalho.</p>
                 </div>
                 <button id="clearNotesBtn" class="text-xs font-semibold text-red-500 hover:underline">Limpar tudo</button>
             </div>
@@ -399,20 +397,20 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40" style="padding-bottom: env(safe-area-inset-bottom);">
         <div class="max-w-4xl mx-auto grid grid-cols-4">
             <button id="tabAgendaBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-blue-700 transition">
-                <span class="relative inline-flex"><i data-lucide="calendar-clock" class="w-5 h-5"></i><i data-lucide="heart-pulse" class="absolute -right-1 -bottom-1 w-2.5 h-2.5"></i></span>
+                <i data-lucide="calendar-clock" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Agenda</span>
             </button>
             <button id="tabMessageBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
-                <span class="relative inline-flex"><i data-lucide="message-circle" class="w-5 h-5"></i><i data-lucide="plus" class="absolute -right-1 -bottom-1 w-2.5 h-2.5"></i></span>
+                <i data-lucide="send" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Nova Mensagem</span>
             </button>
             <button id="tabRemindersBtn" class="relative flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
-                <span class="relative inline-flex"><i data-lucide="bell-ring" class="w-5 h-5"></i><i data-lucide="plus" class="absolute -right-1 -bottom-1 w-2.5 h-2.5"></i></span>
+                <i data-lucide="bell" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Lembretes</span>
                 <span id="remindersBadge" class="hidden absolute top-1 right-[28%] bg-red-500 text-white text-[10px] font-bold rounded-full w-4.5 h-4.5 min-w-[18px] min-h-[18px] flex items-center justify-center">0</span>
             </button>
             <button id="tabNotesBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
-                <span class="relative inline-flex"><i data-lucide="notebook-pen" class="w-5 h-5"></i><i data-lucide="stethoscope" class="absolute -right-1 -bottom-1 w-2.5 h-2.5"></i></span>
+                <i data-lucide="notebook-pen" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Anotações</span>
             </button>
         </div>
@@ -528,6 +526,10 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                     <span class="w-9 h-9 rounded-full bg-amber-500 text-white flex items-center justify-center"><i data-lucide="repeat-2" class="w-4 h-4"></i></span>
                     <span><span class="block font-semibold">Substituir paciente</span><span class="block text-xs text-amber-700/80">Remove este paciente e abre o mesmo horário para outro</span></span>
                 </button>
+                <button type="button" id="deleteAgendaPatientBtn" class="w-full flex items-center gap-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-left text-red-700 hover:bg-red-100 transition">
+                    <span class="w-9 h-9 rounded-full bg-red-600 text-white flex items-center justify-center"><i data-lucide="trash-2" class="w-4 h-4"></i></span>
+                    <span><span class="block font-semibold">Excluir paciente</span><span class="block text-xs text-red-600/80">Remove o agendamento deste horário</span></span>
+                </button>
                 <button type="button" id="cancelAgendaPatientBtn" class="w-full rounded-xl px-4 py-3 text-center text-sm font-semibold text-slate-500 hover:bg-slate-50">Cancelar</button>
             </div>
         </div>
@@ -621,6 +623,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
         const agendaDayLabel = document.getElementById('agendaDayLabel');
         const agendaSlotsList = document.getElementById('agendaSlotsList');
         const agendaAddBtn = document.getElementById('agendaAddBtn');
+        const sendAgendaListBtn = document.getElementById('sendAgendaListBtn');
         const prevDayBtn = document.getElementById('prevDayBtn');
         const nextDayBtn = document.getElementById('nextDayBtn');
         const agendaTodayBtn = document.getElementById('agendaTodayBtn');
@@ -637,6 +640,7 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
         const closeAgendaActionModal = document.getElementById('closeAgendaActionModal');
         const editAgendaPatientBtn = document.getElementById('editAgendaPatientBtn');
         const replaceAgendaPatientBtn = document.getElementById('replaceAgendaPatientBtn');
+        const deleteAgendaPatientBtn = document.getElementById('deleteAgendaPatientBtn');
         const cancelAgendaPatientBtn = document.getElementById('cancelAgendaPatientBtn');
 
         const AGENDA_PROFESSIONALS = ['Médico', 'Enfermeira', 'Dentista'];
@@ -876,7 +880,6 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
             const dayData = agendaData[dateStr] || {};
             let hasScheduled = false;
             let hasNotified = false;
-            let hasAvailable = false;
             AGENDA_PROFESSIONALS.forEach(prof => {
                 const profData = dayData[prof] || {};
                 agendaSlotTimes.forEach(time => {
@@ -884,12 +887,10 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                     if (slot && slot.name && slot.name.trim()) {
                         hasScheduled = true;
                         if (slot.avisado) hasNotified = true;
-                    } else {
-                        hasAvailable = true;
                     }
                 });
             });
-            return { hasScheduled, hasNotified, hasAvailable };
+            return { hasScheduled, hasNotified };
         }
 
         function renderCalendar() {
@@ -915,7 +916,8 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                 const apptStatus = getCalendarAppointmentStatus(cellKey);
                 const statusDots = apptStatus.hasScheduled
                     ? `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-0.5">
-                         <span class="w-1.5 h-1.5 rounded-full ${apptStatus.hasNotified ? 'bg-emerald-500' : 'bg-blue-700'}"></span>
+                         <span class="w-1.5 h-1.5 rounded-full bg-blue-700"></span>
+                         ${apptStatus.hasNotified ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>' : ''}
                        </span>`
                     : '';
                 btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}${hasNotes ? `<span class="absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-100 text-amber-700 border border-amber-200"><i data-lucide="notebook-pen" class="w-2.5 h-2.5"></i></span>` : ''}</span>`;
@@ -928,16 +930,13 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                 const isSelected = isSameDay(cellDate, agendaCurrentDate);
                 const isPast = cellDate.getTime() < today.getTime() && !isToday;
 
-                let cls = 'text-xs py-1.5 rounded-full transition relative ';
+                let cls = 'text-xs py-1.5 rounded-full transition ';
                 if (!inMonth) cls += 'text-slate-200 hover:bg-slate-50 ';
                 else if (isPast) cls += 'text-slate-300 hover:bg-slate-50 ';
-                else if (apptStatus.hasNotified) cls += 'calendar-notified hover:bg-emerald-100 ';
-                else if (apptStatus.hasScheduled) cls += 'calendar-scheduled hover:bg-blue-50 ';
-                else if (apptStatus.hasAvailable) cls += 'calendar-available hover:bg-blue-100 ';
                 else cls += 'text-slate-700 hover:bg-blue-50 ';
-                if (isToday && !isSelected) cls += 'font-bold ';
-                if (isSelected) cls += 'calendar-selected font-bold ';
-                if (hasNotes) cls += ' calendar-note ';
+                if (isToday && !isSelected) cls += 'font-bold text-blue-600 ';
+                if (isSelected) cls = 'text-xs py-1.5 rounded-full bg-blue-700 text-white font-bold ';
+                if (hasNotes && !isSelected) cls += ' ring-1 ring-amber-200 ';
 
                 btn.className = cls;
                 btn.addEventListener('click', () => {
@@ -1019,6 +1018,29 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
             closeAgendaPatientActionModal();
             openAgendaSlotInMessage(selected.time);
             showToast(`Horário ${selected.time} liberado para substituição.`);
+        });
+
+        deleteAgendaPatientBtn.addEventListener('click', () => {
+            if (!selectedAgendaPatientAction) return;
+            const selected = { ...selectedAgendaPatientAction };
+            const slot = agendaData[selected.date]?.[selected.prof]?.[selected.time];
+            if (!slot || !slot.name) return closeAgendaPatientActionModal();
+
+            if (!confirm(`Excluir o agendamento de ${slot.name}?`)) return;
+
+            delete agendaData[selected.date][selected.prof][selected.time];
+            if (Object.keys(agendaData[selected.date][selected.prof]).length === 0) {
+                delete agendaData[selected.date][selected.prof];
+            }
+            if (Object.keys(agendaData[selected.date]).length === 0) {
+                delete agendaData[selected.date];
+            }
+            saveAgenda();
+            closeAgendaPatientActionModal();
+            renderCalendar();
+            renderAgenda();
+            updateRemindersBanner();
+            showToast('Agendamento excluído.');
         });
 
         function openAgendaSlotInMessage(time) {
@@ -1129,6 +1151,45 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
                 });
             });
         }
+
+        function buildAgendaListMessage(dateStr) {
+            const dayData = agendaData[dateStr] || {};
+            const lines = [];
+
+            ['Médico', 'Enfermeira'].forEach(prof => {
+                const names = [];
+                const profData = dayData[prof] || {};
+                agendaSlotTimes.forEach(time => {
+                    const slot = profData[time];
+                    if (slot && slot.name && slot.name.trim()) names.push(slot.name.trim());
+                });
+
+                lines.push(`${prof}:`);
+                if (names.length) {
+                    lines.push(...names);
+                } else {
+                    lines.push('Nenhum paciente agendado.');
+                }
+                lines.push('');
+            });
+
+            return lines.join('\n').trim();
+        }
+
+        sendAgendaListBtn.addEventListener('click', () => {
+            if (!myPhone) {
+                showToast('Cadastre seu número primeiro (botão no topo)');
+                settingsModal.classList.remove('hidden');
+                settingsModal.classList.add('flex');
+                return;
+            }
+
+            const dateStr = dateKey(agendaCurrentDate);
+            const msg = buildAgendaListMessage(dateStr);
+            const link = buildWaLink(myPhone, msg);
+            window.open(link, '_blank');
+            showToast('Abrindo WhatsApp com a lista da agenda...');
+        });
 
         agendaAddBtn.addEventListener('click', () => {
             const k = dateKey(agendaCurrentDate);
