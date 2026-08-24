@@ -25,6 +25,23 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
 .pec-selected-time{background:#eaf3fa!important;border-left:4px solid var(--pec-blue)!important}
 .pec-time-value{color:var(--pec-blue-dark)!important;font-weight:800!important}
 .pec-time-note{color:#5d7180!important}
+
+/* Cores dos cartões da agenda: o status colore o cartão inteiro. */
+#agendaSlotsList .agenda-card-toggle.agenda-booked {
+  background: #e8f0fd !important;
+}
+#agendaSlotsList .agenda-card-toggle.agenda-booked:hover {
+  background: #dbe8fb !important;
+}
+#agendaSlotsList .agenda-card-toggle.agenda-notified {
+  background: #dff5e9 !important;
+}
+#agendaSlotsList .agenda-card-toggle.agenda-notified:hover {
+  background: #cceedd !important;
+}
+#agendaSlotsList .agenda-card-toggle.agenda-available {
+  background: var(--cinza-100) !important;
+}
 </style>
 
 <style id="agendasaude-design-improvements">
@@ -1190,16 +1207,12 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 const slot = dayData[time] || null;
                 const hasPatient = !!(slot && slot.name && slot.name.trim());
                 const card = document.createElement('div');
-                card.className = `${hasPatient ? (slot.avisado ? 'bg-emerald-50' : 'bg-blue-50') : 'bg-slate-50/40'} border-b border-slate-100`;
+                card.className = `${hasPatient ? 'bg-white' : 'bg-slate-50/40'} border-b border-slate-100`;
 
                 const header = document.createElement('button');
                 header.type = 'button';
                 header.className = `agenda-card-toggle w-full flex items-center gap-3 py-3 px-2 text-left transition rounded-lg ${
-                    hasPatient
-                        ? (slot.avisado
-                            ? 'bg-emerald-50 hover:bg-emerald-100/70 active:bg-emerald-100'
-                            : 'bg-blue-50 hover:bg-blue-100/70 active:bg-blue-100')
-                        : 'hover:bg-blue-50/50 active:bg-blue-100/50'
+                    hasPatient ? (slot.avisado ? 'agenda-booked agenda-notified' : 'agenda-booked') : 'agenda-available'
                 }`;
                 header.dataset.time = time;
                 header.innerHTML = `
