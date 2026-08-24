@@ -11,8 +11,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AgendaSaúde">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
-    <link rel="icon" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" href="icon-192.png">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,6 +25,83 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
 .pec-selected-time{background:#eaf3fa!important;border-left:4px solid var(--pec-blue)!important}
 .pec-time-value{color:var(--pec-blue-dark)!important;font-weight:800!important}
 .pec-time-note{color:#5d7180!important}
+</style>
+
+<style id="agendasaude-design-improvements">
+:root{
+  --azul-900:#0f3d7a;--azul-700:#1a56b8;--azul-500:#2f6fe0;--azul-100:#e8f0fd;
+  --verde-600:#1f9d63;--verde-100:#dff5e9;--cinza-900:#1c2430;--cinza-600:#5b6674;
+  --cinza-400:#98a2b3;--cinza-200:#e3e7ee;--cinza-100:#f3f5f8;--amarelo-100:#fff6df;--amarelo-600:#b8860b;
+}
+body{background:#e9edf3!important;color:var(--cinza-900)!important}
+header{background:linear-gradient(135deg,var(--azul-900),var(--azul-700))!important;padding:10px 14px!important;box-shadow:none!important}
+header>div{max-width:900px!important}
+header h1{font-size:15px!important;line-height:1.15!important}
+header .lucide{width:20px!important;height:20px!important}
+#openSettingsBtn{width:36px!important;height:36px!important;padding:0!important;border-radius:10px!important;background:rgba(255,255,255,.14)!important;border:1px solid rgba(255,255,255,.18)!important;color:#fff!important;justify-content:center!important}
+#openSettingsBtn span{display:none!important}
+#remindersBanner{padding:6px 12px 0!important;max-width:900px!important}
+#remindersBanner>div{border-radius:10px!important;padding:7px 12px!important;font-size:12.5px!important;border-color:#f0e0b0!important;background:var(--amarelo-100)!important;color:var(--amarelo-600)!important}
+#remindersBannerBtn{background:transparent!important;color:var(--azul-700)!important;padding:0!important;font-size:12px!important}
+#agendaSection{max-width:900px!important;padding:12px!important}
+#agendaSection>div{grid-template-columns:1fr!important}
+#agendaSection aside{position:static!important;border-radius:14px!important;padding:14px!important}
+#agendaSection aside>button:first-child{margin-bottom:8px!important;padding:7px!important}
+#calDaysGrid{row-gap:4px!important}
+#calDaysGrid button{position:relative!important;width:38px!important;height:38px!important;margin:0 auto!important;padding:0!important;border-radius:10px!important;font-size:14px!important;font-weight:600!important}
+#calDaysGrid button:hover{background:var(--azul-100)!important}
+#calDaysGrid button.bg-blue-700{background:var(--azul-700)!important;color:#fff!important;box-shadow:0 4px 10px rgba(26,86,184,.25)!important}
+#calDaysGrid button.text-blue-600:not(.bg-blue-700){border:2px solid var(--azul-700)!important;color:var(--azul-700)!important;font-weight:800!important}
+#calDaysGrid button.text-slate-300{color:#c3cad4!important;font-weight:400!important}
+#calDaysGrid button.text-slate-200{color:var(--cinza-400)!important}
+#agendaSection .bg-white.rounded-xl.shadow-sm{border-radius:14px!important}
+#agendaProfSelect{border:1px solid #cfd5de!important;min-height:42px!important}
+#agendaDayLabel{font-size:17px!important;color:var(--cinza-900)!important}
+#agendaMonthLabel{color:var(--cinza-600)!important}
+#sendAgendaListBtn{background:var(--verde-600)!important;border-radius:9px!important;padding:8px 12px!important}
+#agendaAddBtn{border-radius:9px!important;padding:8px 14px!important}
+#agendaSlotsList{display:flex!important;flex-direction:column!important;gap:8px!important;border:0!important}
+#agendaSlotsList>div{border:0!important;background:transparent!important}
+#agendaSlotsList .agenda-card-toggle{background:var(--cinza-100)!important;border-radius:12px!important;padding:10px 12px!important;min-height:52px!important}
+#agendaSlotsList>div:has(.agenda-card-toggle) .agenda-card-toggle:hover{background:#eef3fa!important}
+#agendaSlotsList .agenda-card-toggle>span:first-child{width:10px!important;height:10px!important;border-radius:50%!important;box-shadow:0 0 0 3px #fff!important}
+#agendaSlotsList .agenda-card-toggle>span:nth-child(2){width:48px!important;color:var(--cinza-900)!important;font-weight:700!important}
+#agendaSlotsList .agenda-card-toggle>span:nth-child(3) span:first-child{color:var(--cinza-900)!important;font-weight:600!important}
+#agendaSlotsList .agenda-card-toggle>span:nth-child(3) span:nth-child(2){color:var(--cinza-600)!important}
+#agendaSlotsList .agenda-card-toggle>span:nth-child(4){color:var(--cinza-400)!important}
+#agendaSlotsList .agenda-card-toggle .bg-slate-300{background:var(--cinza-200)!important}
+#agendaSlotsList .agenda-card-toggle .bg-blue-700{background:var(--azul-500)!important}
+#agendaSlotsList .agenda-card-toggle .bg-emerald-500{background:var(--verde-600)!important}
+#agendaSlotsList .agenda-card-toggle .text-emerald-600{color:var(--verde-600)!important}
+#agendaSlotsList .agenda-card-toggle .text-emerald-800,#agendaSlotsList .agenda-card-toggle .text-emerald-900{color:#176f4b!important}
+#agendaSlotsList .agenda-card-toggle .text-blue-900,#agendaSlotsList .agenda-card-toggle .text-blue-950{color:var(--cinza-900)!important}
+#agendaSlotsList .agenda-card-toggle .text-slate-400{color:var(--cinza-400)!important}
+#remindersSection{max-width:900px!important;padding:12px!important}
+#remindersSection>div{border-radius:14px!important;padding:14px!important}
+#remindersList{display:flex!important;flex-direction:column!important;gap:8px!important;border:0!important}
+#remindersList>div{background:var(--cinza-100)!important;border-radius:12px!important;border:0!important;padding:10px 12px!important;min-height:58px!important}
+#remindersList .reminder-send-btn:not([title="Enviar de novo"]),#remindersList button.bg-emerald-600{background:var(--verde-600)!important;color:#fff!important;border-radius:9px!important;padding:8px 12px!important}
+#remindersList .text-emerald-600{color:var(--verde-600)!important}
+#remindersList .border-slate-200{border-color:var(--verde-600)!important;color:var(--verde-600)!important;background:#fff!important}
+nav.fixed{border-top:1px solid var(--cinza-200)!important;background:#fff!important}
+nav.fixed>div{max-width:900px!important}
+nav.fixed button{padding:9px 0 8px!important;gap:3px!important;font-size:10.5px!important}
+nav.fixed button .lucide{width:20px!important;height:20px!important}
+#remindersBadge{top:3px!important;right:28%!important;width:18px!important;height:18px!important;border-radius:50%!important;background:#e04b4b!important}
+/* campos obrigatórios já destacados: mantém contraste sem deixar os opcionais gritarem */
+#appointmentForm input[required],#appointmentForm select[required],#appointmentForm textarea[required]{border-width:2px!important;border-color:#8fb4e8!important;background:#f8fbff!important}
+@media(max-width:640px){
+  #agendaSection{padding:8px!important}
+  #agendaSection aside{padding:12px!important}
+  #agendaSection .bg-white.rounded-xl.shadow-sm{border-radius:14px!important}
+  #agendaSection .p-4.md\:p-5{padding:12px!important}
+  #agendaDayLabel{font-size:16px!important}
+  #sendAgendaListBtn,#agendaAddBtn{flex:1!important;min-width:0!important}
+  #agendaSlotsList .agenda-card-toggle{gap:9px!important;padding:10px!important}
+  #agendaSlotsList .agenda-card-toggle>span:nth-child(2){width:44px!important}
+  #agendaSlotsList .agenda-card-toggle>span:nth-child(4){display:none!important}
+  #remindersList>div{padding:10px!important}
+}
 </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
