@@ -649,6 +649,22 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                         class="w-full pl-12 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                 </div>
             </div>
+            <div class="border-t border-slate-200 pt-4 space-y-2">
+                <div>
+                    <h4 class="text-sm font-bold text-slate-700">Backup dos dados</h4>
+                    <p class="text-[11px] text-slate-400 mt-1">Salve uma cópia das agendas, anotações, mensagens e configurações deste aparelho.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="exportBackupBtn" type="button" class="px-3 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-lg hover:bg-slate-900 flex items-center justify-center gap-1.5">
+                        <i data-lucide="download" class="w-4 h-4"></i> Fazer backup
+                    </button>
+                    <button id="importBackupBtn" type="button" class="px-3 py-2.5 bg-slate-100 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-200 flex items-center justify-center gap-1.5">
+                        <i data-lucide="upload" class="w-4 h-4"></i> Restaurar backup
+                    </button>
+                </div>
+                <input id="backupFileInput" type="file" accept="application/json,.json" class="hidden">
+                <p class="text-[10px] text-amber-600">⚠️ Ao restaurar, os dados atuais deste aparelho serão substituídos pelos dados do arquivo.</p>
+            </div>
             <div class="flex justify-end gap-2 pt-2">
                 <button id="cancelSettingsBtn" class="px-4 py-2 bg-slate-100 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-200">Cancelar</button>
                 <button id="saveSettingsBtn" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700">Salvar Meu Número</button>
@@ -2033,6 +2049,76 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             settingsModal.classList.add('hidden');
             settingsModal.classList.remove('flex');
             showToast('Número salvo!');
+        });
+
+        // Backup e restauração dos dados locais
+        const exportBackupBtn = document.getElementById('exportBackupBtn');
+        const importBackupBtn = document.getElementById('importBackupBtn');
+        const backupFileInput = document.getElementById('backupFileInput');
+
+        function collectBackupData() {
+            const data = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('app_')) data[key] = localStorage.getItem(key);
+            }
+            return {
+                app: 'AgendaSaúde',
+                version: 1,
+                createdAt: new Date().toISOString(),
+                data
+            };
+        }
+
+        exportBackupBtn?.addEventListener('click', () => {
+            try {
+                const backup = collectBackupData();
+                const blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                const stamp = new Date().toISOString().slice(0,19).replace(/[T:]/g, '-');
+                a.href = url;
+                a.download = `AgendaSaude-backup-${stamp}.json`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                showToast('Backup criado!');
+            } catch (e) {
+                console.error(e);
+                showToast('Não foi possível criar o backup.');
+            }
+        });
+
+        importBackupBtn?.addEventListener('click', () => backupFileInput?.click());
+
+        backupFileInput?.addEventListener('change', async (event) => {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            try {
+                const text = await file.text();
+                const backup = JSON.parse(text);
+                if (!backup || backup.app !== 'AgendaSaúde' || !backup.data || typeof backup.data !== 'object') {
+                    throw new Error('Arquivo de backup inválido.');
+                }
+                if (!confirm('Restaurar este backup? Os dados atuais deste aparelho serão substituídos.')) {
+                    event.target.value = '';
+                    return;
+                }
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('app_')) localStorage.removeItem(key);
+                });
+                Object.entries(backup.data).forEach(([key, value]) => {
+                    if (key.startsWith('app_') && typeof value === 'string') localStorage.setItem(key, value);
+                });
+                showToast('Backup restaurado. Recarregando...');
+                setTimeout(() => window.location.reload(), 700);
+            } catch (e) {
+                console.error(e);
+                showToast('Backup inválido ou corrompido.');
+            } finally {
+                event.target.value = '';
+            }
         });
 
         // History
