@@ -119,6 +119,14 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
   #agendaSlotsList .agenda-card-toggle>span:nth-child(4){display:none!important}
   #remindersList>div{padding:10px!important}
 }
+
+<style id="agenda-events-and-notes">
+#agendaSlotsList .agenda-event { background:#fff7ed !important; border:1px solid #fed7aa !important; color:#9a3412 !important; }
+#agendaSlotsList .agenda-event-selected { outline:2px solid #f59e0b !important; outline-offset:1px; background:#ffedd5 !important; }
+#agendaSlotsList .agenda-selection-active .agenda-card-toggle { cursor:pointer; }
+#agendaSlotsList .agenda-selected-slot { box-shadow:0 0 0 2px #2563eb inset !important; background:#eff6ff !important; }
+#notesSection textarea#noteText { min-height:110px; resize:vertical; line-height:1.5; white-space:pre-wrap; }
+</style>
 </style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
@@ -394,6 +402,9 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                                 <button id="sendAgendaListBtn" class="inline-flex items-center justify-center gap-1.5 bg-emerald-600 text-white rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-emerald-700 transition">
                                     <i data-lucide="send" class="w-4 h-4"></i> Enviar lista
                                 </button>
+                                <button id="agendaMultiSelectBtn" type="button" class="inline-flex items-center justify-center gap-1.5 bg-amber-500 text-white rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-amber-600 transition">
+                                    <i data-lucide="list-checks" class="w-4 h-4"></i> Selecionar horários
+                                </button>
                                 <button id="agendaAddBtn" class="inline-flex items-center justify-center gap-1.5 bg-blue-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold hover:bg-blue-700 transition">
                                     <i data-lucide="plus" class="w-4 h-4"></i> Inserir paciente
                                 </button>
@@ -409,6 +420,11 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                             <span class="hidden sm:block w-28 text-right">Status</span>
                         </div>
                         <div id="agendaSlotsList" class="divide-y divide-slate-100"></div>
+                        <div id="agendaSelectionBar" class="hidden mt-3 p-3 rounded-xl border border-blue-200 bg-blue-50 flex flex-col sm:flex-row sm:items-center gap-2">
+                            <div class="flex-1 text-xs text-blue-800"><strong id="agendaSelectionCount">0</strong> horário(s) selecionado(s). Selecione horários livres e depois marque o evento.</div>
+                            <button id="agendaMarkSelectedBtn" type="button" class="inline-flex items-center justify-center gap-1.5 bg-blue-600 text-white rounded-lg px-3 py-2 text-xs font-bold hover:bg-blue-700"><i data-lucide="calendar-plus" class="w-4 h-4"></i> Marcar selecionados</button>
+                            <button id="agendaCancelSelectionBtn" type="button" class="inline-flex items-center justify-center gap-1.5 bg-white text-slate-600 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold hover:bg-slate-50">Cancelar</button>
+                        </div>
                         <p class="text-[11px] text-slate-400 mt-4 flex items-start gap-1.5">
                             <i data-lucide="info" class="w-3.5 h-3.5 flex-shrink-0 mt-0.5"></i>
                             Toque em um horário para abrir a tela "Nova Mensagem" já preenchida com o dia, horário e profissional selecionados. Ao enviar, o paciente entra automaticamente na agenda.
@@ -473,7 +489,10 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             </div>
             <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-4">
                 <div class="grid grid-cols-1 md:grid-cols-[1fr_170px_160px] gap-2">
-                    <input id="noteText" type="text" placeholder="Ex.: lembrar de confirmar os pacientes de quinta-feira" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <textarea id="noteText" rows="5" placeholder="Escreva suas anotações aqui. Você pode fazer listas, por exemplo:
+• Confirmar reunião
+• Ligar para a paciente
+• Separar documentos" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"></textarea>
                     <div>
                         <label for="noteReminderDate" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Dia do lembrete</label>
                         <input id="noteReminderDate" type="date" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
@@ -629,6 +648,22 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         </div>
     </div>
 
+    <!-- Marcação de múltiplos horários -->
+    <div id="agendaEventModal" class="fixed inset-0 z-[90] hidden items-end sm:items-center justify-center bg-slate-900/45 p-3 sm:p-4">
+        <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                <div><p class="text-xs text-slate-400">Agenda</p><h3 class="text-base font-bold text-slate-800">Marcar horários</h3><p id="agendaEventCountLabel" class="text-xs text-slate-500 mt-0.5"></p></div>
+                <button id="closeAgendaEventModal" type="button" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-4 space-y-3">
+                <div><label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Tipo</label><select id="agendaEventType" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm"><option>Reunião</option><option>Treinamento</option><option>Visita</option><option>Bloqueio</option><option>Outro</option></select></div>
+                <div><label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Descrição</label><input id="agendaEventLabel" type="text" placeholder="Ex.: Reunião da equipe" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm"></div>
+                <p class="text-[11px] text-slate-400">Os horários selecionados serão marcados na agenda. Eles continuarão reservados até você remover a marcação.</p>
+                <div class="flex gap-2 justify-end pt-1"><button id="cancelAgendaEventBtn" type="button" class="px-4 py-2.5 rounded-lg bg-slate-100 text-slate-600 text-sm font-semibold">Cancelar</button><button id="saveAgendaEventBtn" type="button" class="px-4 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-bold">Salvar marcação</button></div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Templates
         const defaultTemplates = {
@@ -718,6 +753,18 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         const agendaSlotsList = document.getElementById('agendaSlotsList');
         const agendaAddBtn = document.getElementById('agendaAddBtn');
         const sendAgendaListBtn = document.getElementById('sendAgendaListBtn');
+        const agendaMultiSelectBtn = document.getElementById('agendaMultiSelectBtn');
+        const agendaSelectionBar = document.getElementById('agendaSelectionBar');
+        const agendaSelectionCount = document.getElementById('agendaSelectionCount');
+        const agendaMarkSelectedBtn = document.getElementById('agendaMarkSelectedBtn');
+        const agendaCancelSelectionBtn = document.getElementById('agendaCancelSelectionBtn');
+        const agendaEventModal = document.getElementById('agendaEventModal');
+        const agendaEventCountLabel = document.getElementById('agendaEventCountLabel');
+        const agendaEventType = document.getElementById('agendaEventType');
+        const agendaEventLabel = document.getElementById('agendaEventLabel');
+        const closeAgendaEventModal = document.getElementById('closeAgendaEventModal');
+        const cancelAgendaEventBtn = document.getElementById('cancelAgendaEventBtn');
+        const saveAgendaEventBtn = document.getElementById('saveAgendaEventBtn');
         const prevDayBtn = document.getElementById('prevDayBtn');
         const nextDayBtn = document.getElementById('nextDayBtn');
         const agendaTodayBtn = document.getElementById('agendaTodayBtn');
@@ -760,6 +807,8 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
 
         let agendaData = JSON.parse(localStorage.getItem('app_agenda')) || {};
         let notesData = JSON.parse(localStorage.getItem('app_notes')) || [];
+        let agendaSelectionMode = false;
+        let selectedAgendaTimes = new Set();
         let agendaCurrentDate = new Date();
         let calendarViewDate = new Date(agendaCurrentDate.getFullYear(), agendaCurrentDate.getMonth(), 1);
 
@@ -1192,6 +1241,73 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
 
         let pendingAgendaSlot = null;
 
+        function updateAgendaSelectionUI() {
+            agendaSelectionBar.classList.toggle('hidden', !agendaSelectionMode);
+            agendaSelectionCount.textContent = selectedAgendaTimes.size;
+            agendaMultiSelectBtn.innerHTML = agendaSelectionMode
+                ? '<i data-lucide="check" class="w-4 h-4"></i> Seleção ativa'
+                : '<i data-lucide="list-checks" class="w-4 h-4"></i> Selecionar horários';
+            agendaMultiSelectBtn.classList.toggle('bg-amber-500', !agendaSelectionMode);
+            agendaMultiSelectBtn.classList.toggle('bg-blue-600', agendaSelectionMode);
+            lucide.createIcons();
+        }
+
+        function toggleAgendaSelectionMode() {
+            agendaSelectionMode = !agendaSelectionMode;
+            selectedAgendaTimes.clear();
+            updateAgendaSelectionUI();
+            renderAgenda();
+        }
+
+        function openAgendaEventModal(times = []) {
+            if (!times.length) { showToast('Selecione pelo menos um horário livre.'); return; }
+            agendaEventCountLabel.textContent = `${times.length} horário(s): ${times.join(', ')}`;
+            agendaEventType.value = 'Reunião';
+            agendaEventLabel.value = '';
+            agendaEventModal.classList.remove('hidden');
+            agendaEventModal.classList.add('flex');
+            setTimeout(() => agendaEventLabel.focus(), 50);
+        }
+
+        function closeAgendaEventModalFn() {
+            agendaEventModal.classList.add('hidden');
+            agendaEventModal.classList.remove('flex');
+        }
+
+        function saveSelectedAgendaEvent() {
+            const key = dateKey(agendaCurrentDate);
+            const times = [...selectedAgendaTimes];
+            const label = agendaEventLabel.value.trim() || agendaEventType.value;
+            if (!times.length) return;
+            if (!agendaData[key]) agendaData[key] = {};
+            if (!agendaData[key][agendaCurrentProf]) agendaData[key][agendaCurrentProf] = {};
+            times.forEach(time => {
+                const existing = agendaData[key][agendaCurrentProf][time];
+                if (existing && existing.name) return;
+                agendaData[key][agendaCurrentProf][time] = {
+                    event: { type: agendaEventType.value, label },
+                    name: '', phone: '', avisado: false, tipoHorario: 'evento'
+                };
+            });
+            saveAgenda();
+            selectedAgendaTimes.clear();
+            agendaSelectionMode = false;
+            closeAgendaEventModalFn();
+            updateAgendaSelectionUI();
+            renderAgenda();
+            showToast(`${times.length} horário(s) marcado(s) como ${agendaEventType.value}.`);
+        }
+
+        function removeAgendaEvent(time) {
+            const key = dateKey(agendaCurrentDate);
+            const profData = agendaData[key]?.[agendaCurrentProf];
+            if (!profData?.[time]?.event) return;
+            if (!confirm(`Remover a marcação de ${time}?`)) return;
+            delete profData[time];
+            saveAgenda();
+            renderAgenda();
+        }
+
         function renderAgenda() {
             const key = dateKey(agendaCurrentDate);
             agendaDayLabel.textContent = `${weekdayNames[agendaCurrentDate.getDay()]}, ${agendaCurrentDate.getDate()} de ${monthNames[agendaCurrentDate.getMonth()]} de ${agendaCurrentDate.getFullYear()}`;
@@ -1206,28 +1322,32 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             agendaSlotTimes.forEach(time => {
                 const slot = dayData[time] || null;
                 const hasPatient = !!(slot && slot.name && slot.name.trim());
+                const hasEvent = !!(slot && slot.event && slot.event.label);
+                const isSelected = selectedAgendaTimes.has(time);
                 const card = document.createElement('div');
                 card.className = `${hasPatient ? 'bg-white' : 'bg-slate-50/40'} border-b border-slate-100`;
 
                 const header = document.createElement('button');
                 header.type = 'button';
                 header.className = `agenda-card-toggle w-full flex items-center gap-3 py-3 px-2 text-left transition rounded-lg ${
-                    hasPatient ? (slot.avisado ? 'agenda-booked agenda-notified' : 'agenda-booked') : 'agenda-available'
-                }`;
+                    hasEvent ? 'agenda-event' : (hasPatient ? (slot.avisado ? 'agenda-booked agenda-notified' : 'agenda-booked') : 'agenda-available')
+                } ${isSelected ? 'agenda-selected-slot' : ''}`;
                 header.dataset.time = time;
+                const leadingColor = hasEvent ? 'bg-amber-500' : (hasPatient ? (slot.avisado ? 'bg-emerald-500' : 'bg-blue-700') : 'bg-slate-300');
+                const title = hasEvent ? escapeHtml(slot.event.label) : (hasPatient ? escapeHtml(slot.name) : 'Horário disponível');
+                const subtitle = hasEvent ? `${escapeHtml(slot.event.type)}${isSelected ? ' • selecionado' : ''}` : (hasPatient && slot.tipoHorario === 'chegada' ? 'Atendimento por ordem de chegada' : '');
+                const status = hasEvent ? '<span class="text-[11px] text-amber-700 font-semibold">Marcado</span>' : (hasPatient ? (slot.avisado
+                    ? `<span class="inline-flex items-center gap-1 text-emerald-600 text-[11px] font-semibold"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>Avisado</span>`
+                    : `<span class="text-[11px] text-amber-600 font-semibold">Pendente</span>`) : '<span class="text-[11px] text-slate-300">Livre</span>');
                 header.innerHTML = `
-                    <span class="w-1.5 h-10 rounded-full flex-shrink-0 ${hasPatient ? (slot.avisado ? 'bg-emerald-500' : 'bg-blue-700') : 'bg-slate-300'}"></span>
-                    <span class="w-14 text-xs md:text-sm font-semibold ${hasPatient ? (slot.avisado ? 'text-emerald-800' : 'text-blue-900') : 'text-slate-400'} flex-shrink-0">${time}</span>
+                    <span class="w-1.5 h-10 rounded-full flex-shrink-0 ${leadingColor}"></span>
+                    <span class="w-14 text-xs md:text-sm font-semibold ${hasEvent ? 'text-amber-800' : (hasPatient ? (slot.avisado ? 'text-emerald-800' : 'text-blue-900') : 'text-slate-400')} flex-shrink-0">${time}</span>
                     <span class="flex-1 min-w-0">
-                        <span class="block text-sm font-medium ${hasPatient ? (slot.avisado ? 'text-emerald-900' : 'text-blue-950') : 'text-slate-400'} truncate">${hasPatient ? escapeHtml(slot.name) : 'Horário disponível'}</span>
-                        ${hasPatient && slot.tipoHorario === 'chegada' ? '<span class="text-[10px] text-slate-400">Atendimento por ordem de chegada</span>' : ''}
+                        <span class="block text-sm font-medium ${hasEvent ? 'text-amber-900' : (hasPatient ? (slot.avisado ? 'text-emerald-900' : 'text-blue-950') : 'text-slate-400')} truncate">${title}</span>
+                        ${subtitle ? `<span class="text-[10px] ${hasEvent ? 'text-amber-700' : 'text-slate-400'}">${subtitle}</span>` : ''}
                     </span>
-                    <span class="hidden sm:block w-28 text-right flex-shrink-0">
-                        ${hasPatient ? (slot.avisado
-                            ? `<span class="inline-flex items-center gap-1 text-emerald-600 text-[11px] font-semibold"><i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>Avisado</span>`
-                            : `<span class="text-[11px] text-amber-600 font-semibold">Pendente</span>`) : '<span class="text-[11px] text-slate-300">Livre</span>'}
-                    </span>
-                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-300 flex-shrink-0"></i>
+                    <span class="hidden sm:block w-28 text-right flex-shrink-0">${status}</span>
+                    <i data-lucide="${hasEvent ? 'calendar-clock' : 'chevron-right'}" class="w-4 h-4 ${hasEvent ? 'text-amber-500' : 'text-slate-300'} flex-shrink-0"></i>
                 `;
                 card.appendChild(header);
                 agendaSlotsList.appendChild(card);
@@ -1239,8 +1359,18 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                     const time = btn.dataset.time;
                     const slot = dayData[time] || null;
                     const hasPatient = !!(slot && slot.name && slot.name.trim());
+                    const hasEvent = !!(slot && slot.event && slot.event.label);
+                    if (agendaSelectionMode) {
+                        if (hasPatient || hasEvent) { showToast('Selecione apenas horários livres para criar uma marcação.'); return; }
+                        if (selectedAgendaTimes.has(time)) selectedAgendaTimes.delete(time); else selectedAgendaTimes.add(time);
+                        updateAgendaSelectionUI();
+                        renderAgenda();
+                        return;
+                    }
                     if (hasPatient) {
                         openAgendaPatientActionModal(time);
+                    } else if (hasEvent) {
+                        if (confirm(`Remover a marcação “${slot.event.label}” do horário ${time}?`)) removeAgendaEvent(time);
                     } else {
                         openAgendaSlotInMessage(time);
                     }
@@ -1286,6 +1416,14 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             window.open(link, '_blank');
             showToast('Abrindo WhatsApp com a lista da agenda...');
         });
+
+        agendaMultiSelectBtn.addEventListener('click', toggleAgendaSelectionMode);
+        agendaCancelSelectionBtn.addEventListener('click', () => { agendaSelectionMode = false; selectedAgendaTimes.clear(); updateAgendaSelectionUI(); renderAgenda(); });
+        agendaMarkSelectedBtn.addEventListener('click', () => openAgendaEventModal([...selectedAgendaTimes]));
+        closeAgendaEventModal.addEventListener('click', closeAgendaEventModalFn);
+        cancelAgendaEventBtn.addEventListener('click', closeAgendaEventModalFn);
+        saveAgendaEventBtn.addEventListener('click', saveSelectedAgendaEvent);
+        agendaEventModal.addEventListener('click', e => { if (e.target === agendaEventModal) closeAgendaEventModalFn(); });
 
         agendaAddBtn.addEventListener('click', () => {
             const k = dateKey(agendaCurrentDate);
@@ -1386,7 +1524,7 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             renderCalendar();
             showToast('Anotação salva!');
         });
-        noteText.addEventListener('keydown', e => { if (e.key === 'Enter') addNoteBtn.click(); });
+        // Anotações usam textarea: Enter cria nova linha em vez de salvar a anotação.
         clearNotesBtn.addEventListener('click', () => {
             if (!notesData.length) return;
             if (confirm('Apagar todas as anotações?')) { notesData = []; saveNotes(); renderNotes(); renderCalendar(); }
