@@ -803,6 +803,9 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             confirmacao: `Olá, *{NOME}*! Seu atendimento está marcado para amanhã, *{DATA}*, às *{HORARIO}*, com {PROFISSIONAL}.\n\nPodemos confirmar sua presença? Se não puder comparecer, me avise para disponibilizarmos a vaga para outro paciente.\n\n📍 {LOCAL}\n🏠 {ENDERECO}`
         };
         let reminderTemplates = JSON.parse(localStorage.getItem('app_reminder_templates')) || {...defaultReminderTemplates};
+        // Também atualiza modelos de confirmação/lembrete já salvos no aparelho.
+        reminderTemplates = ensureAddressInTemplates(reminderTemplates);
+        localStorage.setItem('app_reminder_templates', JSON.stringify(reminderTemplates));
         const reminderTemplateNames = {
             padrao: 'Padrão',
             curto: 'Curto',
@@ -824,6 +827,21 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         }
 
         let templates = JSON.parse(localStorage.getItem('app_templates')) || {...defaultTemplates};
+        // Migra modelos antigos: se o modelo salvo não tinha {ENDERECO},
+        // acrescenta automaticamente o endereço para que as mensagens novas
+        // também levem essa informação.
+        function ensureAddressInTemplates(obj) {
+            const result = {...obj};
+            Object.keys(result).forEach(k => {
+                const text = String(result[k] || '');
+                if (text && !text.includes('{ENDERECO}')) {
+                    result[k] = text.replace(/\s*$/, '') + '\n🏠 *Endereço:* {ENDERECO}';
+                }
+            });
+            return result;
+        }
+        templates = ensureAddressInTemplates(templates);
+        localStorage.setItem('app_templates', JSON.stringify(templates));
         let history = JSON.parse(localStorage.getItem('app_history')) || [];
         let myPhone = localStorage.getItem('app_my_phone') || '';
 
@@ -1031,7 +1049,10 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         function buildReminderMessage(item, tomorrow, templateKey) {
             const dataStr = formatDate(dateKey(tomorrow));
             const key = templateKey || item.reminderTemplate || 'padrao';
-            const template = reminderTemplates[key] || reminderTemplates.padrao;
+            let template = reminderTemplates[key] || reminderTemplates.padrao;
+            if (!template.includes('{ENDERECO}')) {
+                template = template.replace(/\s*$/, '') + '\n🏠 *Endereço:* {ENDERECO}';
+            }
             const tipo = item.tipoHorario === 'chegada' ? 'por ordem de chegada' : 'horário marcado';
             return template
                 .replace(/{NOME}/g, item.name || '[Nome]')
@@ -1807,6 +1828,10 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             const attendVal = attendanceType.value;
             const locVal = locationInput.value.trim() || 'Unidade de Saúde';
             const addressVal = addressInput.value.trim() || '[Endereço]';
+
+            if (!templateText.includes('{ENDERECO}')) {
+                templateText = templateText.replace(/\s*$/, '') + '\n🏠 *Endereço:* {ENDERECO}';
+            }
 
             let msg = templateText
                 .replace(/{NOME}/g, nameVal)
