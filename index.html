@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AgendaSaúde - Mensagens WhatsApp</title>
 
-    <!-- PWA -->
+    <!-- PWA - AgendaSaúde v10 -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#005ca9">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -345,17 +345,18 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                         class="w-full px-3 py-2 border-2 border-blue-300 bg-blue-50/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Local / Unidade <span class="font-normal normal-case text-slate-400">(opcional)</span></label>
-                        <input type="text" id="location" placeholder="Ex: UBS São Bento de Urânia" value="Unidade Básica de Saúde (UBS)"
-                            class="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg focus:ring-2 focus:ring-slate-300 focus:outline-none text-slate-800 text-sm">
+                <div>
+                    <div class="flex items-center justify-between mb-1">
+                        <label class="block text-xs font-semibold text-slate-600 uppercase">Local / Unidade <span class="font-normal normal-case text-slate-400">(opcional)</span></label>
+                        <button type="button" id="useProfileLocationBtn" class="text-[11px] font-bold text-blue-600 hover:underline">Usar meu perfil</button>
                     </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-500 uppercase mb-1">Endereço <span class="font-normal normal-case text-slate-400">(opcional)</span></label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <input type="text" id="location" placeholder="Ex: UBS São Bento de Urânia"
+                            class="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg focus:ring-2 focus:ring-slate-300 focus:outline-none text-slate-800 text-sm">
                         <input type="text" id="address" placeholder="Ex: Rua Principal, 100 - São Bento de Urânia"
                             class="w-full px-3 py-2 border border-slate-200 bg-slate-50/40 rounded-lg focus:ring-2 focus:ring-slate-300 focus:outline-none text-slate-800 text-sm">
                     </div>
+                    <p class="text-[10px] text-slate-400 mt-1">Você pode alterar esses campos para enviar uma mensagem para outra UBS ou outro local.</p>
                 </div>
 
                 <div>
@@ -638,22 +639,34 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         </div>
     </nav>
 
-    <!-- Modal Cadastro do Meu Número -->
+    <!-- Modal Meu Perfil -->
     <div id="settingsModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-4">
-        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-xl space-y-4">
+        <div class="bg-white w-full max-w-md rounded-2xl p-6 shadow-xl space-y-4 max-h-[90vh] overflow-y-auto">
             <h3 class="font-bold text-lg text-slate-800 flex items-center gap-2">
-                <i data-lucide="smartphone" class="w-5 h-5 text-blue-600"></i>
-                Configurar Meu Número
+                <i data-lucide="user-round-cog" class="w-5 h-5 text-blue-600"></i>
+                Meu perfil
             </h3>
             <p class="text-xs text-slate-500 leading-relaxed">
-                Cadastre seu próprio número do WhatsApp para poder disparar lembretes de teste ou salvar cópias das confirmações no seu próprio chat de anotações.
+                Cadastre aqui os dados padrão da sua unidade. Eles serão preenchidos automaticamente ao agendar e nas mensagens. Na tela de envio você continua podendo trocar o local e o endereço para atender outra UBS ou outro local.
             </p>
-            <div>
-                <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seu WhatsApp (com DDD)</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm">+55</span>
-                    <input type="tel" id="myPhoneNumber" placeholder="(11) 98888-8888"
-                        class="w-full pl-12 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Local / Unidade padrão</label>
+                    <input type="text" id="profileLocation" placeholder="Ex: UBS São Bento de Urânia"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Endereço padrão</label>
+                    <input type="text" id="profileAddress" placeholder="Ex: Rua Principal, 100 - São Bento de Urânia"
+                        class="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Seu WhatsApp (com DDD)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm">+55</span>
+                        <input type="tel" id="myPhoneNumber" placeholder="(11) 98888-8888"
+                            class="w-full pl-12 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
+                    </div>
                 </div>
             </div>
             <div class="border-t border-slate-200 pt-4 space-y-2">
@@ -674,7 +687,7 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             </div>
             <div class="flex justify-end gap-2 pt-2">
                 <button id="cancelSettingsBtn" class="px-4 py-2 bg-slate-100 text-slate-600 text-xs font-semibold rounded-lg hover:bg-slate-200">Cancelar</button>
-                <button id="saveSettingsBtn" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700">Salvar Meu Número</button>
+                <button id="saveSettingsBtn" class="px-4 py-2 bg-blue-600 text-white text-xs font-semibold rounded-lg hover:bg-blue-700">Salvar perfil</button>
             </div>
         </div>
     </div>
@@ -843,7 +856,11 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         templates = ensureAddressInTemplates(templates);
         localStorage.setItem('app_templates', JSON.stringify(templates));
         let history = JSON.parse(localStorage.getItem('app_history')) || [];
-        let myPhone = localStorage.getItem('app_my_phone') || '';
+        let profile = JSON.parse(localStorage.getItem('app_profile') || 'null') || {};
+        if (!profile.phone && localStorage.getItem('app_my_phone')) profile.phone = localStorage.getItem('app_my_phone');
+        if (!profile.location && localStorage.getItem('app_profile_location')) profile.location = localStorage.getItem('app_profile_location');
+        if (!profile.address && localStorage.getItem('app_profile_address')) profile.address = localStorage.getItem('app_profile_address');
+        let myPhone = profile.phone || '';
 
         // DOM elements
         const patientName = document.getElementById('patientName');
@@ -871,6 +888,9 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         const openSettingsBtn = document.getElementById('openSettingsBtn');
         const settingsModal = document.getElementById('settingsModal');
         const myPhoneNumber = document.getElementById('myPhoneNumber');
+        const profileLocation = document.getElementById('profileLocation');
+        const profileAddress = document.getElementById('profileAddress');
+        const useProfileLocationBtn = document.getElementById('useProfileLocationBtn');
         const saveSettingsBtn = document.getElementById('saveSettingsBtn');
         const cancelSettingsBtn = document.getElementById('cancelSettingsBtn');
         const myPhoneStatus = document.getElementById('myPhoneStatus');
@@ -1035,8 +1055,8 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                             avisado: !!slot.avisado, tipoHorario: slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado',
                             profissional: (slot.doctor || prof || '').trim(),
                             atendimento: (slot.consultType || (slot.tipoHorario === 'chegada' ? 'Atendimento por ordem de chegada' : 'Atendimento com horário marcado')).trim(),
-                            local: (slot.location || 'Unidade de Saúde').trim(),
-                            endereco: (slot.address || '').trim(),
+                            local: (slot.location || profile.location || 'Unidade de Saúde').trim(),
+                            endereco: (slot.address || profile.address || '').trim(),
                             reminderTemplate: getReminderChoice(key, prof, time, slot)
                         });
                     }
@@ -1397,8 +1417,8 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             consultType.value = slot?.consultType || defaultConsultTypeForProf(agendaCurrentProf);
             attendanceType.value = slot?.attendanceType || 'horário marcado';
             if (slot?.location) locationInput.value = slot.location;
-            else locationInput.value = 'Unidade Básica de Saúde (UBS)';
-            addressInput.value = slot?.address || '';
+            else locationInput.value = profile.location || '';
+            addressInput.value = slot?.address || profile.address || '';
 
             clearFieldErrors();
             generateMessage();
@@ -1831,8 +1851,8 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             const doctorVal = doctorName.value.trim() || '[Médico/Profissional]';
             const consultVal = consultType.value.trim() || '[Consulta]';
             const attendVal = attendanceType.value;
-            const locVal = locationInput.value.trim() || 'Unidade de Saúde';
-            const addressVal = addressInput.value.trim() || '[Endereço]';
+            const locVal = locationInput.value.trim() || profile.location || 'Unidade de Saúde';
+            const addressVal = addressInput.value.trim() || profile.address || '[Endereço]';
 
             if (!templateText.includes('{ENDERECO}')) {
                 templateText = templateText.replace(/\s*$/, '') + '\n🏠 *Endereço:* {ENDERECO}';
@@ -1902,8 +1922,8 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 phone: patientPhone.value.trim(),
                 category: professionalCategory.value,
                 attendanceType: attendanceType.value,
-                location: locationInput.value.trim(),
-                address: addressInput.value.trim(),
+                location: (locationInput.value.trim() || profile.location || '').trim(),
+                address: (addressInput.value.trim() || profile.address || '').trim(),
                 message: msg
             };
             history.unshift(entry);
@@ -1943,6 +1963,10 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 });
             });
         }
+
+        // Preenche o formulário com o perfil padrão, mas mantém os campos editáveis para cada envio.
+        if (!locationInput.value.trim()) locationInput.value = profile.location || '';
+        if (!addressInput.value.trim()) addressInput.value = profile.address || '';
 
         function clearFieldErrors() {
             [patientName, patientPhone, appDate, appTime, doctorName, consultType, addressInput].forEach(el => {
@@ -1992,8 +2016,8 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 doctor: doctorName.value.trim(),
                 consultType: consultType.value.trim(),
                 attendanceType: attendanceType.value,
-                location: locationInput.value.trim(),
-                address: addressInput.value.trim()
+                location: (locationInput.value.trim() || profile.location || '').trim(),
+                address: (addressInput.value.trim() || profile.address || '').trim()
             };
             saveAgenda();
             pendingAgendaSlot = null;
@@ -2106,21 +2130,44 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
 
         // My phone settings
         openSettingsBtn.addEventListener('click', () => {
-            myPhoneNumber.value = myPhone;
+            myPhoneNumber.value = profile.phone || myPhone || '';
+            profileLocation.value = profile.location || '';
+            profileAddress.value = profile.address || '';
             settingsModal.classList.remove('hidden');
             settingsModal.classList.add('flex');
+            lucide.createIcons();
         });
         cancelSettingsBtn.addEventListener('click', () => {
             settingsModal.classList.add('hidden');
             settingsModal.classList.remove('flex');
         });
         saveSettingsBtn.addEventListener('click', () => {
-            myPhone = myPhoneNumber.value.trim();
+            profile = {
+                ...(profile || {}),
+                phone: myPhoneNumber.value.trim(),
+                location: profileLocation.value.trim(),
+                address: profileAddress.value.trim()
+            };
+            myPhone = profile.phone || '';
+            localStorage.setItem('app_profile', JSON.stringify(profile));
+            // Mantém as chaves antigas para compatibilidade com versões anteriores.
             localStorage.setItem('app_my_phone', myPhone);
+            localStorage.setItem('app_profile_location', profile.location || '');
+            localStorage.setItem('app_profile_address', profile.address || '');
             updateMyPhoneBadge();
+            locationInput.value = profile.location || '';
+            addressInput.value = profile.address || '';
+            generateMessage();
             settingsModal.classList.add('hidden');
             settingsModal.classList.remove('flex');
-            showToast('Número salvo!');
+            showToast('Meu perfil foi salvo!');
+        });
+
+        useProfileLocationBtn?.addEventListener('click', () => {
+            locationInput.value = profile.location || '';
+            addressInput.value = profile.address || '';
+            generateMessage();
+            showToast('Local e endereço do perfil preenchidos.');
         });
 
         // Backup e restauração dos dados locais
