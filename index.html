@@ -239,6 +239,37 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
 .calendar-legend-dot.event{background:#111827!important;}
 .calendar-legend-dot.note{background:#ef4444!important;}
 </style>
+
+<style id="v11-equal-agenda-buttons">
+/* v11: ações da agenda com dimensões uniformes no celular */
+#agendaSection .agenda-action-row{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  gap:8px!important;
+  width:100%!important;
+}
+#agendaSection .agenda-action-row > button{
+  flex:1 1 0!important;
+  width:0!important;
+  min-width:0!important;
+  height:46px!important;
+  min-height:46px!important;
+  max-height:46px!important;
+  padding:6px 5px!important;
+  border-radius:10px!important;
+  font-size:12px!important;
+  line-height:1.15!important;
+  white-space:normal!important;
+  text-align:center!important;
+}
+#agendaSection .agenda-action-row > button i{
+  width:16px!important;height:16px!important;flex-shrink:0!important;
+}
+@media (max-width:520px){
+  #agendaSection .agenda-action-row > button{font-size:11.5px!important;gap:3px!important}
+}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -518,7 +549,7 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                             <div class="hidden md:flex items-center gap-1.5 text-[11px] text-slate-400">
                                 <i data-lucide="mouse-pointer-click" class="w-3.5 h-3.5"></i> Toque no horário para agendar
                             </div>
-                            <div class="flex items-center gap-2 flex-wrap justify-end">
+                            <div class="flex items-center gap-2 flex-wrap justify-end agenda-action-row">
                                 <button id="sendAgendaListBtn" class="inline-flex items-center justify-center gap-1.5 bg-emerald-600 text-white rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-emerald-700 transition">
                                     <i data-lucide="send" class="w-4 h-4"></i> Enviar lista
                                 </button>
