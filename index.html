@@ -1038,7 +1038,6 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         function renderReminders() {
             const { tomorrow, key, items } = collectTomorrowReminders();
             remindersDateLabel.textContent = `${weekdayNames[tomorrow.getDay()]}, ${tomorrow.getDate()} de ${monthNames[tomorrow.getMonth()]} de ${tomorrow.getFullYear()}`;
-            updateReminderMessagePreview();
 
             remindersList.innerHTML = '';
             if (items.length === 0) {
