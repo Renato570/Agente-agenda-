@@ -125,6 +125,20 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
   border-radius:8px; padding:5px 9px; font-weight:700; font-size:12px;
 }
 
+
+/* v3: per-patient reminder choice + clear annotation editing */
+.reminder-row { background:#fff; }
+.reminder-template-per-patient { min-height:34px; }
+.note-edit-btn {
+  display:inline-flex !important; align-items:center; gap:4px;
+  color:#2563eb !important; border:1px solid #bfdbfe !important;
+  background:#eff6ff !important; border-radius:8px !important;
+  padding:5px 8px !important; font-size:11px !important; font-weight:700 !important;
+}
+@media (max-width: 520px) {
+  .reminder-template-per-patient { width:110px !important; }
+}
+
 </style>
 
 <style id="agendasaude-design-improvements">
@@ -542,27 +556,14 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 <p id="remindersDateLabel" class="text-xs text-slate-400 mb-4"></p>
             </div>
 
-            <div class="flex items-center justify-between gap-2 mb-3">
+            <div class="flex items-center justify-between gap-2 mb-4">
                 <div>
-                    <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Modelo da notificação</p>
-                    <p id="reminderTemplateLabel" class="text-xs text-slate-400">Escolha como o lembrete de amanhã será enviado.</p>
+                    <p class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">Mensagem por paciente</p>
+                    <p class="text-xs text-slate-400">Escolha a mensagem individualmente em cada paciente abaixo.</p>
                 </div>
                 <button id="editReminderTemplateBtn" type="button" class="text-xs font-semibold text-blue-600 hover:underline flex items-center gap-1">
                     <i data-lucide="edit-3" class="w-3 h-3"></i> Editar mensagens
                 </button>
-            </div>
-            <select id="reminderTemplateSelect" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none mb-2">
-                <option value="padrao">Lembrete de Véspera</option>
-                <option value="curto">Lembrete de Véspera · curto</option>
-                <option value="confirmacao">Lembrete de Véspera · confirmação</option>
-            </select>
-
-            <div class="mb-4 rounded-xl border border-blue-100 bg-blue-50/60 overflow-hidden">
-                <div class="px-3 py-2 border-b border-blue-100 flex items-center gap-2">
-                    <i data-lucide="eye" class="w-4 h-4 text-blue-600"></i>
-                    <span class="text-xs font-semibold text-blue-800">Mensagem que será enviada</span>
-                </div>
-                <div id="reminderMessagePreview" class="px-3 py-3 text-sm whitespace-pre-wrap text-slate-700 min-h-[110px] max-h-64 overflow-auto"></div>
             </div>
 
             <div id="remindersList" class="divide-y divide-slate-100"></div>
@@ -596,7 +597,10 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                         <label for="noteReminderDate" class="block text-[10px] font-bold uppercase tracking-wide text-slate-500 mb-1">Dia do lembrete</label>
                         <input id="noteReminderDate" type="date" class="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
-                    <button id="addNoteBtn" class="bg-blue-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold hover:bg-blue-700 transition self-end">+ Adicionar anotação</button>
+                    <div class="flex gap-2 self-end">
+                        <button id="cancelEditNoteBtn" type="button" class="hidden bg-slate-100 text-slate-600 rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-slate-200 transition">Cancelar</button>
+                        <button id="addNoteBtn" class="bg-blue-600 text-white rounded-lg px-4 py-2.5 text-sm font-bold hover:bg-blue-700 transition self-end">+ Adicionar anotação</button>
+                    </div>
                 </div>
                 <p class="text-[10px] text-slate-400 mt-2">Ao escolher uma data, um ícone 📝 aparecerá naquele dia no calendário da Agenda.</p>
             </div>
@@ -777,6 +781,26 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             confirmacao: `Olá, *{NOME}*! Seu atendimento está marcado para amanhã, *{DATA}*, às *{HORARIO}*, com {PROFISSIONAL}.\n\nPodemos confirmar sua presença? Se não puder comparecer, me avise para disponibilizarmos a vaga para outro paciente.\n\n📍 {LOCAL}`
         };
         let reminderTemplates = JSON.parse(localStorage.getItem('app_reminder_templates')) || {...defaultReminderTemplates};
+        const reminderTemplateNames = {
+            padrao: 'Padrão',
+            curto: 'Curto',
+            confirmacao: 'Confirmação'
+        };
+        function reminderChoiceKey(dateKeyValue, prof, time) {
+            return `app_reminder_choice_${dateKeyValue}_${prof}_${time}`;
+        }
+        function getReminderChoice(dateKeyValue, prof, time, slot) {
+            return slot?.reminderTemplate || localStorage.getItem(reminderChoiceKey(dateKeyValue, prof, time)) || 'padrao';
+        }
+        function saveReminderChoice(dateKeyValue, prof, time, choice) {
+            localStorage.setItem(reminderChoiceKey(dateKeyValue, prof, time), choice);
+            const slot = agendaData?.[dateKeyValue]?.[prof]?.[time];
+            if (slot) {
+                slot.reminderTemplate = choice;
+                saveAgenda();
+            }
+        }
+
         let templates = JSON.parse(localStorage.getItem('app_templates')) || {...defaultTemplates};
         let history = JSON.parse(localStorage.getItem('app_history')) || [];
         let myPhone = localStorage.getItem('app_my_phone') || '';
@@ -826,6 +850,7 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         const noteText = document.getElementById('noteText');
         const noteReminderDate = document.getElementById('noteReminderDate');
         const addNoteBtn = document.getElementById('addNoteBtn');
+        const cancelEditNoteBtn = document.getElementById('cancelEditNoteBtn');
         const clearNotesBtn = document.getElementById('clearNotesBtn');
         const notesList = document.getElementById('notesList');
         const notesEmpty = document.getElementById('notesEmpty');
@@ -837,8 +862,7 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         const remindersDateLabel = document.getElementById('remindersDateLabel');
         const remindersList = document.getElementById('remindersList');
         const remindersEmptyMsg = document.getElementById('remindersEmptyMsg');
-        const reminderTemplateSelect = document.getElementById('reminderTemplateSelect');
-        const reminderMessagePreview = document.getElementById('reminderMessagePreview');
+        
         const reminderTemplateLabel = document.getElementById('reminderTemplateLabel');
         const editReminderTemplateBtn = document.getElementById('editReminderTemplateBtn');
         const reminderTemplateModal = document.getElementById('reminderTemplateModal');
@@ -970,7 +994,8 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                             avisado: !!slot.avisado, tipoHorario: slot.tipoHorario === 'chegada' ? 'chegada' : 'marcado',
                             profissional: (slot.doctor || prof || '').trim(),
                             atendimento: (slot.consultType || (slot.tipoHorario === 'chegada' ? 'Atendimento por ordem de chegada' : 'Atendimento com horário marcado')).trim(),
-                            local: (slot.location || 'Unidade de Saúde').trim()
+                            local: (slot.location || 'Unidade de Saúde').trim(),
+                            reminderTemplate: getReminderChoice(key, prof, time, slot)
                         });
                     }
                 });
@@ -979,9 +1004,10 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             return { tomorrow, key, items };
         }
 
-        function buildReminderMessage(item, tomorrow) {
+        function buildReminderMessage(item, tomorrow, templateKey) {
             const dataStr = formatDate(dateKey(tomorrow));
-            const template = reminderTemplates[reminderTemplateSelect?.value || 'padrao'] || reminderTemplates.padrao;
+            const key = templateKey || item.reminderTemplate || 'padrao';
+            const template = reminderTemplates[key] || reminderTemplates.padrao;
             const tipo = item.tipoHorario === 'chegada' ? 'por ordem de chegada' : 'horário marcado';
             return template
                 .replace(/{NOME}/g, item.name || '[Nome]')
@@ -990,18 +1016,6 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 .replace(/{PROFISSIONAL}/g, item.profissional || item.prof || '[Profissional]')
                 .replace(/{ATENDIMENTO}/g, item.atendimento || tipo)
                 .replace(/{LOCAL}/g, item.local || 'Unidade de Saúde');
-        }
-
-        function updateReminderMessagePreview() {
-            if (!reminderMessagePreview) return;
-            const { tomorrow, items } = collectTomorrowReminders();
-            if (items.length) {
-                const firstPending = items.find(i => !i.avisado) || items[0];
-                reminderMessagePreview.textContent = buildReminderMessage(firstPending, tomorrow);
-            } else {
-                reminderMessagePreview.textContent = 'Nenhum agendamento para amanhã. A prévia aparecerá aqui quando houver um paciente agendado.';
-            }
-            lucide.createIcons();
         }
 
         function updateRemindersBanner() {
@@ -1033,33 +1047,49 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 remindersEmptyMsg.classList.add('hidden');
                 items.forEach(item => {
                     const row = document.createElement('div');
-                    row.className = 'flex items-center gap-2 py-3 flex-wrap';
+                    row.className = 'reminder-row flex items-center gap-2 py-3 flex-wrap border-b border-slate-100';
                     const hasPhone = !!item.phone;
+                    const choice = item.reminderTemplate || 'padrao';
                     row.innerHTML = `
                         <span class="w-12 text-xs text-slate-400 flex-shrink-0">${item.time}</span>
-                        <div class="flex-1 min-w-[90px]">
-                            <p class="text-sm font-medium text-slate-800 truncate">${item.name}</p>
-                            <p class="text-[11px] text-slate-400">${item.prof} · ${item.tipoHorario === 'chegada' ? 'Hor. de chegada' : 'Horário marcado'}</p>
+                        <div class="flex-1 min-w-[150px]">
+                            <p class="text-sm font-medium text-slate-800 truncate">${escapeHtml(item.name)}</p>
+                            <p class="text-[11px] text-slate-400">${escapeHtml(item.prof)} · ${item.tipoHorario === 'chegada' ? 'Hor. de chegada' : 'Horário marcado'}</p>
                         </div>
+                        <select data-time="${item.time}" data-prof="${escapeHtml(item.prof)}"
+                            class="reminder-template-per-patient w-[125px] flex-shrink-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="padrao" ${choice === 'padrao' ? 'selected' : ''}>Padrão</option>
+                            <option value="curto" ${choice === 'curto' ? 'selected' : ''}>Curto</option>
+                            <option value="confirmacao" ${choice === 'confirmacao' ? 'selected' : ''}>Confirmação</option>
+                        </select>
                         ${item.avisado
-                            ? `<span class="flex items-center gap-1 text-emerald-600 text-xs font-semibold flex-shrink-0"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Enviado</span>
+                            ? `<span class="flex items-center gap-1 text-yellow-700 text-xs font-semibold flex-shrink-0"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Enviado</span>
                                ${hasPhone
-                                    ? `<button data-time="${item.time}" data-prof="${item.prof}" title="Enviar de novo" class="reminder-send-btn flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 transition"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i></button>`
-                                    : `<input type="tel" placeholder="Telefone" data-time="${item.time}" data-prof="${item.prof}"
+                                    ? `<button data-time="${item.time}" data-prof="${escapeHtml(item.prof)}" title="Enviar de novo" class="reminder-send-btn flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 transition"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i></button>`
+                                    : `<input type="tel" placeholder="Telefone" data-time="${item.time}" data-prof="${escapeHtml(item.prof)}"
                                         class="reminder-phone-input w-24 flex-shrink-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                       <button data-time="${item.time}" data-prof="${item.prof}" title="Enviar de novo" class="reminder-send-btn flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 transition"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i></button>`
+                                       <button data-time="${item.time}" data-prof="${escapeHtml(item.prof)}" title="Enviar de novo" class="reminder-send-btn flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full border border-slate-200 text-slate-500 hover:border-blue-300 hover:text-blue-600 transition"><i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i></button>`
                                }`
                             : hasPhone
-                                ? `<button data-time="${item.time}" data-prof="${item.prof}" class="reminder-send-btn flex-shrink-0 text-xs font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1"><i data-lucide="send" class="w-3.5 h-3.5"></i> Enviar</button>`
-                                : `<input type="tel" placeholder="Telefone" data-time="${item.time}" data-prof="${item.prof}"
+                                ? `<button data-time="${item.time}" data-prof="${escapeHtml(item.prof)}" class="reminder-send-btn flex-shrink-0 text-xs font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1"><i data-lucide="send" class="w-3.5 h-3.5"></i> Enviar</button>`
+                                : `<input type="tel" placeholder="Telefone" data-time="${item.time}" data-prof="${escapeHtml(item.prof)}"
                                     class="reminder-phone-input w-28 flex-shrink-0 px-2 py-1.5 border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                                  <button data-time="${item.time}" data-prof="${item.prof}" class="reminder-send-btn flex-shrink-0 text-xs font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1"><i data-lucide="send" class="w-3.5 h-3.5"></i> Enviar</button>`
+                                  <button data-time="${item.time}" data-prof="${escapeHtml(item.prof)}" class="reminder-send-btn flex-shrink-0 text-xs font-semibold bg-emerald-600 text-white px-3 py-1.5 rounded-lg hover:bg-emerald-700 transition flex items-center gap-1"><i data-lucide="send" class="w-3.5 h-3.5"></i> Enviar</button>`
                         }
                     `;
                     remindersList.appendChild(row);
                 });
             }
+
             lucide.createIcons();
+
+            remindersList.querySelectorAll('.reminder-template-per-patient').forEach(select => {
+                select.addEventListener('change', () => {
+                    const { key } = collectTomorrowReminders();
+                    saveReminderChoice(key, select.dataset.prof, select.dataset.time, select.value);
+                    showToast(`Mensagem de ${reminderTemplateNames[select.value] || 'modelo'} escolhida para o paciente.`);
+                });
+            });
 
             remindersList.querySelectorAll('.reminder-send-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -1068,6 +1098,10 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                     const { tomorrow, key, items } = collectTomorrowReminders();
                     const item = items.find(i => i.time === time && i.prof === prof);
                     if (!item) return;
+
+                    const templateSelect = remindersList.querySelector(`.reminder-template-per-patient[data-time="${time}"][data-prof="${prof}"]`);
+                    const templateKey = templateSelect ? templateSelect.value : (item.reminderTemplate || 'padrao');
+                    saveReminderChoice(key, prof, time, templateKey);
 
                     let phone = item.phone;
                     if (!phone) {
@@ -1158,7 +1192,7 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 const apptStatus = getCalendarAppointmentStatus(cellKey);
                 const eventDay = !!(agendaData[cellKey] && Object.values(agendaData[cellKey]).some(profData => Object.values(profData || {}).some(slot => slot && slot.event && slot.event.label)));
                 const statusDots = `${apptStatus.hasScheduled ? '<span title="Paciente agendado" class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>' : ''}${apptStatus.hasNotified ? '<span title="Paciente avisado" class="w-1.5 h-1.5 rounded-full bg-yellow-400 border border-yellow-700"></span>' : ''}${eventDay ? '<span title="Reunião ou evento" class="w-1.5 h-1.5 rounded-full bg-black"></span>' : ''}${hasNotes ? '<span title="Anotação" class="w-1.5 h-1.5 rounded-full bg-red-500"></span>' : ''}`;
-                btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}${hasNotes ? `<span class="absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-100 text-amber-700 border border-amber-200"><i data-lucide="notebook-pen" class="w-2.5 h-2.5"></i></span>` : ''}</span>`;
+                btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}</span>`;
                 if (hasNotes) {
                     const pendingNotes = dateNotes.filter(n => !n.done).length;
                     btn.title = `${dateNotes.length} anotação(ões)${pendingNotes ? ` • ${pendingNotes} pendente(s)` : ' • concluídas'}`;
@@ -1561,6 +1595,17 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             localStorage.setItem('app_notes', JSON.stringify(notesData));
         }
 
+        let editingNoteId = null;
+
+        function cancelNoteEditing() {
+            editingNoteId = null;
+            noteText.value = '';
+            noteReminderDate.value = '';
+            addNoteBtn.textContent = '+ Adicionar anotação';
+            cancelEditNoteBtn?.classList.add('hidden');
+        }
+
+
         function renderNotes() {
             notesList.innerHTML = '';
             notesEmpty.classList.toggle('hidden', notesData.length > 0);
@@ -1597,12 +1642,13 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             notesList.querySelectorAll('.note-edit-btn').forEach(btn => btn.addEventListener('click', () => {
                 const n = notesData.find(x => x.id == btn.dataset.id);
                 if (!n) return;
-                const edited = prompt('Editar anotação:', n.text);
-                if (edited === null) return;
-                const text = edited.trim();
-                if (!text) { showToast('A anotação não pode ficar vazia.'); return; }
-                n.text = text;
-                saveNotes(); renderNotes(); renderCalendar();
+                editingNoteId = n.id;
+                noteText.value = n.text || '';
+                noteReminderDate.value = n.reminderDate || '';
+                addNoteBtn.textContent = 'Salvar edição';
+                cancelEditNoteBtn?.classList.remove('hidden');
+                noteText.focus();
+                noteText.scrollIntoView({behavior:'smooth', block:'center'});
             }));
             notesList.querySelectorAll('.note-delete-btn').forEach(btn => btn.addEventListener('click', () => {
                 notesData = notesData.filter(x => x.id != btn.dataset.id);
@@ -1618,6 +1664,22 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
         addNoteBtn.addEventListener('click', () => {
             const text = noteText.value.trim();
             if (!text) { noteText.focus(); showToast('Digite uma anotação primeiro.'); return; }
+
+            if (editingNoteId !== null) {
+                const note = notesData.find(x => x.id === editingNoteId);
+                if (note) {
+                    note.text = text;
+                    note.reminderDate = noteReminderDate.value || '';
+                    note.editedAt = new Date().toLocaleString('pt-BR');
+                }
+                saveNotes();
+                renderNotes();
+                renderCalendar();
+                cancelNoteEditing();
+                showToast('Anotação atualizada!');
+                return;
+            }
+
             notesData.unshift({
                 id: Date.now(),
                 text,
@@ -1632,10 +1694,11 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             renderCalendar();
             showToast('Anotação salva!');
         });
+        cancelEditNoteBtn?.addEventListener('click', cancelNoteEditing);
         // Anotações usam textarea: Enter cria nova linha em vez de salvar a anotação.
         clearNotesBtn.addEventListener('click', () => {
             if (!notesData.length) return;
-            if (confirm('Apagar todas as anotações?')) { notesData = []; saveNotes(); renderNotes(); renderCalendar(); }
+            if (confirm('Apagar todas as anotações?')) { notesData = []; saveNotes(); renderNotes(); renderCalendar(); cancelNoteEditing(); }
         });
 
         function switchTab(tab) {
@@ -1855,16 +1918,8 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             return true;
         }
 
-        function refreshReminderTemplateControls() {
-            const key = reminderTemplateSelect?.value || 'padrao';
-            const names = { padrao: 'Lembrete de Véspera', curto: 'Lembrete de Véspera · curto', confirmacao: 'Lembrete de Véspera · confirmação' };
-            if (reminderTemplateLabel) reminderTemplateLabel.textContent = names[key] || 'Modelo personalizado';
-            updateReminderMessagePreview();
-        }
-
         function openReminderTemplateEditor() {
-            const key = reminderTemplateSelect.value || 'padrao';
-            reminderTemplateModalSelect.value = key;
+            const key = reminderTemplateModalSelect.value || 'padrao';
             reminderTemplateTextarea.value = reminderTemplates[key] || '';
             reminderTemplateModal.classList.remove('hidden');
             reminderTemplateModal.classList.add('flex');
@@ -1876,7 +1931,6 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             reminderTemplateModal.classList.remove('flex');
         }
 
-        reminderTemplateSelect?.addEventListener('change', refreshReminderTemplateControls);
         editReminderTemplateBtn?.addEventListener('click', openReminderTemplateEditor);
         reminderTemplateModalSelect?.addEventListener('change', () => {
             reminderTemplateTextarea.value = reminderTemplates[reminderTemplateModalSelect.value] || '';
@@ -1891,12 +1945,10 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             if (!value) { showToast('Digite uma mensagem antes de salvar.'); return; }
             reminderTemplates[key] = value;
             localStorage.setItem('app_reminder_templates', JSON.stringify(reminderTemplates));
-            reminderTemplateSelect.value = key;
-            refreshReminderTemplateControls();
             closeReminderTemplateEditor();
+            renderReminders();
             showToast('Mensagem de notificação salva.');
         });
-        refreshReminderTemplateControls();
 
         // Send to patient
         sendWhatsappBtn.addEventListener('click', () => {

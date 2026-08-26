@@ -1,4 +1,4 @@
-// Service worker AgendaSaúde v2 — apenas permite que o navegador reconheça o app
+// Service worker AgendaSaúde v3 — apenas permite que o navegador reconheça o app
 // como instalável (PWA em modo standalone). Não faz cache agressivo para
 // evitar que você veja versões antigas depois de uma atualização.
 
