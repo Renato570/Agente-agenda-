@@ -1160,8 +1160,13 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                     }
 
                     const msg = buildReminderMessage(item, tomorrow);
+                    const normalizedPhone = normalizeWhatsAppPhone(phone);
+                    if (!normalizedPhone || normalizedPhone.length < 10) {
+                        showToast('Telefone inválido. Informe DDD + número.');
+                        return;
+                    }
                     const link = buildWaLink(phone, msg);
-                    window.open(link, '_blank');
+                    openWhatsApp(link);
 
                     if (!agendaData[key]) agendaData[key] = {};
                     if (!agendaData[key][prof]) agendaData[key][prof] = {};
@@ -1591,7 +1596,7 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             const dateStr = dateKey(agendaCurrentDate);
             const msg = buildAgendaListMessage(dateStr);
             const link = buildWaLink(myPhone, msg);
-            window.open(link, '_blank');
+            openWhatsApp(link);
             showToast('Abrindo WhatsApp com a lista da agenda...');
         });
 
@@ -1861,9 +1866,29 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             return true;
         }
 
+        function normalizeWhatsAppPhone(phone) {
+            let digits = onlyDigits(phone);
+            // Aceita números digitados com +55/55 ou apenas DDD + número.
+            if (digits.startsWith('55') && (digits.length === 12 || digits.length === 13)) {
+                return digits;
+            }
+            if (digits.length === 10 || digits.length === 11) {
+                return '55' + digits;
+            }
+            // Mantém outros formatos para não bloquear números válidos de teste.
+            return digits;
+        }
+
         function buildWaLink(phoneDigits, message) {
-            const fullPhone = '55' + onlyDigits(phoneDigits);
+            const fullPhone = normalizeWhatsAppPhone(phoneDigits);
             return `https://wa.me/${fullPhone}?text=${encodeURIComponent(message)}`;
+        }
+
+        function openWhatsApp(link) {
+            // window.open pode ser bloqueado quando o app está instalado como PWA.
+            // Navegação direta é mais confiável no Android e permite ao sistema
+            // entregar o link ao WhatsApp instalado.
+            window.location.href = link;
         }
 
         function saveToHistory(msg) {
@@ -1913,7 +1938,7 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                     const entry = history.find(h => h.id == btn.dataset.id);
                     if (entry) {
                         const link = buildWaLink(entry.phone, entry.message);
-                        window.open(link, '_blank');
+                        openWhatsApp(link);
                     }
                 });
             });
@@ -2012,10 +2037,16 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             if (!validateForm()) return;
             const msg = generateMessage();
             if (!syncMessageToAgenda()) return;
+            const normalizedPhone = normalizeWhatsAppPhone(patientPhone.value);
+            if (!normalizedPhone || normalizedPhone.length < 10) {
+                showToast('Telefone inválido. Informe DDD + número.');
+                patientPhone.focus();
+                return;
+            }
             const link = buildWaLink(patientPhone.value, msg);
             directWaLink.href = link;
             directWaLink.classList.remove('hidden');
-            window.open(link, '_blank');
+            openWhatsApp(link);
             saveToHistory(msg);
             // Enviar a primeira mensagem não significa que o lembrete de amanhã foi enviado.
             // O status do lembrete só muda quando o botão Enviar da tela de Lembretes for usado.
@@ -2033,7 +2064,7 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             }
             const msg = generateMessage();
             const link = buildWaLink(myPhone, msg);
-            window.open(link, '_blank');
+            openWhatsApp(link);
             showToast('Abrindo seu WhatsApp...');
         });
 
