@@ -474,7 +474,6 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                     <div class="calendar-legend">
                       <span class="calendar-legend-item"><i class="calendar-legend-dot available"></i>Disponível</span>
                       <span class="calendar-legend-item"><i class="calendar-legend-dot booked"></i>Agendado</span>
-                      <span class="calendar-legend-item"><i class="calendar-legend-dot notified"></i>Avisado</span>
                       <span class="calendar-legend-item"><i class="calendar-legend-dot event"></i>Reunião / evento</span>
                       <span class="calendar-legend-item"><i class="calendar-legend-dot note"></i>Anotação</span>
                     </div>
@@ -1190,7 +1189,9 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 const hasNotes = dateNotes.length > 0;
                 const apptStatus = getCalendarAppointmentStatus(cellKey);
                 const eventDay = !!(agendaData[cellKey] && Object.values(agendaData[cellKey]).some(profData => Object.values(profData || {}).some(slot => slot && slot.event && slot.event.label)));
-                const statusDots = `${apptStatus.hasScheduled ? '<span title="Paciente agendado" class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>' : ''}${apptStatus.hasNotified ? '<span title="Paciente avisado" class="w-1.5 h-1.5 rounded-full bg-yellow-400 border border-yellow-700"></span>' : ''}${eventDay ? '<span title="Reunião ou evento" class="w-1.5 h-1.5 rounded-full bg-black"></span>' : ''}${hasNotes ? '<span title="Anotação" class="w-1.5 h-1.5 rounded-full bg-red-500"></span>' : ''}`;
+                // No calendário, mostramos apenas: agendado, reunião/evento e anotação.
+                // O status "Avisado" fica somente na agenda, junto ao paciente.
+                const statusDots = `${apptStatus.hasScheduled ? '<span title="Paciente agendado" class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>' : ''}${eventDay ? '<span title="Reunião ou evento" class="w-1.5 h-1.5 rounded-full bg-black"></span>' : ''}${hasNotes ? '<span title="Anotação" class="w-1.5 h-1.5 rounded-full bg-red-500"></span>' : ''}`;
                 btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}</span>`;
                 if (hasNotes) {
                     const pendingNotes = dateNotes.filter(n => !n.done).length;
