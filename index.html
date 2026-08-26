@@ -211,6 +211,20 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
 #notesSection textarea#noteText { min-height:110px; resize:vertical; line-height:1.5; white-space:pre-wrap; }
 </style>
 </style>
+
+<style id="accessibility-final-fix">
+#agendaSlotsList .agenda-card-toggle.agenda-booked{background:#dbeafe !important;border-left:5px solid #2563eb !important;}
+#agendaSlotsList .agenda-card-toggle.agenda-notified{background:#fef3c7 !important;border-left:5px solid #facc15 !important;}
+#agendaSlotsList .agenda-card-toggle.agenda-available{background:#fff !important;border-left:5px solid #111827 !important;}
+.calendar-legend{display:flex!important;flex-wrap:wrap!important;gap:8px 14px!important;margin-top:12px!important;padding:10px 0!important;}
+.calendar-legend-item{display:inline-flex!important;align-items:center!important;gap:6px!important;font-size:11px!important;font-weight:700!important;color:#1c2430!important;}
+.calendar-legend-dot{width:10px!important;height:10px!important;border-radius:50%!important;display:inline-block!important;border:1px solid #333!important;}
+.calendar-legend-dot.available{background:#fff!important;border:2px solid #111827!important;}
+.calendar-legend-dot.booked{background:#2563eb!important;}
+.calendar-legend-dot.notified{background:#facc15!important;}
+.calendar-legend-dot.event{background:#111827!important;}
+.calendar-legend-dot.note{background:#ef4444!important;}
+</style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -443,10 +457,12 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
 
                 <div class="mt-5 pt-4 border-t border-slate-100">
                     <p class="text-[10px] font-bold uppercase tracking-wide text-slate-400 mb-2">Legenda</p>
-                    <div class="space-y-2 text-xs text-slate-500">
-                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Horário disponível</div>
-                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Paciente agendado</div>
-                        <div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Avisado</div>
+                    <div class="calendar-legend">
+                      <span class="calendar-legend-item"><i class="calendar-legend-dot available"></i>Disponível</span>
+                      <span class="calendar-legend-item"><i class="calendar-legend-dot booked"></i>Agendado</span>
+                      <span class="calendar-legend-item"><i class="calendar-legend-dot notified"></i>Avisado</span>
+                      <span class="calendar-legend-item"><i class="calendar-legend-dot event"></i>Reunião / evento</span>
+                      <span class="calendar-legend-item"><i class="calendar-legend-dot note"></i>Anotação</span>
                     </div>
                 </div>
             </aside>
@@ -1140,12 +1156,8 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                 const dateNotes = getNotesForDate(cellKey);
                 const hasNotes = dateNotes.length > 0;
                 const apptStatus = getCalendarAppointmentStatus(cellKey);
-                const statusDots = apptStatus.hasScheduled
-                    ? `<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 flex items-center gap-0.5">
-                         <span class="w-1.5 h-1.5 rounded-full bg-blue-700"></span>
-                         ${apptStatus.hasNotified ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>' : ''}
-                       </span>`
-                    : '';
+                const eventDay = !!(agendaData[cellKey] && Object.values(agendaData[cellKey]).some(profData => Object.values(profData || {}).some(slot => slot && slot.event && slot.event.label)));
+                const statusDots = `${apptStatus.hasScheduled ? '<span title="Paciente agendado" class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>' : ''}${apptStatus.hasNotified ? '<span title="Paciente avisado" class="w-1.5 h-1.5 rounded-full bg-yellow-400 border border-yellow-700"></span>' : ''}${eventDay ? '<span title="Reunião ou evento" class="w-1.5 h-1.5 rounded-full bg-black"></span>' : ''}${hasNotes ? '<span title="Anotação" class="w-1.5 h-1.5 rounded-full bg-red-500"></span>' : ''}`;
                 btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}${hasNotes ? `<span class="absolute -right-1 -top-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-amber-100 text-amber-700 border border-amber-200"><i data-lucide="notebook-pen" class="w-2.5 h-2.5"></i></span>` : ''}</span>`;
                 if (hasNotes) {
                     const pendingNotes = dateNotes.filter(n => !n.done).length;
@@ -1571,12 +1583,25 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                         <p class="text-[10px] ${note.reminderDate ? 'text-amber-700 font-semibold' : 'text-slate-400'} mt-1">${reminderLabel}</p>
                         <p class="text-[10px] text-slate-400 mt-0.5">Criada em ${escapeHtml(note.date || '')}</p>
                     </div>
-                    <button data-id="${note.id}" class="note-delete-btn text-slate-300 hover:text-red-500 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                    <div class="flex items-center gap-1">
+                      <button data-id="${note.id}" class="note-edit-btn text-blue-400 hover:text-blue-700 p-1" title="Editar anotação"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+                      <button data-id="${note.id}" class="note-delete-btn text-slate-300 hover:text-red-500 p-1" title="Excluir anotação"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    </div>`;
                 notesList.appendChild(item);
             });
             notesList.querySelectorAll('.note-done-btn').forEach(btn => btn.addEventListener('click', () => {
                 const n = notesData.find(x => x.id == btn.dataset.id);
                 if (n) n.done = !n.done;
+                saveNotes(); renderNotes(); renderCalendar();
+            }));
+            notesList.querySelectorAll('.note-edit-btn').forEach(btn => btn.addEventListener('click', () => {
+                const n = notesData.find(x => x.id == btn.dataset.id);
+                if (!n) return;
+                const edited = prompt('Editar anotação:', n.text);
+                if (edited === null) return;
+                const text = edited.trim();
+                if (!text) { showToast('A anotação não pode ficar vazia.'); return; }
+                n.text = text;
                 saveNotes(); renderNotes(); renderCalendar();
             }));
             notesList.querySelectorAll('.note-delete-btn').forEach(btn => btn.addEventListener('click', () => {
