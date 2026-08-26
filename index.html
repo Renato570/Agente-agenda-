@@ -83,6 +83,48 @@ header{background:linear-gradient(135deg,var(--pec-blue-dark),var(--pec-blue))!i
 .calendar-legend-dot.notified { background: #1f9d63; }
 .calendar-legend-dot.event { background: #111827; }
 
+
+/* AgendaSaúde: accessible calendar palette */
+.calendar-legend {
+  display:flex; flex-wrap:wrap; gap:9px 13px;
+  margin-top:12px; padding:10px 0 3px;
+  font-size:11px; color:#1c2430;
+}
+.calendar-legend-item {
+  display:inline-flex; align-items:center; gap:6px;
+  font-weight:600;
+}
+.calendar-legend-dot {
+  width:10px; height:10px; border-radius:50%;
+  border:1px solid rgba(0,0,0,.22); flex:0 0 auto;
+}
+.calendar-legend-dot.available { background:#fff; border:2px solid #111827; }
+.calendar-legend-dot.booked { background:#2563eb; border-color:#1d4ed8; }
+.calendar-legend-dot.notified { background:#facc15; border-color:#a16207; }
+.calendar-legend-dot.event { background:#111827; border-color:#000; }
+.calendar-legend-dot.selected { background:#ef4444; border-color:#991b1b; }
+
+/* Full appointment-card backgrounds */
+.appt-card.booked, .appointment-card.booked, .agenda-card.booked {
+  background:#dbeafe !important;
+  border-left:4px solid #2563eb !important;
+}
+.appt-card.notified, .appointment-card.notified, .agenda-card.notified {
+  background:#fef3c7 !important;
+  border-left:4px solid #facc15 !important;
+}
+.appt-card.available, .appointment-card.available, .agenda-card.available {
+  background:#fff !important;
+  border-left:4px solid #111827 !important;
+}
+.agenda-card-toggle.booked, .agenda-card-toggle.notified {
+  border-radius:10px;
+}
+.notes-edit-btn {
+  border:1px solid #2563eb; color:#1d4ed8; background:#fff;
+  border-radius:8px; padding:5px 9px; font-weight:700; font-size:12px;
+}
+
 </style>
 
 <style id="agendasaude-design-improvements">
@@ -2025,6 +2067,59 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
   document.addEventListener('DOMContentLoaded', markCalendarEventDays);
   setTimeout(markCalendarEventDays, 300);
   setTimeout(markCalendarEventDays, 1000);
+})();
+</script>
+
+
+<script>
+(function(){
+  function paintPatientRows(){
+    document.querySelectorAll('.agenda-card-toggle, .appt, .appointment-card, .agenda-card').forEach(row=>{
+      const text=(row.innerText||'').toLowerCase();
+      const parent=row.closest('.agenda-card') || row;
+      const hasPatient = !/horário disponível|disponível/.test(text) &&
+        /[a-záàâãéêíóôõúç]{3,}/i.test(text);
+      if(!hasPatient) return;
+      const notified = /avisado|enviado|notificada/.test(text);
+      parent.classList.add(notified ? 'notified' : 'booked');
+      row.classList.add(notified ? 'notified' : 'booked');
+    });
+  }
+  document.addEventListener('DOMContentLoaded', paintPatientRows);
+  setTimeout(paintPatientRows,400);
+  setTimeout(paintPatientRows,1000);
+})();
+</script>
+
+
+<script>
+(function(){
+  function addNoteEditButtons(){
+    document.querySelectorAll('[data-note], .note-card, .anotacao-card, .annotation-card').forEach(card=>{
+      if(card.querySelector('.notes-edit-btn')) return;
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='notes-edit-btn';
+      btn.textContent='✎ Editar';
+      btn.addEventListener('click',()=>{
+        const field=card.querySelector('textarea, input[type="text"], [contenteditable="true"]');
+        if(field){
+          field.focus();
+          if(field.select) field.select();
+        } else {
+          const current=card.querySelector('.note-text, .anotacao-text, .annotation-text');
+          const value=current ? current.textContent.trim() : '';
+          const edited=prompt('Editar anotação:', value);
+          if(edited===null) return;
+          if(current) current.textContent=edited;
+        }
+      });
+      card.appendChild(btn);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', addNoteEditButtons);
+  setTimeout(addNoteEditButtons,500);
+  setTimeout(addNoteEditButtons,1200);
 })();
 </script>
 
