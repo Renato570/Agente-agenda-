@@ -10,8 +10,8 @@
     "standalone"
   ],
   "orientation": "portrait",
-  "background_color": "#f1f5f9",
-  "theme_color": "#005ca9",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
   "lang": "pt-BR",
   "dir": "ltr",
   "prefer_related_applications": false,
