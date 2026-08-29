@@ -3098,3 +3098,24 @@ body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:inve
 
 </body>
 </html>
+
+<style id="agendasaude-dark-v16-final-fix">
+/* Correção específica: textos dos horários livres precisam continuar legíveis no modo escuro. */
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available > span:nth-of-type(2),
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available > span:nth-of-type(3),
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available > span:nth-of-type(3) > span,
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available > span:nth-of-type(4),
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available .text-slate-400,
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available .text-slate-300 {
+  color:#d7e0ec !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available > span:nth-of-type(3) > span:first-child {
+  color:#d7e0ec !important;
+  font-weight:500 !important;
+}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available > span:nth-of-type(2) {
+  color:#e5edf7 !important;
+}
+</style>
