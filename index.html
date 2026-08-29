@@ -697,6 +697,207 @@ body.dark-mode #messageSection .bg-white {
 }
 </style>
 
+
+<style id="agendasaude-dark-v16-real-fix">
+/* V16: somente MODO ESCURO. Nenhuma destas regras afeta o modo claro. */
+body.dark-mode{
+  --dm-bg:#0b1220;
+  --dm-panel:#151e2e;
+  --dm-panel2:#1b2638;
+  --dm-input:#101827;
+  --dm-border:#34445c;
+  --dm-text:#f4f7fb;
+  --dm-muted:#aeb9ca;
+  background:var(--dm-bg)!important;
+  color:var(--dm-text)!important;
+}
+
+/* Barra azul do aplicativo, um tom mais fechado no escuro */
+body.dark-mode header,
+body.dark-mode .app-header,
+body.dark-mode header.bg-blue-700{
+  background:#07386d!important;
+  background-image:none!important;
+  color:#fff!important;
+}
+
+/* Toda a área Profissional / Equipe: elimina o bloco claro */
+body.dark-mode #agendaSection .bg-white,
+body.dark-mode #agendaSection .bg-slate-50,
+body.dark-mode #agendaSection .bg-slate-50\/70,
+body.dark-mode #agendaSection .bg-slate-50\/40,
+body.dark-mode #agendaSection > .grid > div > .bg-white,
+body.dark-mode #agendaSection > .grid > div > .bg-white > div{
+  background:var(--dm-panel)!important;
+  color:var(--dm-text)!important;
+  border-color:var(--dm-border)!important;
+}
+body.dark-mode #agendaSection > .grid > div > .bg-white > .bg-slate-50\/70{
+  background:#121b2b!important;
+}
+
+/* Títulos e rótulos da agenda, inclusive o nome do dia */
+body.dark-mode #agendaSection h1,
+body.dark-mode #agendaSection h2,
+body.dark-mode #agendaSection h3,
+body.dark-mode #agendaSection label,
+body.dark-mode #agendaSection #agendaDayLabel,
+body.dark-mode #agendaSection #agendaMonthLabel,
+body.dark-mode #agendaSection .text-slate-900,
+body.dark-mode #agendaSection .text-slate-800,
+body.dark-mode #agendaSection .text-slate-700,
+body.dark-mode #agendaSection .text-slate-600{
+  color:var(--dm-text)!important;
+  opacity:1!important;
+}
+body.dark-mode #agendaSection .text-slate-500,
+body.dark-mode #agendaSection .text-slate-400,
+body.dark-mode #agendaSection .text-slate-300{
+  color:var(--dm-muted)!important;
+  opacity:1!important;
+}
+
+/* Select de Médico/Enfermeira/Dentista e botões de navegação */
+body.dark-mode #agendaProfSelect,
+body.dark-mode #agendaSection select,
+body.dark-mode #agendaSection button.bg-white,
+body.dark-mode #agendaSection button.border-slate-200{
+  background:#101827!important;
+  color:#f4f7fb!important;
+  border-color:#34445c!important;
+}
+body.dark-mode #agendaSection option{background:#101827!important;color:#f4f7fb!important;}
+
+/* Horários: nenhum card branco no modo escuro */
+body.dark-mode #agendaSlotsList,
+body.dark-mode #agendaSlotsList > div,
+body.dark-mode #agendaSlotsList .agenda-card-toggle{
+  background:#151e2e!important;
+  color:#f4f7fb!important;
+  border-color:#34445c!important;
+}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available{
+  background:#151e2e!important;border-left:4px solid #64748b!important;
+}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-booked{
+  background:#172b45!important;border-color:#2b4d75!important;border-left:4px solid #3979c9!important;
+}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-notified{
+  background:#302710!important;border-color:#5d4d1c!important;border-left:4px solid #d19a18!important;
+}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-event{
+  background:#202632!important;border-color:#455267!important;border-left:4px solid #8b97a8!important;
+}
+/* Texto dos pacientes nunca fica azul-marinho/preto sobre fundo escuro */
+body.dark-mode #agendaSlotsList .agenda-card-toggle span,
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-blue-900,
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-blue-950,
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-emerald-900,
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-amber-900,
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-amber-800{
+  color:#f4f7fb!important;
+  opacity:1!important;
+}
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-slate-400,
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-slate-300{
+  color:#aeb9ca!important;opacity:1!important;
+}
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-emerald-600,
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-amber-600,
+body.dark-mode #agendaSlotsList .agenda-card-toggle .text-amber-700{
+  color:#f0b83a!important;opacity:1!important;
+}
+
+/* Botões da agenda, mantendo cores mas mais fechadas */
+body.dark-mode #sendAgendaListBtn{background:#08734f!important;}
+body.dark-mode #agendaMultiSelectBtn{background:#9a5707!important;}
+body.dark-mode #agendaAddBtn{background:#1d4fb5!important;}
+
+/* Nova Mensagem: cartão, campos, selects e pré-visualização */
+body.dark-mode #messageSection > section,
+body.dark-mode #messageSection .bg-white,
+body.dark-mode #appointmentForm,
+body.dark-mode #messageSection .bg-emerald-50,
+body.dark-mode #messageSection .bg-slate-800{
+  background:var(--dm-panel)!important;
+  color:var(--dm-text)!important;
+  border-color:var(--dm-border)!important;
+}
+body.dark-mode #appointmentForm input,
+body.dark-mode #appointmentForm textarea,
+body.dark-mode #appointmentForm select,
+body.dark-mode #messageSection input,
+body.dark-mode #messageSection textarea,
+body.dark-mode #messageSection select{
+  background:var(--dm-input)!important;
+  color:#f4f7fb!important;
+  border-color:#465a77!important;
+  box-shadow:none!important;
+}
+body.dark-mode #appointmentForm input::placeholder,
+body.dark-mode #appointmentForm textarea::placeholder,
+body.dark-mode #messageSection input::placeholder,
+body.dark-mode #messageSection textarea::placeholder{
+  color:#91a0b5!important;opacity:1!important;
+}
+body.dark-mode #messageSection label,
+body.dark-mode #messageSection .text-slate-900,
+body.dark-mode #messageSection .text-slate-800,
+body.dark-mode #messageSection .text-slate-700,
+body.dark-mode #messageSection .text-slate-600,
+body.dark-mode #messageSection .text-slate-500{
+  color:#dce4ee!important;opacity:1!important;
+}
+body.dark-mode #messagePreview{
+  background:#0e1726!important;color:#f4f7fb!important;border-color:#34445c!important;
+}
+body.dark-mode #messageSection .bg-emerald-100{background:#174136!important;color:#a9e5ce!important;}
+body.dark-mode #messageSection .text-emerald-900,
+body.dark-mode #messageSection .text-emerald-700,
+body.dark-mode #messageSection .text-emerald-600{color:#a9e5ce!important;}
+body.dark-mode #messageSection .bg-blue-50{background:#10203a!important;color:#bfdbfe!important;}
+body.dark-mode #messageSection .bg-blue-50:hover{background:#162b4b!important;}
+
+/* Confirmações e Anotações */
+body.dark-mode #remindersSection > div,
+body.dark-mode #notesSection > div,
+body.dark-mode #settingsModal > div,
+body.dark-mode #templateModal > div,
+body.dark-mode #agendaPatientActionModal > div,
+body.dark-mode #agendaEventModal > div{
+  background:var(--dm-panel)!important;color:var(--dm-text)!important;border-color:var(--dm-border)!important;
+}
+body.dark-mode #remindersList > *,
+body.dark-mode #notesList > *,
+body.dark-mode #notesSection .bg-slate-50,
+body.dark-mode #remindersSection .bg-white,
+body.dark-mode #notesSection input,
+body.dark-mode #notesSection textarea,
+body.dark-mode #settingsModal input,
+body.dark-mode #settingsModal select,
+body.dark-mode #templateModal textarea,
+body.dark-mode #templateModal select{
+  background:var(--dm-input)!important;color:#f4f7fb!important;border-color:var(--dm-border)!important;
+}
+
+/* Navegação inferior */
+body.dark-mode nav.fixed{background:#0e1726!important;border-color:#34445c!important;}
+body.dark-mode nav.fixed .text-slate-400{color:#aeb9ca!important;}
+
+/* Calendário e legenda */
+body.dark-mode .calendar-legend,
+body.dark-mode .calendar-legend-item,
+body.dark-mode .calendar-legend span{color:#dbe4ef!important;}
+body.dark-mode .calendar-legend-dot.available{background:#f8fafc!important;border-color:#94a3b8!important;}
+body.dark-mode .calendar-legend-dot.booked{background:#3b82f6!important;border-color:#60a5fa!important;}
+body.dark-mode .calendar-legend-dot.event{background:#020617!important;border-color:#64748b!important;}
+body.dark-mode .calendar-legend-dot.note{background:#ef4444!important;border-color:#f87171!important;}
+
+/* Modais e campos nativos do navegador */
+body.dark-mode .bg-white{color:var(--dm-text);}
+body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
+body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(.8);}
+</style>
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
