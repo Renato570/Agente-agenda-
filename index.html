@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AgendaSaúde - Mensagens WhatsApp</title>
 
-    <!-- PWA - AgendaSaúde v10 -->
+    <!-- PWA - AgendaSaúde v12 -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#005ca9">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -268,6 +268,36 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
 @media (max-width:520px){
   #agendaSection .agenda-action-row > button{font-size:11.5px!important;gap:3px!important}
 }
+</style>
+
+
+<style id="dark-mode-agendasaude">
+body.dark-mode{background:#111827!important;color:#e5e7eb!important}
+body.dark-mode .bg-white{background:#1f2937!important}
+body.dark-mode .bg-slate-50{background:#111827!important}
+body.dark-mode .bg-slate-100{background:#374151!important}
+body.dark-mode .bg-slate-200{background:#4b5563!important}
+body.dark-mode .text-slate-800{color:#f3f4f6!important}
+body.dark-mode .text-slate-700{color:#e5e7eb!important}
+body.dark-mode .text-slate-600{color:#d1d5db!important}
+body.dark-mode .text-slate-500{color:#9ca3af!important}
+body.dark-mode .text-slate-400{color:#9ca3af!important}
+body.dark-mode .border-slate-200,body.dark-mode .border-slate-300{border-color:#4b5563!important}
+body.dark-mode input,body.dark-mode textarea,body.dark-mode select{background:#111827!important;color:#f3f4f6!important;border-color:#4b5563!important}
+body.dark-mode input::placeholder,body.dark-mode textarea::placeholder{color:#9ca3af!important}
+body.dark-mode nav.fixed{background:#1f2937!important;border-color:#374151!important}
+body.dark-mode .shadow-xl,body.dark-mode .shadow-lg{box-shadow:0 20px 45px rgba(0,0,0,.35)!important}
+body.dark-mode .calendar-day-event{background:#374151!important}
+body.dark-mode .notice{filter:brightness(.82)}
+body.dark-mode .bg-blue-50{background:#172554!important}
+body.dark-mode .bg-green-50{background:#052e1b!important}
+body.dark-mode .bg-red-50{background:#450a0a!important}
+body.dark-mode .bg-amber-50{background:#451a03!important}
+body.dark-mode .text-blue-700{color:#93c5fd!important}
+body.dark-mode .text-green-700{color:#86efac!important}
+body.dark-mode .text-red-700{color:#fca5a5!important}
+body.dark-mode .text-amber-700{color:#fcd34d!important}
+@media (prefers-color-scheme:dark){body.auto-theme{background:#111827!important;color:#e5e7eb!important}body.auto-theme .bg-white{background:#1f2937!important}body.auto-theme .bg-slate-50{background:#111827!important}body.auto-theme .bg-slate-100{background:#374151!important}body.auto-theme .text-slate-800{color:#f3f4f6!important}body.auto-theme .text-slate-700{color:#e5e7eb!important}body.auto-theme .text-slate-600,body.auto-theme .text-slate-500,body.auto-theme .text-slate-400{color:#9ca3af!important}body.auto-theme .border-slate-200,body.auto-theme .border-slate-300{border-color:#4b5563!important}body.auto-theme input,body.auto-theme textarea,body.auto-theme select{background:#111827!important;color:#f3f4f6!important;border-color:#4b5563!important}body.auto-theme nav.fixed{background:#1f2937!important;border-color:#374151!important}}
 </style>
 
 </head>
@@ -698,6 +728,17 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
                         <input type="tel" id="myPhoneNumber" placeholder="(11) 98888-8888"
                             class="w-full pl-12 pr-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800 text-sm">
                     </div>
+                </div>
+            </div>
+            <div class="border-t border-slate-200 pt-4 space-y-2">
+                <div>
+                    <h4 class="text-sm font-bold text-slate-700">Aparência</h4>
+                    <p class="text-[11px] text-slate-400 mt-1">Escolha como o AgendaSaúde deve aparecer.</p>
+                </div>
+                <div id="themeOptions" class="grid grid-cols-3 gap-2">
+                    <button type="button" data-theme="light" class="theme-option px-2 py-2 rounded-lg border text-xs font-bold">☀️ Claro</button>
+                    <button type="button" data-theme="dark" class="theme-option px-2 py-2 rounded-lg border text-xs font-bold">🌙 Escuro</button>
+                    <button type="button" data-theme="auto" class="theme-option px-2 py-2 rounded-lg border text-xs font-bold">📱 Automático</button>
                 </div>
             </div>
             <div class="border-t border-slate-200 pt-4 space-y-2">
@@ -2172,6 +2213,27 @@ nav.fixed button .lucide{width:20px!important;height:20px!important}
             settingsModal.classList.add('hidden');
             settingsModal.classList.remove('flex');
         });
+        const themeOptions = document.querySelectorAll('.theme-option');
+        function applyTheme(theme) {
+            document.body.classList.remove('dark-mode','auto-theme');
+            if (theme === 'dark') document.body.classList.add('dark-mode');
+            if (theme === 'auto') document.body.classList.add('auto-theme');
+            localStorage.setItem('app_theme', theme);
+            themeOptions.forEach(btn => {
+                const active = btn.dataset.theme === theme;
+                btn.classList.toggle('bg-blue-600', active);
+                btn.classList.toggle('text-white', active);
+                btn.classList.toggle('border-blue-600', active);
+                btn.classList.toggle('bg-slate-50', !active);
+                btn.classList.toggle('text-slate-700', !active);
+            });
+            const metaTheme = document.querySelector('meta[name="theme-color"]');
+            if (metaTheme) metaTheme.setAttribute('content', theme === 'dark' ? '#111827' : '#005ca9');
+        }
+        const savedTheme = localStorage.getItem('app_theme') || 'auto';
+        applyTheme(savedTheme);
+        themeOptions.forEach(btn => btn.addEventListener('click', () => applyTheme(btn.dataset.theme)));
+
         saveSettingsBtn.addEventListener('click', () => {
             profile = {
                 ...(profile || {}),
