@@ -1470,7 +1470,8 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
                     <div id="anthroResult" class="hidden mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3">
                         <p class="text-[11px] uppercase tracking-wide font-semibold text-blue-700">IMC calculado</p>
                         <p id="anthroBmiValue" class="text-2xl font-black text-blue-900 mt-0.5"></p>
-                        <p class="text-[11px] text-blue-700/80 mt-1">Indicador calculado a partir de peso e altura. Não deve ser usado isoladamente para avaliação clínica.</p>
+                        <p id="anthroBmiClassification" class="text-sm font-bold text-blue-800 mt-1"></p>
+                        <p id="anthroBmiNote" class="text-[11px] text-blue-700/80 mt-1">Classificação para adultos. Em crianças e adolescentes, o estado nutricional é avaliado por idade e sexo, não pelos mesmos pontos de corte do adulto.</p>
                     </div>
 
                     <button id="saveAnthroBtn" type="button"
@@ -3479,6 +3480,9 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
         panel.classList.remove('hidden');
         $('anthroSelectedName').textContent = p.name;
         $('anthroSelectedMeta').textContent = p.birthDate ? `Nascimento: ${fmtDate(p.birthDate)}` : 'Perfil criado no Agente Agenda';
+        $('anthroResult')?.classList.add('hidden');
+        $('anthroWeight').value = '';
+        $('anthroHeight').value = '';
 
         const rows = records
             .filter(r => r.profileId === p.id || (!r.profileId && normalize(r.patient) === normalize(p.name)))
@@ -3524,6 +3528,34 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
         renderSelected();
     }
 
+    function getAgeYears(birthDate){
+        if(!birthDate) return null;
+        const parts = String(birthDate).split('-').map(Number);
+        if(parts.length !== 3 || parts.some(x => !Number.isFinite(x))) return null;
+        const [y,m,d] = parts;
+        const now = new Date();
+        let age = now.getFullYear() - y;
+        const beforeBirthday = (now.getMonth()+1 < m) || ((now.getMonth()+1 === m) && now.getDate() < d);
+        if(beforeBirthday) age--;
+        return age;
+    }
+
+    function classifyAdultBmi(bmi, age){
+        // Ministério da Saúde: adults. For older adults, use the
+        // geriatric cutoffs noted by the Ministry of Health.
+        if(age !== null && age >= 60){
+            if(bmi < 22) return 'Baixo peso';
+            if(bmi < 27) return 'Eutrofia (peso adequado)';
+            return 'Sobrepeso';
+        }
+        if(bmi < 18.5) return 'Magreza / baixo peso';
+        if(bmi < 25) return 'Peso normal (eutrofia)';
+        if(bmi < 30) return 'Sobrepeso';
+        if(bmi < 35) return 'Obesidade grau I';
+        if(bmi < 40) return 'Obesidade grau II';
+        return 'Obesidade grau III (grave)';
+    }
+
     function calculate(){
         const w = num($('anthroWeight')?.value);
         const h = num($('anthroHeight')?.value);
@@ -3534,7 +3566,24 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
         }
         const bmi = w / Math.pow(h/100, 2);
         if(!Number.isFinite(bmi)) return null;
+
         $('anthroBmiValue').textContent = bmi.toFixed(2).replace('.',',');
+
+        const p = selectedProfile();
+        const age = p ? getAgeYears(p.birthDate) : null;
+        const classification = $('anthroBmiClassification');
+        const note = $('anthroBmiNote');
+
+        if(age !== null && age < 20){
+            classification.textContent = 'Classificação por IMC não exibida para menores de 20 anos';
+            note.textContent = 'Para crianças e adolescentes, a avaliação do estado nutricional deve considerar idade e sexo, usando curvas/índices específicos.';
+        } else {
+            classification.textContent = classifyAdultBmi(bmi, age);
+            note.textContent = age !== null && age >= 60
+                ? 'Classificação para idosos segundo pontos de corte específicos. O IMC é um indicador e não deve ser usado isoladamente.'
+                : 'Classificação para adultos. O IMC é um indicador e não deve ser usado isoladamente para avaliação clínica.';
+        }
+
         box.classList.remove('hidden');
         return bmi;
     }
