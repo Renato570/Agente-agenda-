@@ -1402,79 +1402,96 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
     <!-- Avaliação antropométrica -->
     <section id="anthroSection" class="hidden max-w-4xl mx-auto p-4 md:p-6 pb-24">
         <div class="space-y-4">
+
+            <!-- Perfil -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
                 <div class="flex items-start justify-between gap-3 mb-4">
                     <div>
                         <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2">
                             <i data-lucide="scale" class="w-5 h-5 text-blue-600"></i>
-                            Avaliação antropométrica
+                            Peso e altura dos pacientes
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Registre peso, altura e acompanhe a evolução do paciente.</p>
+                        <p class="text-xs text-slate-400 mt-1">Crie o perfil uma vez. Depois, em cada visita, apenas registre a nova aferição.</p>
                     </div>
                     <span class="text-[10px] font-semibold uppercase tracking-wide bg-blue-50 text-blue-700 px-2 py-1 rounded-full">Local</span>
                 </div>
 
-                <form id="anthroForm" class="grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="return false;">
-                    <div class="md:col-span-2">
-                        <label for="anthroPatient" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Paciente *</label>
-                        <input id="anthroPatient" list="anthroPatientsList" type="text" autocomplete="off"
-                            placeholder="Digite ou selecione o paciente"
-                            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                        <datalist id="anthroPatientsList"></datalist>
-                        <p id="anthroPatientHint" class="text-[11px] text-slate-400 mt-1">A lista usa os pacientes já registrados na Agenda e nos acompanhamentos.</p>
-                    </div>
-
-                    <div>
-                        <label for="anthroWeight" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Peso (kg) *</label>
-                        <input id="anthroWeight" inputmode="decimal" type="number" min="0.1" max="500" step="0.1"
-                            placeholder="Ex.: 72,5"
-                            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    </div>
-
-                    <div>
-                        <label for="anthroHeight" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Altura (cm) *</label>
-                        <input id="anthroHeight" inputmode="decimal" type="number" min="30" max="250" step="0.1"
-                            placeholder="Ex.: 168"
-                            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    </div>
-
-                    <div class="md:col-span-2 flex flex-wrap items-center gap-2">
-                        <button id="saveAnthroBtn" type="button" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl transition">
-                            <i data-lucide="save" class="w-4 h-4"></i>
-                            Salvar avaliação
-                        </button>
-                        <button id="clearAnthroFormBtn" type="button" class="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl transition">
-                            Limpar
-                        </button>
-                    </div>
-                </form>
-
-                <div id="anthroResult" class="hidden mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
-                    <div class="flex items-center justify-between gap-3">
-                        <div>
-                            <p class="text-[11px] uppercase tracking-wide font-semibold text-blue-700">IMC calculado</p>
-                            <p id="anthroBmiValue" class="text-2xl font-black text-blue-900 mt-0.5"></p>
-                        </div>
-                        <i data-lucide="activity" class="w-8 h-8 text-blue-500"></i>
-                    </div>
-                    <p class="text-[11px] text-blue-700/80 mt-2">O IMC é um indicador calculado a partir de peso e altura e não deve ser usado isoladamente para avaliação clínica, especialmente em crianças e adolescentes.</p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input id="anthroProfileSearch" type="search" placeholder="Buscar paciente"
+                        class="flex-1 px-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    <button id="newAnthroProfileBtn" type="button"
+                        class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl transition whitespace-nowrap">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        Novo perfil
+                    </button>
                 </div>
+
+                <div id="anthroProfilesList" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4"></div>
+                <p id="anthroProfilesEmpty" class="hidden text-sm text-slate-400 text-center py-8">Nenhum perfil criado ainda.</p>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                    <div>
-                        <h3 class="text-sm md:text-base font-bold text-slate-800">Histórico de avaliações</h3>
-                        <p id="anthroHistorySubtitle" class="text-xs text-slate-400">Todos os registros salvos neste aparelho.</p>
+            <!-- Perfil selecionado -->
+            <div id="anthroSelectedPanel" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <div class="flex items-start justify-between gap-3 mb-4">
+                    <div class="min-w-0">
+                        <p class="text-[10px] font-semibold uppercase tracking-wide text-blue-600">Paciente selecionado</p>
+                        <h3 id="anthroSelectedName" class="text-xl font-black text-slate-800 truncate"></h3>
+                        <p id="anthroSelectedMeta" class="text-xs text-slate-400 mt-1"></p>
                     </div>
-                    <div class="flex gap-2">
-                        <input id="anthroSearch" type="search" placeholder="Buscar paciente"
-                            class="w-full sm:w-52 px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                    </div>
+                    <button id="closeAnthroProfileBtn" type="button" class="text-slate-400 hover:text-slate-700 p-2" title="Voltar para os perfis">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
                 </div>
 
-                <div id="anthroHistoryList" class="space-y-3"></div>
-                <p id="anthroEmpty" class="hidden text-sm text-slate-400 text-center py-8">Nenhuma avaliação registrada ainda.</p>
+                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 mb-4">
+                    <div class="flex items-center justify-between gap-3 mb-3">
+                        <div>
+                            <h4 class="font-bold text-slate-800">Nova aferição</h4>
+                            <p class="text-[11px] text-slate-400">Na próxima visita, basta entrar neste perfil e preencher os novos valores.</p>
+                        </div>
+                        <i data-lucide="plus-circle" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label for="anthroWeight" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Peso (kg) *</label>
+                            <input id="anthroWeight" inputmode="decimal" type="number" min="0.1" max="500" step="0.1"
+                                placeholder="Ex.: 72,5"
+                                class="w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label for="anthroHeight" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Altura (cm) *</label>
+                            <input id="anthroHeight" inputmode="decimal" type="number" min="30" max="250" step="0.1"
+                                placeholder="Ex.: 168"
+                                class="w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div id="anthroResult" class="hidden mt-3 rounded-xl border border-blue-200 bg-blue-50 p-3">
+                        <p class="text-[11px] uppercase tracking-wide font-semibold text-blue-700">IMC calculado</p>
+                        <p id="anthroBmiValue" class="text-2xl font-black text-blue-900 mt-0.5"></p>
+                        <p class="text-[11px] text-blue-700/80 mt-1">Indicador calculado a partir de peso e altura. Não deve ser usado isoladamente para avaliação clínica.</p>
+                    </div>
+
+                    <button id="saveAnthroBtn" type="button"
+                        class="mt-3 inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl transition">
+                        <i data-lucide="save" class="w-4 h-4"></i>
+                        Salvar nova aferição
+                    </button>
+                </div>
+
+                <div class="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                        <h4 class="font-bold text-slate-800">Histórico</h4>
+                        <p id="anthroHistorySubtitle" class="text-xs text-slate-400"></p>
+                    </div>
+                    <button id="deleteAnthroProfileBtn" type="button" class="text-xs font-semibold text-red-500 hover:text-red-700">
+                        Excluir perfil
+                    </button>
+                </div>
+
+                <div id="anthroHistoryList" class="space-y-2"></div>
+                <p id="anthroHistoryEmpty" class="hidden text-sm text-slate-400 text-center py-8">Nenhuma aferição registrada.</p>
             </div>
         </div>
     </section>
@@ -3335,21 +3352,297 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
 
 <script>
 (function(){
-  function paintPatientRows(){
-    document.querySelectorAll('.agenda-card-toggle, .appt, .appointment-card, .agenda-card').forEach(row=>{
-      const text=(row.innerText||'').toLowerCase();
-      const parent=row.closest('.agenda-card') || row;
-      const hasPatient = !/horário disponível|disponível/.test(text) &&
-        /[a-záàâãéêíóôõúç]{3,}/i.test(text);
-      if(!hasPatient) return;
-      const notified = /avisado|enviado|notificada/.test(text);
-      parent.classList.add(notified ? 'notified' : 'booked');
-      row.classList.add(notified ? 'notified' : 'booked');
+    'use strict';
+
+    const RECORDS_KEY = 'app_anthropometry';
+    const PROFILES_KEY = 'app_anthro_profiles';
+
+    let records = JSON.parse(localStorage.getItem(RECORDS_KEY) || '[]');
+    let profiles = JSON.parse(localStorage.getItem(PROFILES_KEY) || '[]');
+    let selectedId = null;
+
+    const $ = id => document.getElementById(id);
+
+    function esc(s){
+        return String(s ?? '').replace(/[&<>"']/g, c => ({
+            '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+        }[c]));
+    }
+    function normalize(s){
+        return String(s || '').trim().toLocaleLowerCase('pt-BR')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    }
+    function num(v){ return parseFloat(String(v || '').replace(',', '.')); }
+    function fmtDate(iso){
+        if(!iso) return '';
+        const [y,m,d] = iso.split('-');
+        return d && m && y ? `${d}/${m}/${y}` : iso;
+    }
+    function today(){
+        const d = new Date(), off = d.getTimezoneOffset();
+        return new Date(d.getTime() - off*60000).toISOString().slice(0,10);
+    }
+    function save(){
+        localStorage.setItem(RECORDS_KEY, JSON.stringify(records));
+        localStorage.setItem(PROFILES_KEY, JSON.stringify(profiles));
+    }
+
+    // Migrate existing measurements into profiles automatically.
+    function migrateLegacyProfiles(){
+        const byName = new Map(profiles.map(p => [normalize(p.name), p]));
+        records.forEach(r => {
+            const key = normalize(r.patient);
+            if(!key) return;
+            if(!byName.has(key)){
+                const p = {
+                    id: 'profile_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+                    name: r.patient,
+                    createdAt: r.createdAt || new Date().toISOString()
+                };
+                profiles.push(p);
+                byName.set(key, p);
+            }
+            const p = byName.get(key);
+            if(!r.profileId) r.profileId = p.id;
+        });
+        save();
+    }
+
+    function selectedProfile(){
+        return profiles.find(p => p.id === selectedId) || null;
+    }
+
+    function updatePatientFromAgenda(){
+        // Existing agenda names are offered when creating a profile, but a profile is
+        // still required so subsequent visits do not require typing the name again.
+        const names = new Set();
+        try{
+            const agenda = JSON.parse(localStorage.getItem('app_agenda') || '{}');
+            Object.values(agenda || {}).forEach(day =>
+                Object.values(day || {}).forEach(prof =>
+                    Object.values(prof || {}).forEach(slot => {
+                        if(slot && slot.name) names.add(String(slot.name).trim());
+                    })
+                )
+            );
+        }catch(e){}
+        return [...names].filter(Boolean).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    }
+
+    function renderProfiles(){
+        const q = normalize($('anthroProfileSearch')?.value);
+        const list = $('anthroProfilesList');
+        const empty = $('anthroProfilesEmpty');
+        const filtered = profiles
+            .slice()
+            .sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'))
+            .filter(p=>!q || normalize(p.name).includes(q));
+
+        if(!filtered.length){
+            list.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+        empty.classList.add('hidden');
+
+        list.innerHTML = filtered.map(p => {
+            const rs = records.filter(r => r.profileId === p.id || (!r.profileId && normalize(r.patient) === normalize(p.name)))
+                .sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+            const latest = rs[0];
+            return `
+                <button type="button" data-profile-id="${esc(p.id)}"
+                    class="text-left border border-slate-200 rounded-xl p-4 hover:border-blue-400 hover:shadow-sm transition bg-white">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <h4 class="font-bold text-slate-800 truncate">${esc(p.name)}</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">
+                                ${rs.length ? `${rs.length} ${rs.length === 1 ? 'aferição' : 'aferições'} · última: ${fmtDate(latest.date)}` : 'Nenhuma aferição'}
+                            </p>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-5 h-5 text-slate-300"></i>
+                    </div>
+                </button>`;
+        }).join('');
+        if(window.lucide) lucide.createIcons();
+    }
+
+    function renderSelected(){
+        const p = selectedProfile();
+        const panel = $('anthroSelectedPanel');
+        if(!p){
+            panel.classList.add('hidden');
+            return;
+        }
+        panel.classList.remove('hidden');
+        $('anthroSelectedName').textContent = p.name;
+        $('anthroSelectedMeta').textContent = p.birthDate ? `Nascimento: ${fmtDate(p.birthDate)}` : 'Perfil criado no Agente Agenda';
+
+        const rows = records
+            .filter(r => r.profileId === p.id || (!r.profileId && normalize(r.patient) === normalize(p.name)))
+            .sort((a,b)=>(b.date||'').localeCompare(a.date||'') || (b.createdAt||'').localeCompare(a.createdAt||''));
+
+        $('anthroHistorySubtitle').textContent = `${rows.length} ${rows.length === 1 ? 'aferição registrada' : 'aferições registradas'}.`;
+        const list = $('anthroHistoryList');
+        const empty = $('anthroHistoryEmpty');
+
+        if(!rows.length){
+            list.innerHTML = '';
+            empty.classList.remove('hidden');
+            return;
+        }
+        empty.classList.add('hidden');
+
+        list.innerHTML = rows.map((r,i)=>{
+            const previous = rows[i+1];
+            const diff = previous ? Number(r.weight) - Number(previous.weight) : null;
+            const trend = diff === null ? '' :
+                `<span class="text-[11px] font-semibold ${diff > 0 ? 'text-amber-600' : diff < 0 ? 'text-emerald-600' : 'text-slate-400'}">
+                    ${diff > 0 ? '↑' : diff < 0 ? '↓' : '→'} ${Math.abs(diff).toFixed(1).replace('.',',')} kg
+                </span>`;
+            return `
+                <div class="flex flex-wrap items-center gap-3 border border-slate-200 rounded-xl p-3">
+                    <div class="w-24 text-xs text-slate-500">${fmtDate(r.date)}</div>
+                    <div class="flex-1 min-w-[180px] text-sm">
+                        <strong>${Number(r.weight).toFixed(1).replace('.',',')} kg</strong>
+                        <span class="text-slate-400"> · ${Number(r.height).toFixed(1).replace('.',',')} cm</span>
+                    </div>
+                    <div class="text-sm font-bold text-blue-700">IMC ${Number(r.bmi).toFixed(2).replace('.',',')}</div>
+                    ${trend}
+                    <button type="button" data-delete-record="${esc(r.id)}" class="text-red-500 hover:text-red-700 p-1" title="Excluir aferição">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>`;
+        }).join('');
+        if(window.lucide) lucide.createIcons();
+    }
+
+    function render(){
+        renderProfiles();
+        renderSelected();
+    }
+
+    function calculate(){
+        const w = num($('anthroWeight')?.value);
+        const h = num($('anthroHeight')?.value);
+        const box = $('anthroResult');
+        if(!(w > 0) || !(h > 0)){
+            box.classList.add('hidden');
+            return null;
+        }
+        const bmi = w / Math.pow(h/100, 2);
+        if(!Number.isFinite(bmi)) return null;
+        $('anthroBmiValue').textContent = bmi.toFixed(2).replace('.',',');
+        box.classList.remove('hidden');
+        return bmi;
+    }
+
+    function newProfile(){
+        const suggested = updatePatientFromAgenda();
+        const hint = suggested.length ? `\n\nAlguns nomes encontrados na Agenda:\n• ${suggested.slice(0,8).join('\n• ')}` : '';
+        const name = prompt('Nome do paciente:' + hint);
+        if(name === null) return;
+        const clean = name.trim();
+        if(!clean) return alert('Informe o nome do paciente.');
+        if(profiles.some(p => normalize(p.name) === normalize(clean))){
+            return alert('Já existe um perfil com esse nome.');
+        }
+        const birthDate = prompt('Data de nascimento (opcional, formato DD/MM/AAAA):');
+        let birthIso = '';
+        if(birthDate && /^\d{2}\/\d{2}\/\d{4}$/.test(birthDate.trim())){
+            const [d,m,y] = birthDate.trim().split('/');
+            birthIso = `${y}-${m}-${d}`;
+        }
+        const p = {
+            id: 'profile_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+            name: clean,
+            birthDate: birthIso,
+            createdAt: new Date().toISOString()
+        };
+        profiles.push(p);
+        selectedId = p.id;
+        save();
+        render();
+        $('anthroWeight').focus();
+    }
+
+    function saveMeasurement(){
+        const p = selectedProfile();
+        if(!p) return alert('Selecione um perfil primeiro.');
+        const w = num($('anthroWeight').value);
+        const h = num($('anthroHeight').value);
+        if(!(w > 0) || w > 500) return alert('Informe um peso válido.');
+        if(!(h >= 30) || h > 250) return alert('Informe uma altura válida em centímetros.');
+        const bmi = calculate();
+        if(!bmi) return;
+
+        records.push({
+            id: 'anthro_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+            profileId: p.id,
+            patient: p.name,
+            weight: Number(w.toFixed(1)),
+            height: Number(h.toFixed(1)),
+            bmi: Number(bmi.toFixed(2)),
+            date: today(),
+            createdAt: new Date().toISOString()
+        });
+        save();
+        $('anthroWeight').value = '';
+        $('anthroHeight').value = '';
+        $('anthroResult').classList.add('hidden');
+        render();
+    }
+
+    function deleteRecord(id){
+        const r = records.find(x=>x.id === id);
+        if(!r) return;
+        if(!confirm(`Excluir a aferição de ${r.patient} de ${fmtDate(r.date)}?`)) return;
+        records = records.filter(x=>x.id !== id);
+        save();
+        render();
+    }
+
+    function deleteProfile(){
+        const p = selectedProfile();
+        if(!p) return;
+        const count = records.filter(r=>r.profileId === p.id || (!r.profileId && normalize(r.patient) === normalize(p.name))).length;
+        const msg = count ? `Excluir o perfil de ${p.name} e suas ${count} aferições?` : `Excluir o perfil de ${p.name}?`;
+        if(!confirm(msg)) return;
+        records = records.filter(r=>!(r.profileId === p.id || (!r.profileId && normalize(r.patient) === normalize(p.name))));
+        profiles = profiles.filter(x=>x.id !== p.id);
+        selectedId = null;
+        save();
+        render();
+    }
+
+    $('newAnthroProfileBtn')?.addEventListener('click', newProfile);
+    $('anthroProfileSearch')?.addEventListener('input', renderProfiles);
+    $('anthroProfilesList')?.addEventListener('click', e=>{
+        const btn = e.target.closest('[data-profile-id]');
+        if(!btn) return;
+        selectedId = btn.getAttribute('data-profile-id');
+        renderSelected();
+        document.getElementById('anthroSelectedPanel')?.scrollIntoView({behavior:'smooth', block:'start'});
+        $('anthroWeight').focus();
     });
-  }
-  document.addEventListener('DOMContentLoaded', paintPatientRows);
-  setTimeout(paintPatientRows,400);
-  setTimeout(paintPatientRows,1000);
+    $('closeAnthroProfileBtn')?.addEventListener('click', ()=>{ selectedId=null; render(); });
+    $('saveAnthroBtn')?.addEventListener('click', saveMeasurement);
+    $('anthroWeight')?.addEventListener('input', calculate);
+    $('anthroHeight')?.addEventListener('input', calculate);
+    $('deleteAnthroProfileBtn')?.addEventListener('click', deleteProfile);
+    $('anthroHistoryList')?.addEventListener('click', e=>{
+        const btn = e.target.closest('[data-delete-record]');
+        if(btn) deleteRecord(btn.getAttribute('data-delete-record'));
+    });
+
+    migrateLegacyProfiles();
+    window.renderAnthro = render;
+    document.addEventListener('DOMContentLoaded', ()=>{
+        render();
+        if(window.lucide) lucide.createIcons();
+    });
 })();
 </script>
 
