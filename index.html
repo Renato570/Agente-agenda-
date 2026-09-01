@@ -1058,6 +1058,30 @@ body.dark-mode .bg-white{color:var(--dm-text);}
 body.dark-mode input[type="date"]::-webkit-calendar-picker-indicator,
 body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(.8);}
 </style>
+
+<style id="anthro-module-styles">
+#anthroSection .anthro-history-card { transition: box-shadow .15s ease, transform .15s ease; }
+#anthroSection .anthro-history-card:hover { box-shadow: 0 6px 18px rgba(15,23,42,.07); }
+body.dark-mode #anthroSection .bg-white,
+body.auto-theme #anthroSection .bg-white { background:#151e2e !important; color:#f4f7fb !important; border-color:#34445c !important; }
+body.dark-mode #anthroSection input,
+body.auto-theme #anthroSection input { background:#101827 !important; color:#f4f7fb !important; border-color:#465a77 !important; }
+body.dark-mode #anthroSection input::placeholder,
+body.auto-theme #anthroSection input::placeholder { color:#91a0b5 !important; }
+body.dark-mode #anthroSection label,
+body.auto-theme #anthroSection label { color:#c5cfdd !important; }
+body.dark-mode #anthroSection .bg-blue-50,
+body.auto-theme #anthroSection .bg-blue-50 { background:#10264a !important; border-color:#2b5f96 !important; }
+body.dark-mode #anthroSection .text-blue-900,
+body.auto-theme #anthroSection .text-blue-900 { color:#dbeafe !important; }
+body.dark-mode #anthroSection .text-slate-800,
+body.auto-theme #anthroSection .text-slate-800 { color:#f4f7fb !important; }
+body.dark-mode #anthroSection .text-slate-400,
+body.auto-theme #anthroSection .text-slate-400 { color:#aeb9ca !important; }
+body.dark-mode #anthroSection .bg-slate-100,
+body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; color:#e5edf7 !important; }
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -1374,6 +1398,87 @@ body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:inve
         </div>
     </section>
 
+
+    <!-- Avaliação antropométrica -->
+    <section id="anthroSection" class="hidden max-w-4xl mx-auto p-4 md:p-6 pb-24">
+        <div class="space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <div class="flex items-start justify-between gap-3 mb-4">
+                    <div>
+                        <h2 class="text-base md:text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i data-lucide="scale" class="w-5 h-5 text-blue-600"></i>
+                            Avaliação antropométrica
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">Registre peso, altura e acompanhe a evolução do paciente.</p>
+                    </div>
+                    <span class="text-[10px] font-semibold uppercase tracking-wide bg-blue-50 text-blue-700 px-2 py-1 rounded-full">Local</span>
+                </div>
+
+                <form id="anthroForm" class="grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="return false;">
+                    <div class="md:col-span-2">
+                        <label for="anthroPatient" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Paciente *</label>
+                        <input id="anthroPatient" list="anthroPatientsList" type="text" autocomplete="off"
+                            placeholder="Digite ou selecione o paciente"
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <datalist id="anthroPatientsList"></datalist>
+                        <p id="anthroPatientHint" class="text-[11px] text-slate-400 mt-1">A lista usa os pacientes já registrados na Agenda e nos acompanhamentos.</p>
+                    </div>
+
+                    <div>
+                        <label for="anthroWeight" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Peso (kg) *</label>
+                        <input id="anthroWeight" inputmode="decimal" type="number" min="0.1" max="500" step="0.1"
+                            placeholder="Ex.: 72,5"
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label for="anthroHeight" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Altura (cm) *</label>
+                        <input id="anthroHeight" inputmode="decimal" type="number" min="30" max="250" step="0.1"
+                            placeholder="Ex.: 168"
+                            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+
+                    <div class="md:col-span-2 flex flex-wrap items-center gap-2">
+                        <button id="saveAnthroBtn" type="button" class="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl transition">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            Salvar avaliação
+                        </button>
+                        <button id="clearAnthroFormBtn" type="button" class="inline-flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2.5 px-4 rounded-xl transition">
+                            Limpar
+                        </button>
+                    </div>
+                </form>
+
+                <div id="anthroResult" class="hidden mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                    <div class="flex items-center justify-between gap-3">
+                        <div>
+                            <p class="text-[11px] uppercase tracking-wide font-semibold text-blue-700">IMC calculado</p>
+                            <p id="anthroBmiValue" class="text-2xl font-black text-blue-900 mt-0.5"></p>
+                        </div>
+                        <i data-lucide="activity" class="w-8 h-8 text-blue-500"></i>
+                    </div>
+                    <p class="text-[11px] text-blue-700/80 mt-2">O IMC é um indicador calculado a partir de peso e altura e não deve ser usado isoladamente para avaliação clínica, especialmente em crianças e adolescentes.</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                    <div>
+                        <h3 class="text-sm md:text-base font-bold text-slate-800">Histórico de avaliações</h3>
+                        <p id="anthroHistorySubtitle" class="text-xs text-slate-400">Todos os registros salvos neste aparelho.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <input id="anthroSearch" type="search" placeholder="Buscar paciente"
+                            class="w-full sm:w-52 px-3 py-2 border border-slate-300 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div id="anthroHistoryList" class="space-y-3"></div>
+                <p id="anthroEmpty" class="hidden text-sm text-slate-400 text-center py-8">Nenhuma avaliação registrada ainda.</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Confirmações de amanhã -->
     <section id="remindersSection" class="hidden max-w-4xl mx-auto p-4 md:p-6 pb-24">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
@@ -1437,7 +1542,7 @@ body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:inve
 
     <!-- Bottom Navigation -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-40" style="padding-bottom: env(safe-area-inset-bottom);">
-        <div class="max-w-4xl mx-auto grid grid-cols-4">
+        <div class="max-w-4xl mx-auto grid grid-cols-5">
             <button id="tabAgendaBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-blue-700 transition">
                 <i data-lucide="calendar-clock" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Agenda</span>
@@ -1454,6 +1559,10 @@ body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:inve
             <button id="tabNotesBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
                 <i data-lucide="notebook-pen" class="w-5 h-5"></i>
                 <span class="text-[11px] font-semibold">Anotações</span>
+            </button>
+            <button id="tabAnthroBtn" class="flex flex-col items-center justify-center gap-0.5 py-2.5 text-slate-400 transition">
+                <i data-lucide="scale" class="w-5 h-5"></i>
+                <span class="text-[11px] font-semibold">Peso/Altura</span>
             </button>
         </div>
     </nav>
@@ -2608,8 +2717,8 @@ body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:inve
         function switchTab(tab) {
             const activeClasses = ['text-blue-700'];
             const inactiveClasses = ['text-slate-400'];
-            const allSections = { message: messageSection, agenda: agendaSection, reminders: remindersSection, notes: notesSection };
-            const allTabs = { message: tabMessageBtn, agenda: tabAgendaBtn, reminders: tabRemindersBtn, notes: tabNotesBtn };
+            const allSections = { message: messageSection, agenda: agendaSection, reminders: remindersSection, notes: notesSection, anthro: document.getElementById('anthroSection') };
+            const allTabs = { message: tabMessageBtn, agenda: tabAgendaBtn, reminders: tabRemindersBtn, notes: tabNotesBtn, anthro: document.getElementById('tabAnthroBtn') };
 
             Object.keys(allSections).forEach(key => {
                 if (key === tab) {
@@ -2627,6 +2736,7 @@ body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:inve
             if (tab === 'agenda') renderAgenda();
             if (tab === 'reminders') renderReminders();
             if (tab === 'notes') renderNotes();
+            if (tab === 'anthro') window.renderAnthro?.();
         }
         tabMessageBtn.addEventListener('click', () => {
             pendingAgendaSlot = null;
@@ -2638,6 +2748,7 @@ body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:inve
         tabAgendaBtn.addEventListener('click', () => switchTab('agenda'));
         tabRemindersBtn.addEventListener('click', () => switchTab('reminders'));
         tabNotesBtn.addEventListener('click', () => switchTab('notes'));
+        document.getElementById('tabAnthroBtn')?.addEventListener('click', () => switchTab('anthro'));
         remindersBannerBtn.addEventListener('click', () => switchTab('reminders'));
 
 
@@ -3271,6 +3382,229 @@ body.dark-mode input[type="time"]::-webkit-calendar-picker-indicator{filter:inve
   document.addEventListener('DOMContentLoaded', addNoteEditButtons);
   setTimeout(addNoteEditButtons,500);
   setTimeout(addNoteEditButtons,1200);
+})();
+</script>
+
+
+<script>
+(function(){
+    'use strict';
+
+    const STORAGE_KEY = 'app_anthropometry';
+    let anthroData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+    const $ = id => document.getElementById(id);
+    const patientInput = $('anthroPatient');
+    const weightInput = $('anthroWeight');
+    const heightInput = $('anthroHeight');
+    const saveBtn = $('saveAnthroBtn');
+    const clearBtn = $('clearAnthroFormBtn');
+    const resultBox = $('anthroResult');
+    const bmiValue = $('anthroBmiValue');
+    const historyList = $('anthroHistoryList');
+    const emptyMsg = $('anthroEmpty');
+    const searchInput = $('anthroSearch');
+    const patientList = $('anthroPatientsList');
+
+    function saveData(){
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(anthroData));
+    }
+
+    function normalize(s){
+        return String(s || '').trim().toLocaleLowerCase('pt-BR')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    }
+
+    function esc(s){
+        return String(s ?? '').replace(/[&<>"']/g, c => ({
+            '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+        }[c]));
+    }
+
+    function parseNumber(v){
+        return parseFloat(String(v || '').replace(',', '.'));
+    }
+
+    function fmtDate(iso){
+        if(!iso) return '';
+        const [y,m,d] = iso.split('-');
+        return d && m && y ? `${d}/${m}/${y}` : iso;
+    }
+
+    function today(){
+        const d = new Date();
+        const off = d.getTimezoneOffset();
+        return new Date(d.getTime() - off*60000).toISOString().slice(0,10);
+    }
+
+    function getAgendaPatients(){
+        const names = new Set();
+        try{
+            const agenda = JSON.parse(localStorage.getItem('app_agenda') || '{}');
+            Object.values(agenda || {}).forEach(day => {
+                Object.values(day || {}).forEach(prof => {
+                    Object.values(prof || {}).forEach(slot => {
+                        if(slot && slot.name && String(slot.name).trim()) names.add(String(slot.name).trim());
+                    });
+                });
+            });
+        }catch(e){}
+        anthroData.forEach(r => { if(r.patient) names.add(r.patient); });
+        return [...names].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    }
+
+    function updatePatientList(){
+        if(!patientList) return;
+        patientList.innerHTML = getAgendaPatients()
+            .map(n => `<option value="${esc(n)}"></option>`).join('');
+    }
+
+    function calculateBmi(){
+        const weight = parseNumber(weightInput?.value);
+        const heightCm = parseNumber(heightInput?.value);
+        if(!(weight > 0) || !(heightCm > 0)) {
+            resultBox?.classList.add('hidden');
+            return null;
+        }
+        const heightM = heightCm / 100;
+        const bmi = weight / (heightM * heightM);
+        if(!Number.isFinite(bmi)) return null;
+        bmiValue.textContent = bmi.toFixed(2).replace('.', ',');
+        resultBox.classList.remove('hidden');
+        return bmi;
+    }
+
+    function render(){
+        updatePatientList();
+        const q = normalize(searchInput?.value);
+        const rows = anthroData
+            .slice()
+            .sort((a,b) => (b.date || '').localeCompare(a.date || '') || (b.createdAt || '').localeCompare(a.createdAt || ''))
+            .filter(r => !q || normalize(r.patient).includes(q));
+
+        if(!rows.length){
+            historyList.innerHTML = '';
+            emptyMsg.classList.remove('hidden');
+            return;
+        }
+        emptyMsg.classList.add('hidden');
+
+        // Group by patient for a compact history view.
+        const groups = new Map();
+        rows.forEach(r => {
+            const key = normalize(r.patient);
+            if(!groups.has(key)) groups.set(key, {name:r.patient, records:[]});
+            groups.get(key).records.push(r);
+        });
+
+        historyList.innerHTML = [...groups.values()].map(group => {
+            const latest = group.records[0];
+            const previous = group.records[1];
+            const diff = previous ? latest.weight - previous.weight : null;
+            const diffText = diff === null ? '' :
+                `<span class="text-[11px] ${diff > 0 ? 'text-amber-600' : diff < 0 ? 'text-emerald-600' : 'text-slate-400'}">
+                    ${diff > 0 ? '↑' : diff < 0 ? '↓' : '→'} ${Math.abs(diff).toFixed(1).replace('.',',')} kg desde a última aferição
+                </span>`;
+
+            const recordsHtml = group.records.map(r => `
+                <div class="flex items-center gap-3 py-2.5 border-t border-slate-100 dark:border-slate-700/60">
+                    <div class="w-20 text-xs text-slate-500">${fmtDate(r.date)}</div>
+                    <div class="flex-1 text-sm"><strong>${Number(r.weight).toFixed(1).replace('.',',')} kg</strong> · ${Number(r.height).toFixed(1).replace('.',',')} cm</div>
+                    <div class="text-xs font-semibold text-blue-700">IMC ${Number(r.bmi).toFixed(2).replace('.',',')}</div>
+                    <button type="button" data-delete-anthro="${esc(r.id)}" class="text-red-500 hover:text-red-700 p-1" title="Excluir registro">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                </div>`).join('');
+
+            return `
+                <div class="anthro-history-card border border-slate-200 rounded-xl p-4">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <h4 class="font-bold text-slate-800 truncate">${esc(group.name)}</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">${group.records.length} ${group.records.length === 1 ? 'avaliação' : 'avaliações'}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm font-bold text-slate-700">${Number(latest.weight).toFixed(1).replace('.',',')} kg</div>
+                            ${diffText}
+                        </div>
+                    </div>
+                    <div class="mt-3 overflow-x-auto">${recordsHtml}</div>
+                </div>`;
+        }).join('');
+
+        if(window.lucide) lucide.createIcons();
+    }
+
+    function clearForm(){
+        patientInput.value = '';
+        weightInput.value = '';
+        heightInput.value = '';
+        resultBox.classList.add('hidden');
+        patientInput.focus();
+    }
+
+    function saveRecord(){
+        const patient = patientInput.value.trim();
+        const weight = parseNumber(weightInput.value);
+        const height = parseNumber(heightInput.value);
+        if(!patient){
+            alert('Informe o nome do paciente.');
+            patientInput.focus();
+            return;
+        }
+        if(!(weight > 0) || weight > 500){
+            alert('Informe um peso válido.');
+            weightInput.focus();
+            return;
+        }
+        if(!(height >= 30) || height > 250){
+            alert('Informe uma altura válida em centímetros.');
+            heightInput.focus();
+            return;
+        }
+        const bmi = calculateBmi();
+        if(!bmi) return;
+
+        anthroData.push({
+            id: 'anthro_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
+            patient,
+            weight: Number(weight.toFixed(1)),
+            height: Number(height.toFixed(1)),
+            bmi: Number(bmi.toFixed(2)),
+            date: today(),
+            createdAt: new Date().toISOString()
+        });
+        saveData();
+        render();
+        alert('Avaliação salva.');
+        clearForm();
+    }
+
+    saveBtn?.addEventListener('click', saveRecord);
+    clearBtn?.addEventListener('click', clearForm);
+    weightInput?.addEventListener('input', calculateBmi);
+    heightInput?.addEventListener('input', calculateBmi);
+    searchInput?.addEventListener('input', render);
+
+    historyList?.addEventListener('click', e => {
+        const btn = e.target.closest('[data-delete-anthro]');
+        if(!btn) return;
+        const id = btn.getAttribute('data-delete-anthro');
+        const record = anthroData.find(r => r.id === id);
+        if(!record) return;
+        if(!confirm(`Excluir a avaliação de ${record.patient} de ${fmtDate(record.date)}?`)) return;
+        anthroData = anthroData.filter(r => r.id !== id);
+        saveData();
+        render();
+    });
+
+    // Public hook used by the existing tab system.
+    window.renderAnthro = render;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updatePatientList();
+        if(window.lucide) lucide.createIcons();
+    });
 })();
 </script>
 
