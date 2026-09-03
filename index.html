@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AgendaSaúde - Mensagens WhatsApp</title>
 
-    <!-- PWA - AgendaSaúde v14 -->
+    <!-- PWA - AgendaSaúde v23 -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#005ca9">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3330,7 +3330,7 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
         // ---- PWA: service worker + install prompt ----
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('service-worker.js').catch(() => {});
+                navigator.serviceWorker.register('./service-worker.js', { scope: './' }).catch(() => {});
             });
         }
 
