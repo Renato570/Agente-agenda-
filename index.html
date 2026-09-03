@@ -1399,6 +1399,36 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
     </section>
 
 
+    <!-- Modal para criar perfil antropométrico -->
+    <div id="anthroProfileModal" class="fixed inset-0 z-[90] hidden items-center justify-center bg-slate-900/60 p-4">
+        <div class="w-full max-w-md rounded-2xl bg-white shadow-2xl border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">Novo perfil do paciente</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Cadastre o paciente uma vez para registrar peso e altura nas próximas visitas.</p>
+                </div>
+                <button type="button" id="closeAnthroProfileModal" class="w-9 h-9 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-5 space-y-4">
+                <div>
+                    <label for="anthroNewProfileName" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Nome do paciente *</label>
+                    <input id="anthroNewProfileName" type="text" autocomplete="name" placeholder="Nome completo" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800">
+                </div>
+                <div>
+                    <label for="anthroNewProfileBirth" class="block text-xs font-semibold text-slate-600 uppercase mb-1">Data de nascimento</label>
+                    <input id="anthroNewProfileBirth" type="date" class="w-full px-3 py-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800">
+                    <p class="text-[11px] text-slate-400 mt-1">Opcional. Ajuda na classificação do IMC.</p>
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="button" id="cancelAnthroProfileModal" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-semibold">Cancelar</button>
+                    <button type="button" id="saveAnthroProfileModal" class="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold">Criar perfil</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Avaliação antropométrica -->
     <section id="anthroSection" class="hidden max-w-4xl mx-auto p-4 md:p-6 pb-24">
         <div class="space-y-4">
@@ -3588,33 +3618,48 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
         return bmi;
     }
 
-    function newProfile(){
-        const suggested = updatePatientFromAgenda();
-        const hint = suggested.length ? `\n\nAlguns nomes encontrados na Agenda:\n• ${suggested.slice(0,8).join('\n• ')}` : '';
-        const name = prompt('Nome do paciente:' + hint);
-        if(name === null) return;
-        const clean = name.trim();
-        if(!clean) return alert('Informe o nome do paciente.');
-        if(profiles.some(p => normalize(p.name) === normalize(clean))){
-            return alert('Já existe um perfil com esse nome.');
+    function openNewProfileModal(){
+        const modal = $('anthroProfileModal');
+        if(!modal) return;
+        $('anthroNewProfileName').value = '';
+        $('anthroNewProfileBirth').value = '';
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        if(window.lucide) lucide.createIcons();
+        setTimeout(()=>$('anthroNewProfileName')?.focus(),50);
+    }
+
+    function closeNewProfileModal(){
+        const modal = $('anthroProfileModal');
+        if(!modal) return;
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    function createNewProfile(){
+        const name = $('anthroNewProfileName')?.value.trim() || '';
+        const birthIso = $('anthroNewProfileBirth')?.value || '';
+        if(!name){
+            alert('Informe o nome do paciente.');
+            $('anthroNewProfileName')?.focus();
+            return;
         }
-        const birthDate = prompt('Data de nascimento (opcional, formato DD/MM/AAAA):');
-        let birthIso = '';
-        if(birthDate && /^\d{2}\/\d{2}\/\d{4}$/.test(birthDate.trim())){
-            const [d,m,y] = birthDate.trim().split('/');
-            birthIso = `${y}-${m}-${d}`;
+        if(profiles.some(p => normalize(p.name) === normalize(name))){
+            alert('Já existe um perfil com esse nome.');
+            return;
         }
         const p = {
             id: 'profile_' + Date.now() + '_' + Math.random().toString(36).slice(2,8),
-            name: clean,
+            name,
             birthDate: birthIso,
             createdAt: new Date().toISOString()
         };
         profiles.push(p);
         selectedId = p.id;
         save();
+        closeNewProfileModal();
         render();
-        $('anthroWeight').focus();
+        setTimeout(()=>$('anthroWeight')?.focus(),80);
     }
 
     function saveMeasurement(){
@@ -3666,7 +3711,13 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
         render();
     }
 
-    $('newAnthroProfileBtn')?.addEventListener('click', newProfile);
+    $('newAnthroProfileBtn')?.addEventListener('click', openNewProfileModal);
+    $('closeAnthroProfileModal')?.addEventListener('click', closeNewProfileModal);
+    $('cancelAnthroProfileModal')?.addEventListener('click', closeNewProfileModal);
+    $('saveAnthroProfileModal')?.addEventListener('click', createNewProfile);
+    $('anthroProfileModal')?.addEventListener('click', e=>{ if(e.target === $('anthroProfileModal')) closeNewProfileModal(); });
+    $('anthroNewProfileName')?.addEventListener('keydown', e=>{ if(e.key === 'Enter') createNewProfile(); });
+    $('anthroNewProfileBirth')?.addEventListener('keydown', e=>{ if(e.key === 'Enter') createNewProfile(); });
     $('anthroProfileSearch')?.addEventListener('input', renderProfiles);
     $('anthroProfilesList')?.addEventListener('click', e=>{
         const btn = e.target.closest('[data-profile-id]');
