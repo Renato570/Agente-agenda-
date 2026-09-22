@@ -1,17 +1,19 @@
-const CACHE_NAME = 'agendasaude-v5';
+// AgendaSaúde v23 — modo offline.
+// Mantém os arquivos do aplicativo disponíveis mesmo sem internet.
+const CACHE_NAME = 'agendasaude-v23';
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
   './favicon-64.png',
-  './icons/icon-72.png',
-  './icons/icon-96.png',
-  './icons/icon-128.png',
-  './icons/icon-144.png',
-  './icons/icon-152.png',
-  './icons/icon-192.png',
-  './icons/icon-384.png',
-  './icons/icon-512.png'
+  './icon-72.png',
+  './icon-96.png',
+  './icon-128.png',
+  './icon-144.png',
+  './icon-152.png',
+  './icon-192.png',
+  './icon-384.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -25,29 +27,30 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
+      .then(keys => Promise.all(
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+      ))
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener('fetch', event => {
-  const req = event.request;
-  if (req.method !== 'GET') return;
+  const request = event.request;
+  if (request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(req).then(cached => {
-      if (cached) return cached;
-
-      return fetch(req).then(response => {
+    caches.match(request).then(cached => {
+      // Para o aplicativo local, responde imediatamente pelo cache.
+      // Em paralelo, tenta atualizar o cache quando houver internet.
+      const network = fetch(request).then(response => {
         if (response && (response.ok || response.type === 'opaque')) {
           const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(req, copy)).catch(() => {});
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy)).catch(() => {});
         }
         return response;
-      }).catch(() => {
-        if (req.mode === 'navigate') return caches.match('./index.html');
-        return new Response('', { status: 503, statusText: 'Offline' });
-      });
+      }).catch(() => cached || caches.match('./index.html'));
+
+      return cached || network;
     })
   );
 });
