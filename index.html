@@ -1797,6 +1797,17 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
             documentos: `Olá *{NOME}*!\nLembramos de sua consulta no dia *{DATA}* a partir das *{HORARIO}* com {MEDICO} ({TIPO}).\n\n📌 *Atenção:* Favor trazer documento com foto, cartão do SUS e exames anteriores se possuir.\nLocal: {LOCAL}.\nEndereço: {ENDERECO}.`
         };
 
+        // Modelos de marcação exclusivos para o dentista.
+        // Médico e enfermeira continuam usando os modelos gerais acima.
+        const defaultDentistTemplates = {
+            padrao: `Olá, *{NOME}*! 👋\n\nSua consulta odontológica foi agendada para *{DATA}*, às *{HORARIO}*.\n\n🦷 *Profissional:* {MEDICO}\n📋 *Atendimento:* {TIPO}\n📍 *Local:* {LOCAL}\n🏠 *Endereço:* {ENDERECO}\n\n⏰ *Importante:* o horário é exato. Pedimos que compareça no horário agendado.\n\nCaso não possa comparecer, avise com antecedência.`,
+            curto: `Olá, *{NOME}*! Sua consulta odontológica está marcada para *{DATA}*, às *{HORARIO}*, com {MEDICO}.\n\n📍 {LOCAL}\n🏠 {ENDERECO}\n\n⏰ O horário é exato.`,
+            confirmacao: `Olá, *{NOME}*! Sua consulta odontológica está marcada para *{DATA}*, às *{HORARIO}*, com {MEDICO}.\n\n🦷 *Atendimento:* {TIPO}\n📍 {LOCAL}\n🏠 {ENDERECO}\n\nPodemos confirmar sua presença? Lembrando que o horário é exato.`
+        };
+        let dentistTemplates = JSON.parse(localStorage.getItem('app_dentist_templates')) || {...defaultDentistTemplates};
+        dentistTemplates = ensureAddressInTemplates(dentistTemplates);
+        localStorage.setItem('app_dentist_templates', JSON.stringify(dentistTemplates));
+
         const defaultReminderTemplates = {
             padrao: `Olá, *{NOME}*! 👋\n\nPassando para lembrar que você tem um atendimento amanhã, *{DATA}*.\n\n⏰ *Horário:* {HORARIO}\n👨‍⚕️ *Profissional:* {PROFISSIONAL}\n📋 *Atendimento:* {ATENDIMENTO}\n📍 *Local:* {LOCAL}\n🏠 *Endereço:* {ENDERECO}\n\nPedimos que compareça no horário informado. Caso não possa comparecer, nos avise com antecedência.`,
             curto: `Olá, *{NOME}*! Lembrete do seu atendimento amanhã, {DATA}, às {HORARIO}, com {PROFISSIONAL}. Local: {LOCAL}.\nEndereço: {ENDERECO}.`,
@@ -2400,6 +2411,7 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
             appTime.classList.add('bg-blue-50', 'border-blue-400', 'font-bold', 'text-blue-800');
             document.getElementById('agendaTimeHint').classList.remove('hidden');
             professionalCategory.value = agendaCurrentProf;
+            syncDentistBookingMode();
             doctorName.value = slot?.doctor || '';
             consultType.value = slot?.consultType || defaultConsultTypeForProf(agendaCurrentProf);
             attendanceType.value = slot?.attendanceType || 'horário marcado';
@@ -2820,19 +2832,61 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
             return (str || '').replace(/\D/g, '');
         }
 
+        function isDentistSelected() {
+            return professionalCategory.value === 'Dentista';
+        }
+
+        function syncDentistBookingMode() {
+            const dentist = isDentistSelected();
+            const options = dentist
+                ? [
+                    ['padrao', 'Padrão - Horário exato'],
+                    ['curto', 'Curto - Horário exato'],
+                    ['confirmacao', 'Confirmação - Horário exato']
+                  ]
+                : [
+                    ['padrao', 'Padrão'],
+                    ['curto', 'Curto'],
+                    ['documentos', 'Documentos']
+                  ];
+            const current = templateSelect.value;
+            templateSelect.innerHTML = options.map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
+            templateSelect.value = options.some(([value]) => value === current) ? current : 'padrao';
+
+            // Dentista sempre trabalha com horário exato. Médico/enfermeira mantêm a regra atual.
+            if (dentist) {
+                attendanceType.value = 'horário marcado';
+                attendanceType.disabled = true;
+                attendanceType.classList.add('bg-slate-100', 'text-slate-500');
+            } else {
+                attendanceType.disabled = false;
+                attendanceType.classList.remove('bg-slate-100', 'text-slate-500');
+            }
+
+            updateTemplateDescription();
+        }
+
         function updateTemplateDescription() {
-            const descriptions = {
-                padrao: 'Enviado no momento do agendamento.',
-                curto: 'Enviado no momento do agendamento, em versão resumida.',
-                documentos: 'Enviado no momento do agendamento, com orientação sobre documentos.'
-            };
+            const dentist = isDentistSelected();
+            const descriptions = dentist
+                ? {
+                    padrao: 'Mensagem de marcação do dentista, com horário exato.',
+                    curto: 'Mensagem curta do dentista, com horário exato.',
+                    confirmacao: 'Mensagem de confirmação do dentista, com horário exato.'
+                  }
+                : {
+                    padrao: 'Enviado no momento do agendamento.',
+                    curto: 'Enviado no momento do agendamento, em versão resumida.',
+                    documentos: 'Enviado no momento do agendamento, com orientação sobre documentos.'
+                  };
             const el = document.getElementById('templateDescription');
             if (el) el.textContent = descriptions[templateSelect.value] || '';
         }
 
         function generateMessage() {
             const selectedKey = templateSelect.value;
-            let templateText = templates[selectedKey] || templates.padrao;
+            const sourceTemplates = isDentistSelected() ? dentistTemplates : templates;
+            let templateText = sourceTemplates[selectedKey] || sourceTemplates.padrao;
 
             const nameVal = patientName.value.trim() || '[Nome do Paciente]';
             const dateVal = formatDate(appDate.value) || '[Data]';
@@ -2956,6 +3010,7 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
         // Preenche o formulário com o perfil padrão, mas mantém os campos editáveis para cada envio.
         if (!locationInput.value.trim()) locationInput.value = profile.location || '';
         if (!addressInput.value.trim()) addressInput.value = profile.address || '';
+        syncDentistBookingMode();
 
         function clearFieldErrors() {
             [patientName, patientPhone, appDate, appTime, doctorName, consultType, addressInput].forEach(el => {
@@ -2967,6 +3022,10 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
         [patientName, patientPhone, appDate, appTime, attendanceType, doctorName, consultType, locationInput, addressInput, templateSelect]
             .forEach(el => el.addEventListener('input', () => { clearFieldErrors(); generateMessage(); }));
         attendanceType.addEventListener('change', generateMessage);
+        professionalCategory.addEventListener('change', () => {
+            syncDentistBookingMode();
+            generateMessage();
+        });
         templateSelect.addEventListener('change', () => { generateMessage(); updateTemplateDescription(); });
 
         function syncMessageToAgenda() {

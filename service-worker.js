@@ -1,6 +1,6 @@
 // AgendaSaúde v23 — modo offline.
 // Mantém os arquivos do aplicativo disponíveis mesmo sem internet.
-const CACHE_NAME = 'agendasaude-v23';
+const CACHE_NAME = 'agendasaude-v23-dentista';
 const APP_SHELL = [
   './',
   './index.html',
