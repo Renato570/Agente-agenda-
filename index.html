@@ -1082,6 +1082,47 @@ body.dark-mode #anthroSection .bg-slate-100,
 body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; color:#e5edf7 !important; }
 </style>
 
+
+<style id="agendasaude-refresh-2026">
+:root{--agenda-blue:#1769aa;--agenda-line:#e2e8f0;--agenda-muted:#94a3b8}
+body{background:#f4f7fb!important;color:#1e293b}
+header.bg-blue-700{padding:8px 14px!important;background:linear-gradient(115deg,#174d7a,#287db8)!important;box-shadow:0 2px 10px rgba(15,23,42,.10)!important}
+header h1{font-size:15px!important;letter-spacing:-.2px}
+header .lucide,header i{width:19px!important;height:19px!important}
+#agendaSection{padding:10px!important}
+#agendaSection aside,#agendaSection .bg-white.rounded-xl.shadow-sm{border-radius:16px!important;box-shadow:0 4px 18px rgba(15,23,42,.055)!important;border-color:#e7edf4!important}
+#agendaSection aside{padding:12px!important}
+#calDaysGrid{row-gap:5px!important}
+#calDaysGrid button{width:36px!important;height:36px!important;border-radius:11px!important;transition:background .15s ease,transform .15s ease!important}
+#calDaysGrid button:active{transform:scale(.94)}
+.calendar-day-event::after{width:16px!important;height:3px!important;bottom:3px!important;border-radius:8px!important;background:#287db8!important}
+.calendar-legend{gap:8px 10px!important;font-size:10px!important}
+#agendaSection .agenda-action-row{display:flex!important;flex-wrap:wrap!important;gap:7px!important}
+#agendaSection .agenda-action-row>button{flex:1 1 42%!important;width:auto!important;min-width:0!important;height:42px!important;min-height:42px!important;max-height:42px!important;border-radius:11px!important;box-shadow:none!important;transition:transform .15s ease,box-shadow .15s ease!important}
+#agendaSection .agenda-action-row>button:first-child{flex:1 1 100%!important;background:#1769aa!important;color:#fff!important}
+#agendaSection .agenda-action-row>button:active{transform:scale(.98)}
+#agendaSlotsList{gap:5px!important}
+#agendaSlotsList .agenda-card-toggle{border-radius:12px!important;box-shadow:0 1px 3px rgba(15,23,42,.04)!important;margin-bottom:3px!important;padding-top:8px!important;padding-bottom:8px!important;min-height:44px!important}
+#agendaSlotsList .agenda-card-toggle.agenda-available{color:#64748b!important;border:1px solid #e8edf3!important;background:#fafbfd!important}
+#agendaSlotsList .agenda-card-toggle.agenda-available .text-xs,#agendaSlotsList .agenda-card-toggle.agenda-available .text-sm{color:#94a3b8!important}
+#agendaSlotsList .agenda-card-toggle.agenda-booked{border:1px solid #cfe0fb!important}
+#agendaSlotsList .agenda-card-toggle.agenda-notified{border:1px solid #c8ead8!important}
+#agendaSlotsList .agenda-card-toggle>span:nth-child(3) span:first-child{font-weight:650!important}
+#agendaSlotsList .agenda-card-toggle{transition:background .15s ease,border-color .15s ease,transform .15s ease!important}
+#agendaSlotsList .agenda-card-toggle:active{transform:scale(.995)}
+#agendaCompactToggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #dbe4ee;background:#fff;color:#475569;border-radius:10px;padding:7px 10px;font-size:12px;font-weight:600;margin:0 0 8px}
+#agendaCompactToggle:active{transform:scale(.98)}
+body.dark-mode{background:#111827!important;color:#e5e7eb!important}
+body.dark-mode header.bg-blue-700{background:linear-gradient(115deg,#102b45,#174d7a)!important}
+body.dark-mode #agendaSection aside,body.dark-mode #agendaSection .bg-white.rounded-xl.shadow-sm{background:#1f2937!important;border-color:#374151!important}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available{background:#1f2937!important;color:#cbd5e1!important;border-color:#374151!important}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available .text-xs,body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available .text-sm{color:#9ca3af!important}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-booked{background:#172554!important;border-color:#1e40af!important}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-notified{background:#052e1b!important;border-color:#166534!important}
+body.dark-mode #agendaCompactToggle{background:#1f2937;color:#d1d5db;border-color:#374151}
+@media(max-width:640px){header.bg-blue-700{padding:7px 12px!important}header h1{font-size:14px!important}#calDaysGrid button{width:32px!important;height:32px!important;border-radius:9px!important}#agendaSlotsList .agenda-card-toggle{padding:8px 9px!important}}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -4057,6 +4098,42 @@ body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; co
         updatePatientList();
         if(window.lucide) lucide.createIcons();
     });
+})();
+</script>
+
+
+<script id="agendasaude-compact-calendar">
+(function(){
+  function setupCompactCalendar(){
+    const grid=document.getElementById('calDaysGrid');
+    if(!grid || document.getElementById('agendaCompactToggle')) return;
+    const aside=grid.closest('aside');
+    if(!aside) return;
+    const btn=document.createElement('button');
+    btn.id='agendaCompactToggle';
+    btn.type='button';
+    btn.innerHTML='<span>▦</span><span>Calendário compacto</span>';
+    const monthLabel=document.getElementById('calMonthLabel');
+    (monthLabel && monthLabel.parentElement ? monthLabel.parentElement : grid).insertAdjacentElement('afterend',btn);
+    let compact=false;
+    btn.addEventListener('click',function(){
+      compact=!compact;
+      btn.innerHTML=compact?'<span>▦</span><span>Expandir mês</span>':'<span>▦</span><span>Calendário compacto</span>';
+      grid.classList.toggle('agenda-calendar-compact',compact);
+      const cells=Array.from(grid.children);
+      if(compact){
+        const selected=grid.querySelector('button.bg-blue-700') || grid.querySelector('button[aria-current="date"]');
+        let idx=selected?cells.indexOf(selected):-1;
+        if(idx<0) idx= Math.min(cells.length-1, Math.max(0,new Date().getDate()+new Date(new Date().getFullYear(),new Date().getMonth(),1).getDay()-1));
+        const start=idx-(idx%7);
+        cells.forEach((el,i)=>el.hidden=!(i>=start&&i<start+7));
+      }else{cells.forEach(el=>el.hidden=false);}
+    });
+    const observer=new MutationObserver(()=>{if(compact){compact=false;btn.innerHTML='<span>▦</span><span>Calendário compacto</span>';Array.from(grid.children).forEach(el=>el.hidden=false);}});
+    observer.observe(grid,{childList:true});
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setupCompactCalendar); else setupCompactCalendar();
+  setTimeout(setupCompactCalendar,500);
 })();
 </script>
 
