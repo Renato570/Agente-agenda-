@@ -1082,6 +1082,37 @@ body.dark-mode #anthroSection .bg-slate-100,
 body.auto-theme #anthroSection .bg-slate-100 { background:#1b2638 !important; color:#e5edf7 !important; }
 </style>
 
+
+<style id="agendasaude-refresh-2026">
+:root{--agenda-primary:#1769aa;--agenda-primary-soft:#eaf4fc;--agenda-border:#e2e8f0;--agenda-text:#1e293b;--agenda-muted:#94a3b8}
+body{background:#f4f7fb!important;color:var(--agenda-text)}
+header{padding:8px 14px!important;background:linear-gradient(115deg,#174d7a,#287db8)!important;box-shadow:0 2px 10px rgba(15,23,42,.10)!important}
+header h1{font-size:15px!important;letter-spacing:-.2px}
+header .lucide{width:19px!important;height:19px!important}
+#agendaSection aside{border-radius:16px!important;box-shadow:0 4px 18px rgba(15,23,42,.055)!important;border-color:#e7edf4!important}
+#calDaysGrid{row-gap:5px!important}
+#calDaysGrid button{width:36px!important;height:36px!important;border-radius:11px!important;transition:background .15s ease,transform .15s ease!important}
+#calDaysGrid button:active{transform:scale(.94)}
+.calendar-day-event::after{width:16px;height:3px;bottom:3px;border-radius:8px;background:#287db8}
+.calendar-legend{gap:8px 10px!important;font-size:10px!important}
+#agendaSection .agenda-action-row{gap:7px!important}
+#agendaSection .agenda-action-row>button{border-radius:11px!important;box-shadow:none!important;transition:transform .15s ease,box-shadow .15s ease!important}
+#agendaSection .agenda-action-row>button:active{transform:scale(.98)}
+#agendaSlotsList .agenda-card-toggle{border-radius:12px!important;box-shadow:0 1px 3px rgba(15,23,42,.04)!important;margin-bottom:7px!important}
+#agendaSlotsList .agenda-card-toggle.agenda-available{color:#64748b!important;border:1px solid #e8edf3!important}
+#agendaSlotsList .agenda-card-toggle.agenda-available .text-xs,#agendaSlotsList .agenda-card-toggle.agenda-available .text-sm{color:#94a3b8!important}
+#agendaSlotsList .agenda-card-toggle.agenda-booked{border:1px solid #cfe0fb!important}
+#agendaSlotsList .agenda-card-toggle.agenda-notified{border:1px solid #c8ead8!important}
+button,input,select,textarea{transition:color .15s ease,border-color .15s ease,background-color .15s ease}
+body.dark-mode header{background:linear-gradient(115deg,#102b45,#174d7a)!important}
+body.dark-mode #agendaSection aside{background:#1f2937!important;border-color:#374151!important}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available{background:#1f2937!important;color:#cbd5e1!important;border-color:#374151!important}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available .text-xs,body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-available .text-sm{color:#9ca3af!important}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-booked{background:#172554!important;border-color:#1e40af!important}
+body.dark-mode #agendaSlotsList .agenda-card-toggle.agenda-notified{background:#052e1b!important;border-color:#166534!important}
+@media(max-width:640px){header{padding:7px 12px!important}header h1{font-size:14px!important}#agendaSection aside{padding:10px!important}#calDaysGrid button{width:32px!important;height:32px!important;border-radius:9px!important}#agendaSlotsList .agenda-card-toggle{padding:9px 10px!important}}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
