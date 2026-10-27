@@ -1123,6 +1123,143 @@ body.dark-mode #agendaCompactToggle{background:#1f2937;color:#d1d5db;border-colo
 @media(max-width:640px){header.bg-blue-700{padding:7px 12px!important}header h1{font-size:14px!important}#calDaysGrid button{width:32px!important;height:32px!important;border-radius:9px!important}#agendaSlotsList .agenda-card-toggle{padding:8px 9px!important}}
 </style>
 
+
+<style id="agenda-calendar-colorful-redesign">
+/* Calendário com aparência de calendário de verdade, com estados fáceis de distinguir */
+#agendaSection aside{
+  background:linear-gradient(180deg,#f0f8ff 0%,#ffffff 60%)!important;
+  border:1px solid #c9e2f4!important;
+  border-radius:18px!important;
+  box-shadow:0 8px 24px rgba(16,72,120,.10)!important;
+}
+#calMonthLabel{
+  color:#123b60!important;
+  font-size:15px!important;
+  font-weight:850!important;
+  letter-spacing:-.2px!important;
+}
+#calPrevMonthBtn,#calNextMonthBtn{
+  background:#dceeff!important;
+  color:#155e9a!important;
+  border-radius:10px!important;
+  min-width:34px!important;
+  min-height:34px!important;
+}
+#calDaysGrid{
+  gap:5px!important;
+  margin-top:8px!important;
+}
+#calDaysGrid button.calendar-date{
+  position:relative!important;
+  width:100%!important;
+  max-width:42px!important;
+  height:42px!important;
+  min-height:42px!important;
+  margin:0 auto!important;
+  padding:0!important;
+  border-radius:12px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:13px!important;
+  line-height:1!important;
+  font-weight:750!important;
+  border:1px solid transparent!important;
+  background:#fff!important;
+  color:#24445d!important;
+  box-shadow:0 1px 2px rgba(15,50,80,.05)!important;
+}
+#calDaysGrid button.calendar-date.calendar-future:hover{
+  background:#e5f3ff!important;
+  border-color:#93c5fd!important;
+}
+#calDaysGrid button.calendar-date.calendar-outside{
+  color:#b7c5d0!important;
+  background:#f5f8fb!important;
+  box-shadow:none!important;
+}
+#calDaysGrid button.calendar-date.calendar-past{
+  color:#8293a1!important;
+  background:#edf2f6!important;
+}
+#calDaysGrid button.calendar-date.calendar-booked{
+  background:#dbeafe!important;
+  color:#1d4ed8!important;
+  border-color:#93c5fd!important;
+}
+#calDaysGrid button.calendar-date.calendar-note{
+  background:#ffedd5!important;
+  color:#9a3412!important;
+  border-color:#fdba74!important;
+}
+#calDaysGrid button.calendar-date.calendar-event{
+  background:#ede9fe!important;
+  color:#6d28d9!important;
+  border-color:#c4b5fd!important;
+}
+#calDaysGrid button.calendar-date.calendar-booked.calendar-note{
+  background:linear-gradient(135deg,#dbeafe 0 50%,#ffedd5 50% 100%)!important;
+  color:#173e6c!important;
+}
+#calDaysGrid button.calendar-date.calendar-booked.calendar-event{
+  background:linear-gradient(135deg,#dbeafe 0 50%,#ede9fe 50% 100%)!important;
+  color:#243d83!important;
+}
+#calDaysGrid button.calendar-date.calendar-today:not(.calendar-selected){
+  box-shadow:inset 0 0 0 2px #0891b2!important;
+  font-weight:950!important;
+}
+#calDaysGrid button.calendar-date.calendar-selected{
+  background:#155eaa!important;
+  color:#fff!important;
+  border-color:#0b477f!important;
+  box-shadow:0 4px 10px rgba(21,94,170,.28)!important;
+  transform:translateY(-1px);
+}
+#calDaysGrid button.calendar-date span.relative{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:100%!important;
+  height:100%!important;
+}
+#calDaysGrid button.calendar-date span.relative span{
+  width:5px!important;height:5px!important;border-radius:50%!important;
+  position:absolute!important;bottom:4px!important;left:50%!important;
+  transform:translateX(-50%)!important;margin:0!important;
+}
+#calDaysGrid button.calendar-date.calendar-selected span.relative span{background:#fff!important}
+#calDaysGrid button.calendar-date.calendar-booked span.relative span:first-of-type{background:#2563eb!important}
+#calDaysGrid button.calendar-date.calendar-note span.relative span{background:#ea580c!important}
+#calDaysGrid button.calendar-date.calendar-event span.relative span{background:#7c3aed!important}
+.calendar-legend{
+  background:#fff!important;border:1px solid #d9e8f3!important;border-radius:12px!important;
+  padding:10px!important;gap:8px 12px!important;margin-top:14px!important;color:#29465b!important;
+}
+.calendar-legend-item{font-size:11px!important;font-weight:700!important}
+.calendar-legend-dot.available{background:#fff!important;border:2px solid #9ca3af!important}
+.calendar-legend-dot.booked{background:#60a5fa!important;border-color:#2563eb!important}
+.calendar-legend-dot.notified{background:#facc15!important;border-color:#ca8a04!important}
+.calendar-legend-dot.event{background:#a78bfa!important;border-color:#7c3aed!important}
+.calendar-legend-dot.note{background:#fb923c!important;border-color:#ea580c!important}
+@media(max-width:520px){
+  #agendaSection aside{padding:12px!important;border-radius:16px!important}
+  #calDaysGrid{gap:4px!important;row-gap:5px!important}
+  #calDaysGrid button.calendar-date{max-width:100%!important;width:100%!important;height:38px!important;min-height:38px!important;border-radius:10px!important;font-size:12px!important}
+  .calendar-legend{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+  .calendar-legend-item{font-size:10px!important}
+}
+body.dark-mode #agendaSection aside{background:#17283b!important;border-color:#334d66!important}
+body.dark-mode #calMonthLabel{color:#e0f2fe!important}
+body.dark-mode #calDaysGrid button.calendar-date{background:#26394d!important;color:#dbeafe!important;border-color:#40566b!important}
+body.dark-mode #calDaysGrid button.calendar-date.calendar-booked{background:#1e3a8a!important;color:#dbeafe!important}
+body.dark-mode #calDaysGrid button.calendar-date.calendar-note{background:#7c2d12!important;color:#ffedd5!important}
+body.dark-mode #calDaysGrid button.calendar-date.calendar-event{background:#4c1d95!important;color:#ede9fe!important}
+body.dark-mode #calDaysGrid button.calendar-date.calendar-outside{background:#1b2938!important;color:#65798c!important}
+body.dark-mode #calDaysGrid button.calendar-date.calendar-selected{background:#1d4ed8!important;color:#fff!important}
+body.dark-mode .calendar-legend{background:#1f2937!important;border-color:#374151!important;color:#e5e7eb!important}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -2313,15 +2450,17 @@ body.dark-mode #agendaCompactToggle{background:#1f2937;color:#d1d5db;border-colo
                 const isSelected = isSameDay(cellDate, agendaCurrentDate);
                 const isPast = cellDate.getTime() < today.getTime() && !isToday;
 
-                let cls = 'text-xs py-1.5 rounded-full transition ';
-                if (!inMonth) cls += 'text-slate-200 hover:bg-slate-50 ';
-                else if (isPast) cls += 'text-slate-300 hover:bg-slate-50 ';
-                else cls += 'text-slate-700 hover:bg-blue-50 ';
-                if (isToday && !isSelected) cls += 'font-bold text-blue-600 ';
-                if (isSelected) cls = 'text-xs py-1.5 rounded-full bg-blue-700 text-white font-bold ';
-                if (hasNotes && !isSelected) cls += ' ring-1 ring-amber-200 ';
+                let cls = 'calendar-date text-xs transition ';
+                if (!inMonth) cls += 'calendar-outside ';
+                else if (isPast) cls += 'calendar-past ';
+                else cls += 'calendar-future ';
+                if (apptStatus.hasScheduled) cls += 'calendar-booked ';
+                if (eventDay) cls += 'calendar-event ';
+                if (hasNotes) cls += 'calendar-note ';
+                if (isToday) cls += 'calendar-today ';
+                if (isSelected) cls += 'calendar-selected ';
 
-                btn.className = cls;
+                btn.className = cls.trim();
                 btn.addEventListener('click', () => {
                     agendaCurrentDate = new Date(cellDate);
                     expandedAgendaTime = null;
