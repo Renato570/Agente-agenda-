@@ -1260,6 +1260,58 @@ body.dark-mode #calDaysGrid button.calendar-date.calendar-selected{background:#1
 body.dark-mode .calendar-legend{background:#1f2937!important;border-color:#374151!important;color:#e5e7eb!important}
 </style>
 
+
+<style id="agenda-calendar-requested-style">
+/* Agenda: dias com consultas em azul mais escuro; pontos separados por profissional. */
+#calDaysGrid button.calendar-date.calendar-booked{
+  background:#174a8b!important;color:#fff!important;border-color:#123d74!important;
+  box-shadow:0 2px 6px rgba(18,61,116,.18)!important;
+}
+#calDaysGrid button.calendar-date.calendar-booked.calendar-today:not(.calendar-selected){
+  box-shadow:inset 0 0 0 2px #62d9ff,0 2px 6px rgba(18,61,116,.18)!important;
+}
+#calDaysGrid button.calendar-date.calendar-booked.calendar-selected{
+  background:#082f62!important;color:#fff!important;border-color:#082f62!important;
+}
+#calDaysGrid button.calendar-date.calendar-event{
+  background:#dcfce7!important;color:#166534!important;border-color:#86efac!important;
+}
+#calDaysGrid button.calendar-date.calendar-event.calendar-selected{
+  background:#166534!important;color:#fff!important;border-color:#14532d!important;
+}
+.calendar-dots{position:absolute;bottom:3px;left:50%;transform:translateX(-50%);display:flex;justify-content:center;align-items:center;gap:2px;min-height:5px;max-width:calc(100% - 4px)}
+.calendar-dots>span{display:inline-block;width:5px;height:5px;min-width:5px;border-radius:50%}
+.calendar-dot-doctor{background:#ef4444}
+.calendar-dot-nurse{background:#f59e0b}
+.calendar-dot-dentist{background:#a78bfa}
+.calendar-dot-mark{background:#15803d}
+.calendar-dot-event{background:#0f766e}
+.calendar-dot-note{background:#f97316}
+#calDaysGrid button.calendar-date.calendar-selected .calendar-dots>span{outline:1px solid #fff8}
+.agenda-date-event-tools{margin:10px 0 4px;padding:10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px}
+#markCalendarEventBtn{width:100%;padding:9px 10px;border-radius:9px;background:#166534;color:#fff;font-size:12px;font-weight:800}
+.agenda-date-event-tools p{font-size:10px;color:#166534;text-align:center;margin:6px 0 0}
+.calendar-legend-dot.doctor{background:#ef4444!important;border-color:#dc2626!important}
+.calendar-legend-dot.nurse{background:#f59e0b!important;border-color:#d97706!important}
+.calendar-legend-dot.dentist{background:#a78bfa!important;border-color:#8b5cf6!important}
+#agendaSection .agenda-action-row{background:#eaf4ff!important;border:1px solid #c9e0ff!important;border-radius:15px!important;padding:10px!important}
+#agendaSection .agenda-action-row>button{border:1px solid #b8d5f6!important;background:#dbeafe!important;color:#174a8b!important;font-weight:750!important}
+#agendaSection .agenda-action-row>button:first-child{background:#174a8b!important;color:#fff!important;border-color:#174a8b!important}
+#agendaSection input,#agendaSection select,#agendaSection textarea{border-color:#bfd7ef!important;background-color:#f8fbff!important}
+body.dark-mode #calDaysGrid button.calendar-date.calendar-booked{background:#123d70!important;color:#f0f9ff!important}
+body.dark-mode #calDaysGrid button.calendar-date.calendar-event{background:#14532d!important;color:#dcfce7!important}
+body.dark-mode .agenda-date-event-tools{background:#123522!important;border-color:#246442!important}
+body.dark-mode .agenda-date-event-tools p{color:#bbf7d0!important}
+body.dark-mode #agendaSection .agenda-action-row{background:#172b42!important;border-color:#304b68!important}
+body.dark-mode #agendaSection .agenda-action-row>button{background:#243d59!important;color:#dbeafe!important;border-color:#3b5b7c!important}
+body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#174a8b!important;color:#fff!important}
+@media(max-width:520px){
+ .calendar-dots{gap:2px;bottom:3px}
+ .calendar-dots>span{width:4px;height:4px;min-width:4px}
+ #markCalendarEventBtn{font-size:11px;padding:9px 6px}
+}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -1497,12 +1549,16 @@ body.dark-mode .calendar-legend{background:#1f2937!important;border-color:#37415
                     <span>D</span><span>S</span><span>T</span><span>Q</span><span>Q</span><span>S</span><span>S</span>
                 </div>
                 <div id="calDaysGrid" class="grid grid-cols-7 gap-y-1 text-center"></div>
+                <div class="agenda-date-event-tools">
+                    <button type="button" id="markCalendarEventBtn">＋ Marcar feriado ou reunião</button>
+                    <p>Verde claro = feriado/reunião</p>
+                </div>
 
                 <div class="mt-5 pt-4 border-t border-slate-100">
                     <p class="text-[10px] font-bold uppercase tracking-wide text-slate-400 mb-2">Legenda</p>
                     <div class="calendar-legend">
                       <span class="calendar-legend-item"><i class="calendar-legend-dot available"></i>Disponível</span>
-                      <span class="calendar-legend-item"><i class="calendar-legend-dot booked"></i>Agendado</span>
+                      <span class="calendar-legend-item"><i class="calendar-legend-dot doctor"></i>Médico</span><span class="calendar-legend-item"><i class="calendar-legend-dot nurse"></i>Enfermeira</span><span class="calendar-legend-item"><i class="calendar-legend-dot dentist"></i>Dentista</span>
                       <span class="calendar-legend-item"><i class="calendar-legend-dot event"></i>Reunião / evento</span>
                       <span class="calendar-legend-item"><i class="calendar-legend-dot note"></i>Anotação</span>
                     </div>
@@ -2415,6 +2471,49 @@ body.dark-mode .calendar-legend{background:#1f2937!important;border-color:#37415
             return { hasScheduled, hasNotified };
         }
 
+        // Marcações por dia inteiro: feriado e reunião. Persistem neste navegador.
+        let calendarDayMarks = {};
+        try { calendarDayMarks = JSON.parse(localStorage.getItem('app_calendar_day_marks') || '{}') || {}; }
+        catch (_) { calendarDayMarks = {}; }
+
+        function saveCalendarDayMarks() {
+            localStorage.setItem('app_calendar_day_marks', JSON.stringify(calendarDayMarks));
+        }
+
+        const markCalendarEventBtn = document.getElementById('markCalendarEventBtn');
+        if (markCalendarEventBtn) {
+            markCalendarEventBtn.addEventListener('click', () => {
+                const key = dateKey(agendaCurrentDate);
+                const existing = calendarDayMarks[key];
+                const choice = prompt(
+                    `Marcar ${formatDate(key)}\\nDigite 1 para Feriado, 2 para Reunião ou 3 para remover a marcação.`,
+                    existing ? '3' : '1'
+                );
+                if (choice === null) return;
+                const normalized = choice.trim();
+                if (normalized === '3') {
+                    if (existing) {
+                        delete calendarDayMarks[key];
+                        saveCalendarDayMarks();
+                        renderCalendar();
+                        showToast('Marcação removida do calendário.');
+                    }
+                    return;
+                }
+                if (normalized !== '1' && normalized !== '2') {
+                    showToast('Escolha 1, 2 ou 3.');
+                    return;
+                }
+                const type = normalized === '1' ? 'Feriado' : 'Reunião';
+                const label = prompt(`Descrição opcional para ${type.toLowerCase()}:`, existing?.label || '');
+                if (label === null) return;
+                calendarDayMarks[key] = { type, label: label.trim() };
+                saveCalendarDayMarks();
+                renderCalendar();
+                showToast(`${type} marcado no calendário.`);
+            });
+        }
+
         function renderCalendar() {
             calMonthLabel.textContent = `${monthNames[calendarViewDate.getMonth()]} - ${calendarViewDate.getFullYear()}`;
             calDaysGrid.innerHTML = '';
@@ -2437,9 +2536,23 @@ body.dark-mode .calendar-legend{background:#1f2937!important;border-color:#37415
                 const hasNotes = dateNotes.length > 0;
                 const apptStatus = getCalendarAppointmentStatus(cellKey);
                 const eventDay = !!(agendaData[cellKey] && Object.values(agendaData[cellKey]).some(profData => Object.values(profData || {}).some(slot => slot && slot.event && slot.event.label)));
-                // No calendário, mostramos apenas: agendado, reunião/evento e anotação.
-                // O status "Avisado" fica somente na agenda, junto ao paciente.
-                const statusDots = `${apptStatus.hasScheduled ? '<span title="Paciente agendado" class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>' : ''}${eventDay ? '<span title="Reunião ou evento" class="w-1.5 h-1.5 rounded-full bg-black"></span>' : ''}${hasNotes ? '<span title="Anotação" class="w-1.5 h-1.5 rounded-full bg-red-500"></span>' : ''}`;
+                const markedDay = !!((calendarDayMarks || {})[cellKey]);
+                // Um pontinho por profissional com pelo menos uma consulta no dia.
+                const professionalDots = AGENDA_PROFESSIONALS.map(prof => {
+                    const profData = (agendaData[cellKey] || {})[prof] || {};
+                    const hasAppointment = agendaSlotTimes.some(time => {
+                        const slot = profData[time];
+                        return !!(slot && slot.name && slot.name.trim());
+                    });
+                    if (!hasAppointment) return '';
+                    const dotClass = prof === 'Médico' ? 'calendar-dot-doctor' :
+                        prof === 'Enfermeira' ? 'calendar-dot-nurse' : 'calendar-dot-dentist';
+                    return `<span title="${prof}" class="${dotClass}"></span>`;
+                }).join('');
+                const dayMark = (calendarDayMarks || {})[cellKey];
+                const markedDayDot = dayMark ? '<span title="' + escapeHtml(dayMark.type + (dayMark.label ? ': ' + dayMark.label : '')) + '" class="calendar-dot-mark"></span>' : '';
+                const noteDot = hasNotes ? '<span title="Anotação" class="calendar-dot-note"></span>' : '';
+                const statusDots = `<span class="calendar-dots">${professionalDots}${markedDayDot}${eventDay ? '<span title="Evento por horário" class="calendar-dot-event"></span>' : ''}${noteDot}</span>`;
                 btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}</span>`;
                 if (hasNotes) {
                     const pendingNotes = dateNotes.filter(n => !n.done).length;
@@ -2455,7 +2568,7 @@ body.dark-mode .calendar-legend{background:#1f2937!important;border-color:#37415
                 else if (isPast) cls += 'calendar-past ';
                 else cls += 'calendar-future ';
                 if (apptStatus.hasScheduled) cls += 'calendar-booked ';
-                if (eventDay) cls += 'calendar-event ';
+                if (eventDay || markedDay) cls += 'calendar-event ';
                 if (hasNotes) cls += 'calendar-note ';
                 if (isToday) cls += 'calendar-today ';
                 if (isSelected) cls += 'calendar-selected ';
@@ -4239,43 +4352,6 @@ body.dark-mode .calendar-legend{background:#1f2937!important;border-color:#37415
     });
 })();
 </script>
-
-
-<script id="agendasaude-compact-calendar">
-(function(){
-  function setupCompactCalendar(){
-    const grid=document.getElementById('calDaysGrid');
-    if(!grid || document.getElementById('agendaCompactToggle')) return;
-    const aside=grid.closest('aside');
-    if(!aside) return;
-    const btn=document.createElement('button');
-    btn.id='agendaCompactToggle';
-    btn.type='button';
-    btn.innerHTML='<span>▦</span><span>Calendário compacto</span>';
-    const monthLabel=document.getElementById('calMonthLabel');
-    (monthLabel && monthLabel.parentElement ? monthLabel.parentElement : grid).insertAdjacentElement('afterend',btn);
-    let compact=false;
-    btn.addEventListener('click',function(){
-      compact=!compact;
-      btn.innerHTML=compact?'<span>▦</span><span>Expandir mês</span>':'<span>▦</span><span>Calendário compacto</span>';
-      grid.classList.toggle('agenda-calendar-compact',compact);
-      const cells=Array.from(grid.children);
-      if(compact){
-        const selected=grid.querySelector('button.bg-blue-700') || grid.querySelector('button[aria-current="date"]');
-        let idx=selected?cells.indexOf(selected):-1;
-        if(idx<0) idx= Math.min(cells.length-1, Math.max(0,new Date().getDate()+new Date(new Date().getFullYear(),new Date().getMonth(),1).getDay()-1));
-        const start=idx-(idx%7);
-        cells.forEach((el,i)=>el.hidden=!(i>=start&&i<start+7));
-      }else{cells.forEach(el=>el.hidden=false);}
-    });
-    const observer=new MutationObserver(()=>{if(compact){compact=false;btn.innerHTML='<span>▦</span><span>Calendário compacto</span>';Array.from(grid.children).forEach(el=>el.hidden=false);}});
-    observer.observe(grid,{childList:true});
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',setupCompactCalendar); else setupCompactCalendar();
-  setTimeout(setupCompactCalendar,500);
-})();
-</script>
-
 </body>
 </html>
 
