@@ -1421,6 +1421,103 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
 }
 </style>
 
+
+<style id="agenda-calendar-priority-polish">
+/* Base calendar tiles: consistent regardless of month boundaries */
+#calDaysGrid button.calendar-date{
+  position:relative!important;
+  overflow:hidden!important;
+  background:#f1f5f9!important;
+  color:#526579!important;
+  border:1px solid #e5edf5!important;
+  box-shadow:none!important;
+}
+#calDaysGrid button.calendar-date.calendar-outside{
+  background:#f1f5f9!important;
+  color:#b7c3d0!important;
+  border-color:#edf1f5!important;
+}
+#calDaysGrid button.calendar-date.calendar-past:not(.calendar-booked):not(.calendar-event):not(.calendar-weekend){
+  background:#f1f5f9!important;color:#9aa8b7!important;
+}
+/* Weekend: subtle rose, only when no higher-priority mark is present */
+#calDaysGrid button.calendar-date.calendar-weekend:not(.calendar-booked):not(.calendar-event){
+  background:#fff1f2!important;
+  color:#be4454!important;
+  border-color:#ffe0e4!important;
+}
+#calDaysGrid button.calendar-date.calendar-weekend.calendar-outside:not(.calendar-booked):not(.calendar-event){
+  background:#f7f1f2!important;color:#c6a6aa!important;border-color:#f3e7e9!important;
+}
+/* Appointment days follow the selected professional's legend color. */
+#calDaysGrid button.calendar-date.calendar-booked:not(.calendar-event){
+  background:#fee2e2!important;color:#b91c1c!important;border-color:#fecaca!important;
+  box-shadow:inset 0 -3px 0 #fca5a5!important;
+}
+#agendaSection[data-prof="Enfermeira"] #calDaysGrid button.calendar-date.calendar-booked:not(.calendar-event){
+  background:#ffedd5!important;color:#c2410c!important;border-color:#fed7aa!important;
+  box-shadow:inset 0 -3px 0 #fdba74!important;
+}
+#agendaSection[data-prof="Dentista"] #calDaysGrid button.calendar-date.calendar-booked:not(.calendar-event){
+  background:#ede9fe!important;color:#6d28d9!important;border-color:#ddd6fe!important;
+  box-shadow:inset 0 -3px 0 #c4b5fd!important;
+}
+/* Multi-professional appointments: small independent dots, one per professional */
+.calendar-dots{
+  position:absolute!important;bottom:3px!important;left:50%!important;transform:translateX(-50%)!important;
+  display:flex!important;justify-content:center!important;align-items:center!important;gap:3px!important;
+  min-height:5px!important;max-width:calc(100% - 4px)!important;
+}
+.calendar-dots>span{display:inline-block!important;width:5px!important;height:5px!important;min-width:5px!important;border-radius:50%!important}
+.calendar-dot-doctor{background:#ef4444!important}
+.calendar-dot-nurse{background:#f59e0b!important}
+.calendar-dot-dentist{background:#8b5cf6!important}
+.calendar-dot-mark{background:#15803d!important}
+.calendar-dot-event{background:#0f766e!important}
+.calendar-dot-note{background:#f97316!important}
+/* Holiday/meeting takes priority over appointments, weekends and today. */
+#calDaysGrid button.calendar-date.calendar-event{
+  background:#dcfce7!important;color:#166534!important;border-color:#86efac!important;
+  box-shadow:inset 0 -3px 0 #86efac!important;
+}
+#calDaysGrid button.calendar-date.calendar-event.calendar-outside{
+  background:#dcfce7!important;color:#166534!important;border-color:#86efac!important;
+}
+/* Today is identified by an outline, never by a dark fill. */
+#calDaysGrid button.calendar-date.calendar-today:not(.calendar-selected){
+  outline:3px solid #0891b2!important;outline-offset:-3px!important;
+}
+#calDaysGrid button.calendar-date.calendar-today.calendar-booked:not(.calendar-event):not(.calendar-selected){
+  outline:3px solid #0891b2!important;outline-offset:-3px!important;
+}
+#calDaysGrid button.calendar-date.calendar-selected{
+  outline:3px solid #1e40af!important;outline-offset:-3px!important;
+  filter:saturate(1.05)!important;
+}
+/* In-month dates remain visually consistent, including the last row. */
+#calDaysGrid button.calendar-date.calendar-future:not(.calendar-booked):not(.calendar-event):not(.calendar-weekend){
+  background:#f1f5f9!important;color:#334155!important;border-color:#edf2f7!important;
+}
+#calDaysGrid button.calendar-date.calendar-outside.calendar-future:not(.calendar-booked):not(.calendar-event){
+  background:#f1f5f9!important;color:#b7c3d0!important;border-color:#edf1f5!important;
+}
+@media(max-width:600px){
+  #calDaysGrid button.calendar-date{border-radius:11px!important}
+  .calendar-dots{gap:2px!important;bottom:3px!important}
+  .calendar-dots>span{width:4px!important;height:4px!important;min-width:4px!important}
+}
+</style>
+
+
+<style id="agenda-calendar-selected-professional-only">
+#calDaysGrid button.calendar-date.calendar-booked:not(.calendar-booked-current):not(.calendar-event){
+  background:#f1f5f9!important;color:#526579!important;border-color:#e5edf5!important;box-shadow:none!important;
+}
+#calDaysGrid button.calendar-date.calendar-booked:not(.calendar-booked-current):not(.calendar-event).calendar-weekend{
+  background:#fff1f2!important;color:#be4454!important;border-color:#ffe0e4!important;
+}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -2595,23 +2692,32 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
 
         function getCalendarAppointmentStatus(dateStr) {
             const dayData = agendaData[dateStr] || {};
+            const professionalsWithAppointments = [];
             let hasScheduled = false;
             let hasNotified = false;
-            let hasAnyScheduled = false;
             AGENDA_PROFESSIONALS.forEach(prof => {
                 const profData = dayData[prof] || {};
-                getAgendaSlotTimes(prof).forEach(time => {
+                const hasAppointment = getAgendaSlotTimes(prof).some(time => {
                     const slot = profData[time];
-                    if (slot && slot.name && slot.name.trim()) {
-                        hasAnyScheduled = true;
-                        if (prof === agendaCurrentProf) {
-                            hasScheduled = true;
-                            if (slot.avisado) hasNotified = true;
-                        }
-                    }
+                    return !!(slot && slot.name && slot.name.trim());
                 });
+                if (hasAppointment) {
+                    professionalsWithAppointments.push(prof);
+                    if (prof === agendaCurrentProf) {
+                        hasScheduled = true;
+                        hasNotified = getAgendaSlotTimes(prof).some(time => {
+                            const slot = profData[time];
+                            return !!(slot && slot.name && slot.name.trim() && slot.avisado);
+                        });
+                    }
+                }
             });
-            return { hasScheduled, hasNotified, hasAnyScheduled };
+            return {
+                hasScheduled,
+                hasNotified,
+                hasAnyScheduled: professionalsWithAppointments.length > 0,
+                professionalsWithAppointments
+            };
         }
 
         // Marcações por dia inteiro: feriado e reunião. Persistem neste navegador.
@@ -2680,8 +2786,17 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
                 const apptStatus = getCalendarAppointmentStatus(cellKey);
                 const eventDay = !!(agendaData[cellKey] && Object.values(agendaData[cellKey]).some(profData => Object.values(profData || {}).some(slot => slot && slot.event && slot.event.label)));
                 const markedDay = !!((calendarDayMarks || {})[cellKey]);
-                // Sem pontinhos no calendário: o destaque visual do dia indica que há agenda.
-                const statusDots = '';
+                // Um ponto independente por profissional com consulta neste dia.
+                const professionalsWithAppointments = apptStatus.professionalsWithAppointments || [];
+                const professionalDots = professionalsWithAppointments.map(prof => {
+                    const dotClass = prof === 'Médico' ? 'calendar-dot-doctor' :
+                        prof === 'Enfermeira' ? 'calendar-dot-nurse' : 'calendar-dot-dentist';
+                    return `<span title="${prof}" class="${dotClass}"></span>`;
+                }).join('');
+                const dayMark = (calendarDayMarks || {})[cellKey];
+                const markedDayDot = dayMark ? '<span title="' + escapeHtml(dayMark.type + (dayMark.label ? ': ' + dayMark.label : '')) + '" class="calendar-dot-mark"></span>' : '';
+                const noteDot = hasNotes ? '<span title="Anotação" class="calendar-dot-note"></span>' : '';
+                const statusDots = `<span class="calendar-dots">${professionalDots}${markedDayDot}${eventDay ? '<span title="Evento por horário" class="calendar-dot-event"></span>' : ''}${noteDot}</span>`;
                 btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}</span>`;
                 if (hasNotes) {
                     const pendingNotes = dateNotes.filter(n => !n.done).length;
@@ -2693,10 +2808,13 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
                 const isPast = cellDate.getTime() < today.getTime() && !isToday;
 
                 let cls = 'calendar-date text-xs transition ';
+                const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
                 if (!inMonth) cls += 'calendar-outside ';
                 else if (isPast) cls += 'calendar-past ';
                 else cls += 'calendar-future ';
-                if (apptStatus.hasScheduled) cls += 'calendar-booked ';
+                if (isWeekend) cls += 'calendar-weekend ';
+                if (apptStatus.hasAnyScheduled) cls += 'calendar-booked ';
+                if (apptStatus.hasScheduled) cls += 'calendar-booked-current ';
                 if (eventDay || markedDay) cls += 'calendar-event ';
                 if (hasNotes) cls += 'calendar-note ';
                 if (isToday) cls += 'calendar-today ';
