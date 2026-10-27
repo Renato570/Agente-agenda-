@@ -1518,7 +1518,16 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
 }
 </style>
 
-</head>
+
+<style id="whatsapp-open-fallback-style">
+#directWaLink:not(.hidden){
+  display:flex!important;align-items:center;justify-content:center;gap:8px;
+  margin-top:10px;padding:11px 14px;border-radius:10px;
+  background:#e8f8ee!important;color:#087443!important;
+  border:1px solid #a7e3bd!important;font-weight:800;text-decoration:none;
+}
+</style>
+\n</head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
     <!-- Header -->
@@ -3488,10 +3497,34 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
         }
 
         function openWhatsApp(link) {
-            // window.open pode ser bloqueado quando o app está instalado como PWA.
-            // Navegação direta é mais confiável no Android e permite ao sistema
-            // entregar o link ao WhatsApp instalado.
-            window.location.href = link;
+            // Abre o WhatsApp a partir do clique do usuário. Em alguns celulares,
+            // window.location.href dentro de um PWA não entrega o link ao app externo.
+            // O clique em um link real costuma funcionar melhor no Android.
+            try {
+                const launchLink = document.createElement('a');
+                launchLink.href = link;
+                launchLink.target = '_blank';
+                launchLink.rel = 'noopener noreferrer';
+                launchLink.style.display = 'none';
+                document.body.appendChild(launchLink);
+                launchLink.click();
+                launchLink.remove();
+
+                // Fallback: se o navegador não abrir uma nova aba/app, tenta
+                // a URL oficial da API de envio do WhatsApp na mesma janela.
+                window.setTimeout(() => {
+                    if (document.visibilityState === 'visible') {
+                        const fallbackUrl = link.replace(
+                            /^https:\/\/wa\.me\//,
+                            'https://api.whatsapp.com/send?phone='
+                        );
+                        window.location.assign(fallbackUrl);
+                    }
+                }, 900);
+            } catch (error) {
+                // Último recurso para navegadores mais restritivos.
+                window.location.assign(link);
+            }
         }
 
         function saveToHistory(msg) {
