@@ -1715,6 +1715,23 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
 }
 </style>
 
+
+<style id="agenda-professional-name-and-add-ui">
+#agendaProfessionalTopbar{border-left:5px solid var(--agenda-professional-color,#2563eb)!important}
+#agendaProfessionalTopbar>label{color:var(--agenda-professional-color,#2563eb)!important}
+.agenda-professional-name-row{display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:10px;align-items:end}
+.agenda-professional-name-row label{grid-column:1/-1;font-size:10px;font-weight:800;letter-spacing:.7px;color:#64748b}
+.agenda-professional-name-row input{width:100%;min-width:0;padding:10px 11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#1e293b;font-size:14px;outline:none}
+.agenda-professional-name-row input:focus{border-color:var(--agenda-professional-color,#2563eb);box-shadow:0 0 0 2px color-mix(in srgb,var(--agenda-professional-color,#2563eb) 18%,transparent)}
+.agenda-professional-name-row button,.agenda-add-professional-btn{border:1px solid color-mix(in srgb,var(--agenda-professional-color,#2563eb) 35%,white);border-radius:10px;padding:10px 12px;font-size:12px;font-weight:800;color:var(--agenda-professional-color,#2563eb);background:#fff;white-space:nowrap}
+.agenda-add-professional-btn{width:100%;margin-top:8px;background:color-mix(in srgb,var(--agenda-professional-color,#2563eb) 8%,white)}
+@media(max-width:420px){
+ .agenda-professional-name-row{grid-template-columns:1fr}
+ .agenda-professional-name-row label{grid-column:auto}
+ .agenda-professional-name-row button{width:100%}
+}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -1946,7 +1963,13 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
                   <option value="Dentista">Dentista</option>
                 </select>
               </div>
-              <p>O calendário e os horários acompanham o profissional selecionado.</p>
+              <div class="agenda-professional-name-row">
+                <label for="agendaProfessionalNameInput">NOME DO PROFISSIONAL</label>
+                <input id="agendaProfessionalNameInput" type="text" placeholder="Ex.: Dra. Maria" autocomplete="name">
+                <button type="button" id="saveAgendaProfessionalNameBtn">Salvar nome</button>
+              </div>
+              <button type="button" id="addAgendaProfessionalBtn" class="agenda-add-professional-btn">＋ Adicionar profissional</button>
+              <p>O calendário e os horários acompanham o profissional selecionado. O nome salvo será usado automaticamente nas mensagens, mas você ainda poderá editá-lo ao preparar cada mensagem.</p>
             </div>
 <aside class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 h-fit lg:sticky lg:top-20">
                 <button id="agendaTodayBtn" class="w-full mb-3 text-xs font-semibold text-blue-700 border border-blue-200 rounded-lg py-2 hover:bg-blue-50 transition">Hoje</button>
@@ -2616,8 +2639,48 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
         const deleteAgendaPatientBtn = document.getElementById('deleteAgendaPatientBtn');
         const cancelAgendaPatientBtn = document.getElementById('cancelAgendaPatientBtn');
 
-        const AGENDA_PROFESSIONALS = ['Médico', 'Enfermeira', 'Dentista'];
+        const AGENDA_DEFAULT_PROFESSIONALS = ['Médico', 'Enfermeira', 'Dentista'];
+        let AGENDA_EXTRA_PROFESSIONALS = [];
+        try {
+            AGENDA_EXTRA_PROFESSIONALS = JSON.parse(localStorage.getItem('agendaExtraProfessionals') || '[]');
+            if (!Array.isArray(AGENDA_EXTRA_PROFESSIONALS)) AGENDA_EXTRA_PROFESSIONALS = [];
+        } catch (_) { AGENDA_EXTRA_PROFESSIONALS = []; }
+        let AGENDA_PROFESSIONALS = [...AGENDA_DEFAULT_PROFESSIONALS, ...AGENDA_EXTRA_PROFESSIONALS.map(p => p.name).filter(Boolean)];
         let agendaCurrentProf = AGENDA_PROFESSIONALS[0];
+        const AGENDA_PROFESSIONAL_NAMES_KEY = 'agendaProfessionalNames';
+        let agendaProfessionalNames = {};
+        try { agendaProfessionalNames = JSON.parse(localStorage.getItem(AGENDA_PROFESSIONAL_NAMES_KEY) || '{}') || {}; } catch (_) { agendaProfessionalNames = {}; }
+        const AGENDA_PROFESSIONAL_COLORS = {
+            'Médico': '#2563eb',
+            'Enfermeira': '#db2777',
+            'Dentista': '#dc2626'
+        };
+        function getProfessionalDisplayName(prof = agendaCurrentProf) {
+            return (agendaProfessionalNames[prof] || '').trim();
+        }
+        function getProfessionalTheme(prof = agendaCurrentProf) {
+            const extra = AGENDA_EXTRA_PROFESSIONALS.find(p => p.name === prof);
+            return (extra && extra.color) || AGENDA_PROFESSIONAL_COLORS[prof] || '#0f766e';
+        }
+        function saveProfessionalNames() {
+            localStorage.setItem(AGENDA_PROFESSIONAL_NAMES_KEY, JSON.stringify(agendaProfessionalNames));
+        }
+        function refreshProfessionalSelects() {
+            ['agendaProfSelectTop', 'agendaProfSelect'].forEach(id => {
+                const select = document.getElementById(id);
+                if (!select) return;
+                const current = select.value || agendaCurrentProf;
+                select.innerHTML = '';
+                AGENDA_PROFESSIONALS.forEach(prof => {
+                    const option = document.createElement('option');
+                    option.value = prof;
+                    const savedName = getProfessionalDisplayName(prof);
+                    option.textContent = savedName ? `${prof} · ${savedName}` : prof;
+                    select.appendChild(option);
+                });
+                if (AGENDA_PROFESSIONALS.includes(current)) select.value = current;
+            });
+        }
 
         const AGENDA_START_HOUR = 9;
         const AGENDA_END_HOUR = 14;
@@ -2875,9 +2938,102 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
         agendaProfSelect.addEventListener('change', () => {
             agendaCurrentProf = agendaProfSelect.value;
             expandedAgendaTime = null;
+            updateProfessionalThemeUI();
+            if (!doctorName.value.trim() || AGENDA_PROFESSIONALS.includes(doctorName.value.trim())) {
+                doctorName.value = getProfessionalDisplayName(agendaCurrentProf);
+            }
             renderAgenda();
             renderCalendar();
         });
+
+        const agendaProfSelectTop = document.getElementById('agendaProfSelectTop');
+        const agendaProfessionalNameInput = document.getElementById('agendaProfessionalNameInput');
+        const saveAgendaProfessionalNameBtn = document.getElementById('saveAgendaProfessionalNameBtn');
+        const addAgendaProfessionalBtn = document.getElementById('addAgendaProfessionalBtn');
+
+        function updateProfessionalThemeUI() {
+            const color = getProfessionalTheme(agendaCurrentProf);
+            const topbar = document.getElementById('agendaProfessionalTopbar');
+            if (topbar) {
+                topbar.style.setProperty('--agenda-professional-color', color);
+                topbar.style.borderLeftColor = color;
+                topbar.style.background = color + '12';
+                topbar.style.borderColor = color + '35';
+            }
+            if (agendaProfessionalNameInput) agendaProfessionalNameInput.value = getProfessionalDisplayName(agendaCurrentProf);
+            if (agendaProfSelectTop && agendaProfSelectTop.value !== agendaCurrentProf) agendaProfSelectTop.value = agendaCurrentProf;
+            const label = document.querySelector('#agendaProfessionalTopbar > label');
+            if (label) label.style.color = color;
+        }
+        function selectAgendaProfessional(prof) {
+            if (!AGENDA_PROFESSIONALS.includes(prof)) return;
+            agendaCurrentProf = prof;
+            if (agendaProfSelectTop) agendaProfSelectTop.value = prof;
+            if (typeof agendaProfSelect !== 'undefined' && agendaProfSelect) agendaProfSelect.value = prof;
+            expandedAgendaTime = null;
+            updateProfessionalThemeUI();
+            renderAgenda();
+            renderCalendar();
+        }
+        if (agendaProfSelectTop) {
+            agendaProfSelectTop.addEventListener('change', () => selectAgendaProfessional(agendaProfSelectTop.value));
+        }
+        if (saveAgendaProfessionalNameBtn) {
+            saveAgendaProfessionalNameBtn.addEventListener('click', () => {
+                const name = agendaProfessionalNameInput.value.trim();
+                if (!name) {
+                    delete agendaProfessionalNames[agendaCurrentProf];
+                } else {
+                    agendaProfessionalNames[agendaCurrentProf] = name;
+                }
+                saveProfessionalNames();
+                refreshProfessionalSelects();
+                selectAgendaProfessional(agendaCurrentProf);
+                showToast(name ? 'Nome do profissional salvo para as mensagens.' : 'Nome salvo removido.');
+            });
+        }
+        if (addAgendaProfessionalBtn) {
+            addAgendaProfessionalBtn.addEventListener('click', () => {
+                const name = prompt('Nome/categoria do novo profissional (ex.: Psicólogo):');
+                if (!name || !name.trim()) return;
+                const cleanName = name.trim();
+                if (AGENDA_PROFESSIONALS.some(p => p.toLocaleLowerCase() === cleanName.toLocaleLowerCase())) {
+                    showToast('Esse profissional já existe.');
+                    return;
+                }
+                const color = prompt('Cor tema em hexadecimal (ex.: #0f766e). Escolha uma cor bem diferente das existentes:','#0f766e');
+                if (!color || !/^#[0-9a-fA-F]{6}$/.test(color.trim())) {
+                    showToast('Cor inválida. Use o formato #RRGGBB.');
+                    return;
+                }
+                AGENDA_EXTRA_PROFESSIONALS.push({name: cleanName, color: color.trim()});
+                localStorage.setItem('agendaExtraProfessionals', JSON.stringify(AGENDA_EXTRA_PROFESSIONALS));
+                // A lista constante não pode ser ampliada em runtime, então atualiza as opções
+                // e registra o novo profissional na lista ativa usada pela agenda.
+                if (!AGENDA_PROFESSIONALS.includes(cleanName)) AGENDA_PROFESSIONALS.push(cleanName);
+                refreshProfessionalSelects();
+                selectAgendaProfessional(cleanName);
+                showToast('Novo calendário criado. Configure o nome e a cor do profissional.');
+            });
+        }
+        refreshProfessionalSelects();
+        updateProfessionalThemeUI();
+
+
+        function applySelectedProfessionalCalendarTheme() {
+            const color = getProfessionalTheme(agendaCurrentProf);
+            const grid = document.getElementById('calDaysGrid');
+            if (!grid) return;
+            grid.querySelectorAll('button.calendar-date').forEach(day => {
+                day.style.setProperty('--selected-professional-color', color);
+                if (day.classList.contains('calendar-booked') && !day.classList.contains('calendar-event')) {
+                    day.style.backgroundColor = color + '25';
+                    day.style.borderColor = color + '75';
+                    day.style.color = color;
+                    day.style.boxShadow = `inset 0 -3px 0 ${color}70`;
+                }
+            });
+        }
 
         function isSameDay(a, b) {
             return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
@@ -3621,6 +3777,11 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
         }
 
         function generateMessage() {
+            // Preenche automaticamente o nome salvo para este calendário, mantendo o campo editável.
+            if (!doctorName.value.trim()) {
+                const savedProfessionalName = getProfessionalDisplayName(agendaCurrentProf);
+                if (savedProfessionalName) doctorName.value = savedProfessionalName;
+            }
             const selectedKey = templateSelect.value;
             const sourceTemplates = isDentistSelected() ? dentistTemplates : templates;
             let templateText = sourceTemplates[selectedKey] || sourceTemplates.padrao;
@@ -3628,7 +3789,7 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
             const nameVal = patientName.value.trim() || '[Nome do Paciente]';
             const dateVal = formatDate(appDate.value) || '[Data]';
             const timeVal = appTime.value || '[Horário]';
-            const doctorVal = doctorName.value.trim() || '[Médico/Profissional]';
+            const doctorVal = doctorName.value.trim() || getProfessionalDisplayName(agendaCurrentProf) || '[Médico/Profissional]';
             const consultVal = consultType.value.trim() || '[Consulta]';
             const attendVal = attendanceType.value;
             const locVal = locationInput.value.trim() || profile.location || 'Unidade de Saúde';
