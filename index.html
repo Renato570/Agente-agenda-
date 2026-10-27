@@ -1602,6 +1602,46 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
 .calendar-dots>span{width:6px!important;height:6px!important;min-width:6px!important}
 </style>
 
+
+<style id="agenda-professional-final-theme-fix">
+/* Tema do calendário por profissional: médico azul, dentista vermelho, enfermeira rosa. */
+#agendaSection[data-prof="Médico"] #calDaysGrid button.calendar-date.calendar-booked-current:not(.calendar-event){
+  background:#dceeff!important;color:#164e8a!important;border-color:#9bc7f2!important;
+  box-shadow:inset 0 -3px 0 #8ab8e8!important;
+}
+#agendaSection[data-prof="Dentista"] #calDaysGrid button.calendar-date.calendar-booked-current:not(.calendar-event){
+  background:#ffe0e0!important;color:#a61b1b!important;border-color:#f2a5a5!important;
+  box-shadow:inset 0 -3px 0 #e98585!important;
+}
+#agendaSection[data-prof="Enfermeira"] #calDaysGrid button.calendar-date.calendar-booked-current:not(.calendar-event){
+  background:#ffe0f0!important;color:#8a1454!important;border-color:#e9a6cc!important;
+  box-shadow:inset 0 -3px 0 #dc83b7!important;
+}
+#agendaProfessionalTopbar[data-prof="Dentista"]{
+  background:#fff1f1!important;border-color:#fecaca!important;border-left-color:#dc2626!important;
+}
+#agendaProfessionalTopbar[data-prof="Dentista"] .agenda-professional-control{border-color:#fca5a5!important}
+#agendaProfessionalTopbar[data-prof="Dentista"] .agenda-professional-control>span,
+#agendaProfessionalTopbar[data-prof="Dentista"]>label{color:#b91c1c!important}
+#agendaProfessionalTopbar[data-prof="Enfermeira"]{
+  background:#fff0f7!important;border-color:#fbcfe8!important;border-left-color:#db2777!important;
+}
+#agendaProfessionalTopbar[data-prof="Enfermeira"] .agenda-professional-control{border-color:#f9a8d4!important}
+#agendaProfessionalTopbar[data-prof="Enfermeira"] .agenda-professional-control>span,
+#agendaProfessionalTopbar[data-prof="Enfermeira"]>label{color:#9d174d!important}
+#agendaProfessionalTopbar[data-prof="Médico"]{
+  background:#eff6ff!important;border-color:#bfdbfe!important;border-left-color:#2563eb!important;
+}
+#agendaProfessionalTopbar[data-prof="Médico"] .agenda-professional-control{border-color:#93c5fd!important}
+#agendaProfessionalTopbar[data-prof="Médico"] .agenda-professional-control>span,
+#agendaProfessionalTopbar[data-prof="Médico"]>label{color:#1d4ed8!important}
+/* A marcação de feriado/reunião tem prioridade sobre a cor do profissional. */
+#calDaysGrid button.calendar-date.calendar-event{
+  background:#dcfce7!important;color:#166534!important;border-color:#86efac!important;
+  box-shadow:inset 0 -3px 0 #86efac!important;
+}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -3572,24 +3612,23 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
         }
 
         function openWhatsApp(link) {
-            // Usa o endpoint oficial de envio do WhatsApp com navegação direta,
-            // acionada pelo clique do usuário, para evitar bloqueio de popup.
+            // A navegação direta para wa.me é acionada pelo clique do usuário,
+            // permitindo que Android/Chrome encaminhem o endereço ao WhatsApp.
             try {
-                const parsed = new URL(link);
+                const parsed = new URL(link, window.location.href);
                 let phone = '';
-                let text = parsed.searchParams.get('text') || '';
-                if (parsed.hostname === 'wa.me') {
-                    phone = parsed.pathname.replace(/\\D/g, '');
+                let message = parsed.searchParams.get('text') || '';
+                if (parsed.hostname.toLowerCase() === 'wa.me') {
+                    phone = parsed.pathname.replace(/\D/g, '');
                 } else {
-                    phone = parsed.searchParams.get('phone') || '';
+                    phone = (parsed.searchParams.get('phone') || '').replace(/\D/g, '');
                 }
                 if (!phone) throw new Error('Número ausente no link');
-                const whatsappUrl = 'https://api.whatsapp.com/send?phone=' +
-                    encodeURIComponent(phone) + '&text=' + encodeURIComponent(text);
-                window.location.href = whatsappUrl;
+                const whatsappUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(message);
+                window.location.assign(whatsappUrl);
             } catch (error) {
-                // Fallback: tenta navegar para o link wa.me original.
-                window.location.href = link;
+                // Fallback para o link original se a URL não puder ser interpretada.
+                window.location.assign(link);
             }
         }
 
@@ -3668,17 +3707,22 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
         templateSelect.addEventListener('change', () => { generateMessage(); updateTemplateDescription(); });
 
         function syncMessageToAgenda() {
-            if (!pendingAgendaSlot) return;
-            const old = pendingAgendaSlot;
             const newDate = appDate.value;
+            const newProf = AGENDA_PROFESSIONALS.includes(professionalCategory.value)
+                ? professionalCategory.value
+                : (agendaCurrentProf || 'Médico');
             const newTime = snapToAgendaSlot(appTime.value, newProf);
-            const newProf = AGENDA_PROFESSIONALS.includes(professionalCategory.value) ? professionalCategory.value : old.prof;
-            if (!newDate || !newTime) return;
 
-            // Se veio de um horário livre/ocupado, remove o registro anterior somente
-            // quando o usuário mudou o destino. Assim não ficam dois pacientes no mesmo horário.
-            if (old.date !== newDate || old.time !== newTime || old.prof !== newProf) {
-                if (agendaData[old.date]?.[old.prof]?.[old.time]) {
+            if (!newDate || !newTime || !patientName.value.trim()) {
+                showToast('Preencha paciente, data e horário para salvar na agenda.');
+                return false;
+            }
+
+            const old = pendingAgendaSlot;
+            if (old && (old.date !== newDate || old.time !== newTime || old.prof !== newProf)) {
+                const oldSlot = agendaData[old.date]?.[old.prof]?.[old.time];
+                // Só remove a reserva antiga se ela pertencia ao mesmo paciente.
+                if (oldSlot && oldSlot.name === patientName.value.trim()) {
                     delete agendaData[old.date][old.prof][old.time];
                 }
             }
@@ -3686,10 +3730,11 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
             if (!agendaData[newDate]) agendaData[newDate] = {};
             if (!agendaData[newDate][newProf]) agendaData[newDate][newProf] = {};
             const existing = agendaData[newDate][newProf][newTime];
+            const samePatient = existing && existing.name &&
+                existing.name.trim().toLocaleLowerCase() === patientName.value.trim().toLocaleLowerCase();
 
-            if (existing && existing.name && existing.name.trim() &&
-                !(old.date === newDate && old.time === newTime && old.prof === newProf)) {
-                showToast('Esse horário já está ocupado.');
+            if (existing && existing.name && existing.name.trim() && !samePatient) {
+                showToast('Esse horário já está ocupado. Escolha outro horário para não substituir outro paciente.');
                 return false;
             }
 
@@ -3697,7 +3742,6 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
                 ...(existing || {}),
                 name: patientName.value.trim(),
                 phone: patientPhone.value.trim(),
-                // Agendar não significa avisar. Só a ação de envio marca como avisado.
                 avisado: existing ? !!existing.avisado : false,
                 tipoHorario: attendanceType.value === 'horário marcado' ? 'marcado' : 'chegada',
                 doctor: doctorName.value.trim(),
@@ -3749,8 +3793,8 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
             const msg = generateMessage();
             if (!syncMessageToAgenda()) return;
             const normalizedPhone = normalizeWhatsAppPhone(patientPhone.value);
-            if (!normalizedPhone || normalizedPhone.length < 10) {
-                showToast('Telefone inválido. Informe DDD + número.');
+            if (!normalizedPhone || ![12, 13].includes(normalizedPhone.length) || !normalizedPhone.startsWith('55')) {
+                showToast('Telefone inválido. Informe DDD + número, com código do Brasil.');
                 patientPhone.focus();
                 return;
             }
@@ -3778,7 +3822,7 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
             if (!syncMessageToAgenda()) return;
             const msg = generateMessage();
             const normalizedPhone = normalizeWhatsAppPhone(myPhone);
-            if (!normalizedPhone || normalizedPhone.length < 12) {
+            if (!normalizedPhone || ![12, 13].includes(normalizedPhone.length) || !normalizedPhone.startsWith('55')) {
                 showToast('Seu número precisa incluir DDD e número com código do Brasil.');
                 settingsModal.classList.remove('hidden');
                 settingsModal.classList.add('flex');
