@@ -1312,6 +1312,42 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
 }
 </style>
 
+
+<style id="agenda-professional-clean-layout">
+/* Layout refinado: hierarquia simples, poucos tons e controles claros */
+#agendaProfessionalTopbar{margin:12px 0 14px;padding:14px 16px;background:#f4f8fc;border:1px solid #d9e4ef;border-radius:16px;box-shadow:0 3px 10px rgba(24,55,85,.04)}
+#agendaProfessionalTopbar>label{display:block;font-size:10px;font-weight:850;letter-spacing:1.1px;color:#53677b;margin-bottom:8px}
+.agenda-professional-control{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #cbd8e6;border-radius:11px;padding:0 12px;min-height:48px;color:#1d4e89}
+#agendaProfessionalTopbar select{width:100%;border:0;outline:0;background:transparent;color:#193b5b;font-weight:800;font-size:15px;min-height:46px}
+#agendaProfessionalTopbar p{font-size:11px;color:#6b7f92;margin:7px 0 0}
+#agendaSection #agendaProfSelect{display:none!important}
+#agendaSection .bg-white.rounded-xl.shadow-sm.border.border-slate-200.overflow-hidden{border:1px solid #dbe5ef!important;border-radius:17px!important;box-shadow:0 5px 20px rgba(20,55,90,.06)!important}
+#agendaSection .calendar-legend{background:#f8fafc!important;border:1px solid #e2e8f0!important;border-radius:12px!important}
+#agendaSection .calendar-legend-item{font-size:11px!important;color:#475569!important}
+#agendaSection .agenda-date-event-tools{background:#f0fdf4!important;border-color:#bbf7d0!important}
+#agendaSection .agenda-date-event-tools p{color:#166534!important}
+#agendaSection .agenda-action-row{background:#f8fafc!important;border:1px solid #e2e8f0!important;border-radius:12px!important;padding:8px!important}
+#agendaSection .agenda-action-row button{box-shadow:none!important}
+#agendaSection input,#agendaSection textarea,#agendaSection select:not(#agendaProfSelect){border-color:#cbd5e1!important;border-radius:10px!important}
+#calDaysGrid button.calendar-date{box-shadow:none!important;border-radius:10px!important}
+#calDaysGrid button.calendar-date.calendar-booked{background:#174a7e!important;border-color:#174a7e!important;color:#fff!important}
+#calDaysGrid button.calendar-date.calendar-event{background:#dcfce7!important;border-color:#86efac!important;color:#166534!important}
+#calDaysGrid button.calendar-date.calendar-selected{background:#0f3764!important;border-color:#0f3764!important;color:#fff!important}
+#calDaysGrid button.calendar-date.calendar-outside{background:#f8fafc!important;color:#cbd5e1!important}
+#calDaysGrid button.calendar-date.calendar-past:not(.calendar-booked):not(.calendar-event){background:#f1f5f9!important;color:#94a3b8!important}
+#calDaysGrid button.calendar-date.calendar-today:not(.calendar-selected){outline:2px solid #60a5fa!important;outline-offset:-2px!important}
+body.dark-mode #agendaProfessionalTopbar{background:#172538!important;border-color:#34445c!important}
+body.dark-mode #agendaProfessionalTopbar>label,body.dark-mode #agendaProfessionalTopbar p{color:#aeb9ca!important}
+body.dark-mode .agenda-professional-control{background:#101827!important;border-color:#34445c!important}
+body.dark-mode #agendaProfessionalTopbar select{color:#f4f7fb!important}
+@media(max-width:600px){
+ #agendaProfessionalTopbar{padding:12px;margin:8px 0 12px}
+ #agendaProfessionalTopbar select{font-size:14px}
+ #agendaSection .agenda-action-row{justify-content:stretch!important}
+ #agendaSection .agenda-action-row button{flex:1 1 auto}
+}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -1532,7 +1568,20 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
         <div class="grid grid-cols-1 lg:grid-cols-[245px_1fr] gap-4">
 
             <!-- Calendário lateral -->
-            <aside class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 h-fit lg:sticky lg:top-20">
+            
+            <div id="agendaProfessionalTopbar" class="agenda-professional-topbar">
+              <label for="agendaProfSelect">PROFISSIONAL DA AGENDA</label>
+              <div class="agenda-professional-control">
+                <span aria-hidden="true">✚</span>
+                <select id="agendaProfSelectTop" aria-label="Selecionar profissional">
+                  <option value="Médico">Médico</option>
+                  <option value="Enfermeira">Enfermeira</option>
+                  <option value="Dentista">Dentista</option>
+                </select>
+              </div>
+              <p>O calendário e os horários acompanham o profissional selecionado.</p>
+            </div>
+<aside class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 h-fit lg:sticky lg:top-20">
                 <button id="agendaTodayBtn" class="w-full mb-3 text-xs font-semibold text-blue-700 border border-blue-200 rounded-lg py-2 hover:bg-blue-50 transition">Hoje</button>
 
                 <div class="flex items-center justify-between mb-3">
@@ -2206,6 +2255,20 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
         const AGENDA_START_HOUR = 9;
         const AGENDA_END_HOUR = 14;
         const AGENDA_STEP_MIN = 15;
+
+        function getAgendaSlotTimes(prof = agendaCurrentProf) {
+            if (prof === 'Dentista') {
+                const times = [];
+                let minutes = 7 * 60 + 30;
+                const end = 16 * 60 + 30;
+                while (minutes <= end) {
+                    times.push(`${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`);
+                    minutes += 30;
+                }
+                return times;
+            }
+            return agendaSlotTimes;
+        }
         const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
         const weekdayNames = ['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
 
@@ -2239,14 +2302,16 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
             localStorage.setItem('app_agenda', JSON.stringify(agendaData));
         }
 
-        function snapToAgendaSlot(timeStr) {
+        function snapToAgendaSlot(timeStr, prof = agendaCurrentProf) {
             if (!timeStr) return null;
             const [h, m] = timeStr.split(':').map(Number);
             const totalMin = h * 60 + m;
-            const startMin = AGENDA_START_HOUR * 60;
-            const endMin = AGENDA_END_HOUR * 60;
+            const dentist = prof === 'Dentista';
+            const startMin = dentist ? 7 * 60 + 30 : AGENDA_START_HOUR * 60;
+            const endMin = dentist ? 16 * 60 + 30 : AGENDA_END_HOUR * 60;
+            const step = dentist ? 30 : AGENDA_STEP_MIN;
             if (totalMin < startMin || totalMin > endMin) return null;
-            const snappedMin = Math.round((totalMin - startMin) / AGENDA_STEP_MIN) * AGENDA_STEP_MIN + startMin;
+            const snappedMin = Math.round((totalMin - startMin) / step) * step + startMin;
             const sh = Math.floor(snappedMin / 60);
             const sm = snappedMin % 60;
             return `${String(sh).padStart(2, '0')}:${String(sm).padStart(2, '0')}`;
@@ -2279,7 +2344,7 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
             const items = [];
             AGENDA_PROFESSIONALS.forEach(prof => {
                 const profData = dayData[prof] || {};
-                agendaSlotTimes.forEach(time => {
+                getAgendaSlotTimes().forEach(time => {
                     const slot = profData[time];
                     if (slot && slot.name && slot.name.trim()) {
                         items.push({
@@ -2444,6 +2509,7 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
             agendaCurrentProf = agendaProfSelect.value;
             expandedAgendaTime = null;
             renderAgenda();
+            renderCalendar();
         });
 
         function isSameDay(a, b) {
@@ -2458,17 +2524,21 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
             const dayData = agendaData[dateStr] || {};
             let hasScheduled = false;
             let hasNotified = false;
+            let hasAnyScheduled = false;
             AGENDA_PROFESSIONALS.forEach(prof => {
                 const profData = dayData[prof] || {};
-                agendaSlotTimes.forEach(time => {
+                getAgendaSlotTimes(prof).forEach(time => {
                     const slot = profData[time];
                     if (slot && slot.name && slot.name.trim()) {
-                        hasScheduled = true;
-                        if (slot.avisado) hasNotified = true;
+                        hasAnyScheduled = true;
+                        if (prof === agendaCurrentProf) {
+                            hasScheduled = true;
+                            if (slot.avisado) hasNotified = true;
+                        }
                     }
                 });
             });
-            return { hasScheduled, hasNotified };
+            return { hasScheduled, hasNotified, hasAnyScheduled };
         }
 
         // Marcações por dia inteiro: feriado e reunião. Persistem neste navegador.
@@ -2540,7 +2610,7 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
                 // Um pontinho por profissional com pelo menos uma consulta no dia.
                 const professionalDots = AGENDA_PROFESSIONALS.map(prof => {
                     const profData = (agendaData[cellKey] || {})[prof] || {};
-                    const hasAppointment = agendaSlotTimes.some(time => {
+                    const hasAppointment = getAgendaSlotTimes(prof).some(time => {
                         const slot = profData[time];
                         return !!(slot && slot.name && slot.name.trim());
                     });
@@ -2814,7 +2884,7 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
             const color = PROF_COLORS[agendaCurrentProf] || PROF_COLORS['Médico'];
             agendaSlotsList.innerHTML = '';
 
-            agendaSlotTimes.forEach(time => {
+            getAgendaSlotTimes().forEach(time => {
                 const slot = dayData[time] || null;
                 const hasPatient = !!(slot && slot.name && slot.name.trim());
                 const hasEvent = !!(slot && slot.event && slot.event.label);
@@ -2923,7 +2993,7 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
         agendaAddBtn.addEventListener('click', () => {
             const k = dateKey(agendaCurrentDate);
             const dayData = (agendaData[k] && agendaData[k][agendaCurrentProf]) || {};
-            const newTime = agendaSlotTimes.find(t => !dayData[t]);
+            const newTime = getAgendaSlotTimes().find(t => !dayData[t]);
             if (!newTime) {
                 showToast('Não há horários livres neste período.');
                 return;
@@ -3325,7 +3395,7 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
             if (!pendingAgendaSlot) return;
             const old = pendingAgendaSlot;
             const newDate = appDate.value;
-            const newTime = snapToAgendaSlot(appTime.value);
+            const newTime = snapToAgendaSlot(appTime.value, newProf);
             const newProf = AGENDA_PROFESSIONALS.includes(professionalCategory.value) ? professionalCategory.value : old.prof;
             if (!newDate || !newTime) return;
 
@@ -4352,6 +4422,21 @@ body.dark-mode #agendaSection .agenda-action-row>button:first-child{background:#
     });
 })();
 </script>
+
+<script id="agenda-professional-top-sync">
+(function(){
+  const top = document.getElementById('agendaProfSelectTop');
+  const original = document.getElementById('agendaProfSelect');
+  if(!top || !original) return;
+  top.value = original.value || 'Médico';
+  top.addEventListener('change', function(){
+    original.value = top.value;
+    original.dispatchEvent(new Event('change', {bubbles:true}));
+  });
+  original.addEventListener('change', function(){ top.value = original.value; });
+})();
+</script>
+
 </body>
 </html>
 
