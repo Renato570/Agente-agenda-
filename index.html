@@ -1348,6 +1348,79 @@ body.dark-mode #agendaProfessionalTopbar select{color:#f4f7fb!important}
 }
 </style>
 
+
+<style id="agenda-professional-distinction-v2">
+/* Cores por profissional, com distinção visual na barra superior e na agenda diária. */
+#calDaysGrid button.calendar-date.calendar-booked{
+  background:#d9ecff!important;
+  color:#174a7e!important;
+  border:1px solid #9bc9f5!important;
+  box-shadow:inset 0 -3px 0 #8bbff0!important;
+  font-weight:850!important;
+}
+#calDaysGrid button.calendar-date.calendar-booked.calendar-today:not(.calendar-selected){
+  outline:2px solid #0891b2!important;outline-offset:-2px!important;
+}
+#calDaysGrid button.calendar-date.calendar-selected{
+  background:#2463a6!important;color:#fff!important;border-color:#1e5592!important;
+}
+#calDaysGrid button.calendar-date.calendar-event{
+  background:#dcfce7!important;color:#166534!important;border-color:#86efac!important;
+  box-shadow:inset 0 -3px 0 #86efac!important;
+}
+#calDaysGrid button.calendar-date.calendar-event.calendar-selected{
+  background:#166534!important;color:#fff!important;border-color:#14532d!important;
+}
+/* Identidade do profissional sempre visível no topo */
+#agendaProfessionalTopbar{
+  position:relative!important;
+  border-width:1px 1px 1px 6px!important;
+  transition:background .18s ease,border-color .18s ease!important;
+}
+#agendaProfessionalTopbar[data-prof="Médico"]{
+  background:#eff6ff!important;border-color:#bfdbfe!important;border-left-color:#2563eb!important;
+}
+#agendaProfessionalTopbar[data-prof="Enfermeira"]{
+  background:#ecfdf5!important;border-color:#a7f3d0!important;border-left-color:#0f9f75!important;
+}
+#agendaProfessionalTopbar[data-prof="Dentista"]{
+  background:#f5f3ff!important;border-color:#ddd6fe!important;border-left-color:#7c3aed!important;
+}
+#agendaProfessionalTopbar[data-prof="Médico"] .agenda-professional-control{border-color:#93c5fd!important;background:#fff!important}
+#agendaProfessionalTopbar[data-prof="Enfermeira"] .agenda-professional-control{border-color:#6ee7b7!important;background:#fff!important}
+#agendaProfessionalTopbar[data-prof="Dentista"] .agenda-professional-control{border-color:#c4b5fd!important;background:#fff!important}
+#agendaProfessionalTopbar[data-prof="Médico"] .agenda-professional-control>span{color:#2563eb!important}
+#agendaProfessionalTopbar[data-prof="Enfermeira"] .agenda-professional-control>span{color:#0f9f75!important}
+#agendaProfessionalTopbar[data-prof="Dentista"] .agenda-professional-control>span{color:#7c3aed!important}
+#agendaProfessionalTopbar[data-prof="Médico"] label{color:#1d4ed8!important}
+#agendaProfessionalTopbar[data-prof="Enfermeira"] label{color:#047857!important}
+#agendaProfessionalTopbar[data-prof="Dentista"] label{color:#6d28d9!important}
+/* Faixa colorida na área da agenda para reduzir trocas acidentais de profissional */
+#agendaSection[data-prof="Médico"] #agendaProfessionalTopbar{border-left-color:#2563eb!important}
+#agendaSection[data-prof="Enfermeira"] #agendaProfessionalTopbar{border-left-color:#0f9f75!important}
+#agendaSection[data-prof="Dentista"] #agendaProfessionalTopbar{border-left-color:#7c3aed!important}
+#agendaSection .agenda-professional-badge{
+  display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:9px;
+  font-size:11px;font-weight:850;letter-spacing:.25px;margin:0 0 10px;
+}
+#agendaSection[data-prof="Médico"] .agenda-professional-badge{background:#dbeafe;color:#1d4ed8}
+#agendaSection[data-prof="Enfermeira"] .agenda-professional-badge{background:#d1fae5;color:#047857}
+#agendaSection[data-prof="Dentista"] .agenda-professional-badge{background:#ede9fe;color:#6d28d9}
+#agendaSection .agenda-professional-badge::before{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+body.dark-mode #calDaysGrid button.calendar-date.calendar-booked{background:#234d76!important;color:#e0f2fe!important;border-color:#4e83b2!important}
+body.dark-mode #agendaProfessionalTopbar[data-prof="Médico"]{background:#172c47!important;border-color:#304a6b!important;border-left-color:#60a5fa!important}
+body.dark-mode #agendaProfessionalTopbar[data-prof="Enfermeira"]{background:#12352e!important;border-color:#265a4d!important;border-left-color:#34d399!important}
+body.dark-mode #agendaProfessionalTopbar[data-prof="Dentista"]{background:#2c2347!important;border-color:#4a3b70!important;border-left-color:#a78bfa!important}
+body.dark-mode #agendaProfessionalTopbar select{color:#f4f7fb!important}
+body.dark-mode #agendaSection[data-prof="Médico"] .agenda-professional-badge{background:#1e3a5f;color:#bfdbfe}
+body.dark-mode #agendaSection[data-prof="Enfermeira"] .agenda-professional-badge{background:#123d32;color:#a7f3d0}
+body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{background:#35255b;color:#ddd6fe}
+@media(max-width:600px){
+  #agendaProfessionalTopbar{border-radius:14px!important}
+  #calDaysGrid button.calendar-date.calendar-booked{box-shadow:inset 0 -2px 0 #8bbff0!important}
+}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -2607,22 +2680,8 @@ body.dark-mode #agendaProfessionalTopbar select{color:#f4f7fb!important}
                 const apptStatus = getCalendarAppointmentStatus(cellKey);
                 const eventDay = !!(agendaData[cellKey] && Object.values(agendaData[cellKey]).some(profData => Object.values(profData || {}).some(slot => slot && slot.event && slot.event.label)));
                 const markedDay = !!((calendarDayMarks || {})[cellKey]);
-                // Um pontinho por profissional com pelo menos uma consulta no dia.
-                const professionalDots = AGENDA_PROFESSIONALS.map(prof => {
-                    const profData = (agendaData[cellKey] || {})[prof] || {};
-                    const hasAppointment = getAgendaSlotTimes(prof).some(time => {
-                        const slot = profData[time];
-                        return !!(slot && slot.name && slot.name.trim());
-                    });
-                    if (!hasAppointment) return '';
-                    const dotClass = prof === 'Médico' ? 'calendar-dot-doctor' :
-                        prof === 'Enfermeira' ? 'calendar-dot-nurse' : 'calendar-dot-dentist';
-                    return `<span title="${prof}" class="${dotClass}"></span>`;
-                }).join('');
-                const dayMark = (calendarDayMarks || {})[cellKey];
-                const markedDayDot = dayMark ? '<span title="' + escapeHtml(dayMark.type + (dayMark.label ? ': ' + dayMark.label : '')) + '" class="calendar-dot-mark"></span>' : '';
-                const noteDot = hasNotes ? '<span title="Anotação" class="calendar-dot-note"></span>' : '';
-                const statusDots = `<span class="calendar-dots">${professionalDots}${markedDayDot}${eventDay ? '<span title="Evento por horário" class="calendar-dot-event"></span>' : ''}${noteDot}</span>`;
+                // Sem pontinhos no calendário: o destaque visual do dia indica que há agenda.
+                const statusDots = '';
                 btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}</span>`;
                 if (hasNotes) {
                     const pendingNotes = dateNotes.filter(n => !n.done).length;
@@ -4428,12 +4487,43 @@ body.dark-mode #agendaProfessionalTopbar select{color:#f4f7fb!important}
   const top = document.getElementById('agendaProfSelectTop');
   const original = document.getElementById('agendaProfSelect');
   if(!top || !original) return;
-  top.value = original.value || 'Médico';
+  function applyProfessionalStyle(){
+    const prof = original.value || 'Médico';
+    top.value = prof;
+    const bar = document.getElementById('agendaProfessionalTopbar');
+    const section = document.getElementById('agendaSection');
+    if(bar) bar.dataset.prof = prof;
+    if(section) section.dataset.prof = prof;
+  }
+  applyProfessionalStyle();
   top.addEventListener('change', function(){
     original.value = top.value;
     original.dispatchEvent(new Event('change', {bubbles:true}));
+    applyProfessionalStyle();
   });
-  original.addEventListener('change', function(){ top.value = original.value; });
+  original.addEventListener('change', applyProfessionalStyle);
+})();
+</script>
+
+
+<script id="agenda-professional-badge-sync">
+(function(){
+  const section=document.getElementById('agendaSection');
+  const top=document.getElementById('agendaProfSelectTop');
+  if(!section||!top) return;
+  function syncBadge(){
+    const prof=top.value||'Médico';
+    section.dataset.prof=prof;
+    const heading=Array.from(section.querySelectorAll('h1,h2,h3')).find(el=>/Agenda de (Médico|Enfermeira|Dentista)/i.test(el.textContent||''));
+    if(!heading) return;
+    let badge=section.querySelector('.agenda-professional-badge');
+    if(!badge){badge=document.createElement('div');badge.className='agenda-professional-badge';heading.parentNode.insertBefore(badge,heading);}
+    badge.textContent='Agenda de '+prof;
+  }
+  top.addEventListener('change',()=>setTimeout(syncBadge,50));
+  const observer=new MutationObserver(syncBadge);
+  observer.observe(section,{subtree:true,childList:true,characterData:true});
+  syncBadge();
 })();
 </script>
 
