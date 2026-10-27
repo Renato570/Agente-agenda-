@@ -1642,6 +1642,79 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
 }
 </style>
 
+
+<style id="agenda-final-calendar-theme-cleanup">
+/* Tema do seletor: a faixa lateral e os detalhes usam a mesma cor do profissional. */
+#agendaProfessionalTopbar[data-prof="Médico"]{
+  border-left-color:#2563eb!important;
+}
+#agendaProfessionalTopbar[data-prof="Dentista"]{
+  border-left-color:#dc2626!important;
+}
+#agendaProfessionalTopbar[data-prof="Enfermeira"]{
+  border-left-color:#db2777!important;
+}
+/* Remover completamente os pontos sob os números do calendário. */
+#calDaysGrid .calendar-dots,
+#calDaysGrid .calendar-dots *,
+#calDaysGrid .calendar-date .calendar-dot-doctor,
+#calDaysGrid .calendar-date .calendar-dot-nurse,
+#calDaysGrid .calendar-date .calendar-dot-dentist,
+#calDaysGrid .calendar-date .calendar-dot-mark,
+#calDaysGrid .calendar-date .calendar-dot-event,
+#calDaysGrid .calendar-date .calendar-dot-note{
+  display:none!important;
+}
+/* Médico: calendário azul, consultas em azul claro. */
+#agendaSection[data-prof="Médico"] #calDaysGrid button.calendar-date:not(.calendar-event):not(.calendar-weekend){
+  border-color:#d4e5f8!important;
+}
+#agendaSection[data-prof="Médico"] #calDaysGrid button.calendar-date.calendar-booked:not(.calendar-event){
+  background:#dceeff!important;color:#164e8a!important;border-color:#9bc7f2!important;
+  box-shadow:inset 0 -3px 0 #8ab8e8!important;
+}
+#agendaSection[data-prof="Médico"] #calDaysGrid button.calendar-date.calendar-selected:not(.calendar-event){
+  outline:3px solid #2563eb!important;outline-offset:-3px!important;
+}
+/* Dentista: calendário inteiro vermelho, consultas em vermelho mais claro. */
+#agendaSection[data-prof="Dentista"] #calDaysGrid button.calendar-date:not(.calendar-event):not(.calendar-weekend){
+  background:#fff7f7!important;color:#563333!important;border-color:#f1cccc!important;
+}
+#agendaSection[data-prof="Dentista"] #calDaysGrid button.calendar-date.calendar-booked:not(.calendar-event){
+  background:#ffdede!important;color:#991b1b!important;border-color:#ef9a9a!important;
+  box-shadow:inset 0 -3px 0 #e87979!important;
+}
+#agendaSection[data-prof="Dentista"] #calDaysGrid button.calendar-date.calendar-selected:not(.calendar-event){
+  outline:3px solid #dc2626!important;outline-offset:-3px!important;
+}
+/* Enfermeira: calendário rosa, consultas em rosa mais claro. */
+#agendaSection[data-prof="Enfermeira"] #calDaysGrid button.calendar-date:not(.calendar-event):not(.calendar-weekend){
+  background:#fff6fb!important;color:#6f234b!important;border-color:#f0c9df!important;
+}
+#agendaSection[data-prof="Enfermeira"] #calDaysGrid button.calendar-date.calendar-booked:not(.calendar-event){
+  background:#ffdced!important;color:#861653!important;border-color:#e9a0c7!important;
+  box-shadow:inset 0 -3px 0 #d978ad!important;
+}
+#agendaSection[data-prof="Enfermeira"] #calDaysGrid button.calendar-date.calendar-selected:not(.calendar-event){
+  outline:3px solid #db2777!important;outline-offset:-3px!important;
+}
+/* Datas fora do mês ficam cinza; feriados/reuniões mantêm verde prioritário. */
+#calDaysGrid button.calendar-date.calendar-outside:not(.calendar-event){
+  background:#f1f5f9!important;color:#b7c3d0!important;border-color:#e8edf3!important;
+  box-shadow:none!important;
+}
+#calDaysGrid button.calendar-date.calendar-event{
+  background:#dcfce7!important;color:#166534!important;border-color:#86efac!important;
+  box-shadow:inset 0 -3px 0 #86efac!important;
+}
+#calDaysGrid button.calendar-date.calendar-today:not(.calendar-selected){
+  outline:3px solid #0891b2!important;outline-offset:-3px!important;
+}
+#calDaysGrid button.calendar-date.calendar-weekend:not(.calendar-booked):not(.calendar-event):not(.calendar-outside){
+  background:#fff1f2!important;color:#be4454!important;border-color:#ffe0e4!important;
+}
+</style>
+
 </head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
@@ -2920,8 +2993,8 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
                 const dayMark = (calendarDayMarks || {})[cellKey];
                 const markedDayDot = dayMark ? '<span title="' + escapeHtml(dayMark.type + (dayMark.label ? ': ' + dayMark.label : '')) + '" class="calendar-dot-mark"></span>' : '';
                 const noteDot = hasNotes ? '<span title="Anotação" class="calendar-dot-note"></span>' : '';
-                const statusDots = `<span class="calendar-dots">${professionalDots}${markedDayDot}${eventDay ? '<span title="Evento por horário" class="calendar-dot-event"></span>' : ''}${noteDot}</span>`;
-                btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}${statusDots}</span>`;
+                const statusDots = '';
+                btn.innerHTML = `<span class="relative inline-flex items-center justify-center w-full">${cellDate.getDate()}</span>`;
                 if (hasNotes) {
                     const pendingNotes = dateNotes.filter(n => !n.done).length;
                     btn.title = `${dateNotes.length} anotação(ões)${pendingNotes ? ` • ${pendingNotes} pendente(s)` : ' • concluídas'}`;
