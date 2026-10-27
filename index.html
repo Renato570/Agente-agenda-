@@ -1527,7 +1527,82 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
   border:1px solid #a7e3bd!important;font-weight:800;text-decoration:none;
 }
 </style>
-\n</head>
+
+<style id="agenda-professional-calendar-themes">
+/* Tema do calendário conforme profissional selecionado: azul, vermelho e rosa bem distintos. */
+#agendaSection[data-prof="Médico"] #calDaysGrid button.calendar-date:not(.calendar-event){
+  border-color:#d4e5f8!important;
+}
+#agendaSection[data-prof="Médico"] #calDaysGrid button.calendar-date.calendar-booked-current:not(.calendar-event){
+  background:#dceeff!important;color:#164e8a!important;border-color:#9bc7f2!important;
+  box-shadow:inset 0 -3px 0 #8ab8e8!important;
+}
+#agendaSection[data-prof="Médico"] #calDaysGrid button.calendar-date.calendar-selected:not(.calendar-event){
+  outline:3px solid #2563eb!important;outline-offset:-3px!important;
+}
+#agendaSection[data-prof="Médico"] #calDaysGrid .calendar-weekday,
+#agendaSection[data-prof="Médico"] #calDaysGrid .weekday-label{color:#2563eb!important}
+
+#agendaSection[data-prof="Dentista"] #calDaysGrid button.calendar-date:not(.calendar-event){
+  border-color:#f3caca!important;
+}
+#agendaSection[data-prof="Dentista"] #calDaysGrid button.calendar-date.calendar-booked-current:not(.calendar-event){
+  background:#ffe0e0!important;color:#a61b1b!important;border-color:#f2a5a5!important;
+  box-shadow:inset 0 -3px 0 #e98585!important;
+}
+#agendaSection[data-prof="Dentista"] #calDaysGrid button.calendar-date.calendar-selected:not(.calendar-event){
+  outline:3px solid #c62828!important;outline-offset:-3px!important;
+}
+
+#agendaSection[data-prof="Enfermeira"] #calDaysGrid button.calendar-date:not(.calendar-event){
+  border-color:#f2cfe2!important;
+}
+#agendaSection[data-prof="Enfermeira"] #calDaysGrid button.calendar-date.calendar-booked-current:not(.calendar-event){
+  background:#ffe0f0!important;color:#8a1454!important;border-color:#e9a6cc!important;
+  box-shadow:inset 0 -3px 0 #dc83b7!important;
+}
+#agendaSection[data-prof="Enfermeira"] #calDaysGrid button.calendar-date.calendar-selected:not(.calendar-event){
+  outline:3px solid #c0267a!important;outline-offset:-3px!important;
+}
+
+/* Datas de outro mês ficam sempre cinza, evitando texto preto ou confusão com o tema. */
+#calDaysGrid button.calendar-date.calendar-outside:not(.calendar-event){
+  background:#f1f5f9!important;color:#b7c3d0!important;border-color:#edf1f5!important;
+  box-shadow:none!important;
+}
+/* Prioridade máxima: feriado/reunião continua verde independentemente do tema. */
+#calDaysGrid button.calendar-date.calendar-event{
+  background:#dcfce7!important;color:#166534!important;border-color:#86efac!important;
+  box-shadow:inset 0 -3px 0 #86efac!important;
+}
+#calDaysGrid button.calendar-date.calendar-event.calendar-selected{
+  outline:3px solid #15803d!important;outline-offset:-3px!important;
+}
+/* O dia atual recebe contorno, não fundo escuro. */
+#calDaysGrid button.calendar-date.calendar-today:not(.calendar-selected){
+  outline:3px solid #0891b2!important;outline-offset:-3px!important;
+}
+/* Fim de semana só aparece em rosa suave quando não houver consulta/evento prioritário. */
+#calDaysGrid button.calendar-date.calendar-weekend:not(.calendar-booked-current):not(.calendar-event):not(.calendar-outside){
+  background:#fff1f2!important;color:#be4454!important;border-color:#ffe0e4!important;
+}
+@media(max-width:600px){
+  #calDaysGrid button.calendar-date{border-radius:11px!important}
+}
+</style>
+
+
+<style id="agenda-professional-dot-contrast">
+/* Os pontos continuam seguindo a legenda original, independentes do tema do calendário. */
+.calendar-dot-doctor{background:#ef4444!important;border:1px solid #b91c1c!important}
+.calendar-dot-nurse{background:#f59e0b!important;border:1px solid #b45309!important}
+.calendar-dot-dentist{background:#8b5cf6!important;border:1px solid #6d28d9!important}
+.calendar-dot-mark{background:#15803d!important;border:1px solid #14532d!important}
+.calendar-dot-event{background:#0f766e!important;border:1px solid #134e4a!important}
+.calendar-dots>span{width:6px!important;height:6px!important;min-width:6px!important}
+</style>
+
+</head>
 <body class="bg-slate-100 min-h-screen font-sans text-slate-800">
 
     <!-- Header -->
@@ -3497,33 +3572,24 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
         }
 
         function openWhatsApp(link) {
-            // Abre o WhatsApp a partir do clique do usuário. Em alguns celulares,
-            // window.location.href dentro de um PWA não entrega o link ao app externo.
-            // O clique em um link real costuma funcionar melhor no Android.
+            // Usa o endpoint oficial de envio do WhatsApp com navegação direta,
+            // acionada pelo clique do usuário, para evitar bloqueio de popup.
             try {
-                const launchLink = document.createElement('a');
-                launchLink.href = link;
-                launchLink.target = '_blank';
-                launchLink.rel = 'noopener noreferrer';
-                launchLink.style.display = 'none';
-                document.body.appendChild(launchLink);
-                launchLink.click();
-                launchLink.remove();
-
-                // Fallback: se o navegador não abrir uma nova aba/app, tenta
-                // a URL oficial da API de envio do WhatsApp na mesma janela.
-                window.setTimeout(() => {
-                    if (document.visibilityState === 'visible') {
-                        const fallbackUrl = link.replace(
-                            /^https:\/\/wa\.me\//,
-                            'https://api.whatsapp.com/send?phone='
-                        );
-                        window.location.assign(fallbackUrl);
-                    }
-                }, 900);
+                const parsed = new URL(link);
+                let phone = '';
+                let text = parsed.searchParams.get('text') || '';
+                if (parsed.hostname === 'wa.me') {
+                    phone = parsed.pathname.replace(/\\D/g, '');
+                } else {
+                    phone = parsed.searchParams.get('phone') || '';
+                }
+                if (!phone) throw new Error('Número ausente no link');
+                const whatsappUrl = 'https://api.whatsapp.com/send?phone=' +
+                    encodeURIComponent(phone) + '&text=' + encodeURIComponent(text);
+                window.location.href = whatsappUrl;
             } catch (error) {
-                // Último recurso para navegadores mais restritivos.
-                window.location.assign(link);
+                // Fallback: tenta navegar para o link wa.me original.
+                window.location.href = link;
             }
         }
 
@@ -3699,18 +3765,32 @@ body.dark-mode #agendaSection[data-prof="Dentista"] .agenda-professional-badge{b
             showToast('Paciente agendado e abrindo WhatsApp...');
         });
 
-        // Send copy to self
+        // Enviar cópia para o próprio número e manter o paciente na agenda.
         sendToSelfBtn.addEventListener('click', () => {
+            if (!validateForm()) return;
             if (!myPhone) {
                 showToast('Cadastre seu número primeiro (botão no topo)');
                 settingsModal.classList.remove('hidden');
                 settingsModal.classList.add('flex');
                 return;
             }
+            // Salva/atualiza o paciente na agenda antes de abrir o WhatsApp.
+            if (!syncMessageToAgenda()) return;
             const msg = generateMessage();
-            const link = buildWaLink(myPhone, msg);
+            const normalizedPhone = normalizeWhatsAppPhone(myPhone);
+            if (!normalizedPhone || normalizedPhone.length < 12) {
+                showToast('Seu número precisa incluir DDD e número com código do Brasil.');
+                settingsModal.classList.remove('hidden');
+                settingsModal.classList.add('flex');
+                return;
+            }
+            const link = buildWaLink(normalizedPhone, msg);
+            directWaLink.href = link;
+            directWaLink.classList.remove('hidden');
+            saveToHistory(msg);
+            renderAgenda();
             openWhatsApp(link);
-            showToast('Abrindo seu WhatsApp...');
+            showToast('Paciente salvo na agenda. Abrindo WhatsApp...');
         });
 
         // Copy text only
